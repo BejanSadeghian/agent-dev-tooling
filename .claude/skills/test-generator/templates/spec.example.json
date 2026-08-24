@@ -1,0 +1,15 @@
+{
+  "name": "users",
+  "fields": [
+    { "name": "id", "type": "uuid" },
+    { "name": "full_name", "type": "name" },
+    { "name": "email", "type": "email", "domain": "example.test" },
+    { "name": "age", "type": "int", "min": 18, "max": 90 },
+    { "name": "score", "type": "float", "min": 0, "max": 1, "precision": 3 },
+    { "name": "role", "type": "enum", "values": ["admin", "editor", "viewer"] },
+    { "name": "signed_up_at", "type": "date", "from": "2024-01-01", "to": "2026-01-01" },
+    { "name": "invite_code", "type": "pattern", "pattern": "AA-####" },
+    { "name": "bio", "type": "text", "words": 6, "nullable": true, "nullRate": 0.2 },
+    { "name": "active", "type": "bool" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "test-generator",
+  "kind": "orchestration",
+  "summary": "Generates accuracy, edge-case, and performance tests plus deterministic fixtures for a skill's artifacts and Python code.",
+  "artifacts": [],
+  "python": { "dir": "scripts", "entrypoints": [] },
+  "generation": { "generatedBy": "hand-written", "skipped": [] },
+  "notes": "Ships datagen.mjs rather than Python analysis code; its own regression suite exercises the generator."
+}

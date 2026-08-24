@@ -1,0 +1,9 @@
+{
+  "id": "edge-corpus-covers-adversarial-inputs",
+  "description": "The --edge-cases corpus includes empty, unicode, oversized, quote, and injection values.",
+  "type": "command",
+  "cmd": "node scripts/datagen.mjs --spec evals/fixtures/csv-escape.spec.json --rows 0 --edge-cases --format json",
+  "expectExitCode": 0,
+  "expectStdout": ["<script>alert\\(1\\)</script>", "ünïcødé", "o'brien", "\"token\": \"\""],
+  "provenance": "hard rule: boundary + adversarial inputs are the cases the contract tests miss"
+}

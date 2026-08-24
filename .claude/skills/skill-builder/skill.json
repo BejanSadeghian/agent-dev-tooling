@@ -1,0 +1,8 @@
+{
+  "name": "skill-builder",
+  "kind": "orchestration",
+  "summary": "Interviews the author, generates the skill (docs, manifest, deterministic Python, artifacts, tests), refines it by application, and gates it.",
+  "artifacts": [],
+  "generation": { "generatedBy": "hand-written", "skipped": [] },
+  "notes": "Produces skills rather than data artifacts; its output is verified by this repo's own gates running against what it generates."
+}

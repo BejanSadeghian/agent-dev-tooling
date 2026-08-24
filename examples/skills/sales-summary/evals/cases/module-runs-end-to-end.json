@@ -1,0 +1,11 @@
+{
+  "id": "module-runs-end-to-end",
+  "description": "The documented command actually produces both artifacts from raw rows.",
+  "type": "command",
+  "kind": "performance",
+  "covers": ["category-summary", "summary-brief"],
+  "cmd": "tmp=$(mktemp -d) && python3 -c \"import sys; sys.path.insert(0,'python'); from summarize import write_artifacts; rows=[{'category':'Tools','units':2,'revenue':50.0},{'category':'Parts','units':5,'revenue':125.5}]; w=write_artifacts(rows, sys.argv[1]); print('wrote', len(w), 'artifacts')\" \"$tmp\" && test -s \"$tmp/category-summary.csv\" && test -s \"$tmp/summary-brief.md\" && rm -rf \"$tmp\"",
+  "expectExitCode": 0,
+  "expectStdout": ["wrote 2 artifacts"],
+  "provenance": "hard rule: the workflow's own command must work as written"
+}

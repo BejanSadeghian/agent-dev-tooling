@@ -1,0 +1,8 @@
+{
+  "name": "orders",
+  "fields": [
+    { "name": "id", "type": "uuid" },
+    { "name": "user_id", "type": "ref", "from": "users.id" },
+    { "name": "total", "type": "float", "min": 1, "max": 500, "precision": 2 }
+  ]
+}

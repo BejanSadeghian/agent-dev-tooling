@@ -1,0 +1,57 @@
+{
+  "skill": "skill-builder",
+  "contentHash": "0a93032bb1d1db059294a28abe8440d370059fcd6a49cc499b8616a571d8c98a",
+  "passed": true,
+  "total": 10,
+  "failed": 0,
+  "ranAt": "2026-08-24T21:18:50.019Z",
+  "cases": [
+    {
+      "id": "application-run-required",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "artifacts-are-declared-and-tested",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "exact-parts-become-python",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "feedback-becomes-a-case",
+      "passed": true
+    },
+    {
+      "id": "gate-commands-in-order",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "interview-precedes-writing",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "no-invented-answers",
+      "passed": true
+    },
+    {
+      "id": "optional-parts-are-never-an-opening-question",
+      "passed": true,
+      "kind": "edge"
+    },
+    {
+      "id": "ships-its-references",
+      "passed": true,
+      "kind": "performance"
+    },
+    {
+      "id": "trigger-boundary-stated",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "no-arithmetic-in-the-prompt",
+  "description": "The skill still forbids computing the totals in the reply instead of running the module.",
+  "type": "contains",
+  "kind": "accuracy",
+  "covers": ["summary-brief"],
+  "file": "SKILL.md",
+  "patterns": ["Never compute the totals in the reply", "python/summarize\\.py"],
+  "provenance": "hard rule: a number produced by a language model is not reproducible and cannot be tested"
+}

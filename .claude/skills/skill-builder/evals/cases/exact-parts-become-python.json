@@ -1,0 +1,13 @@
+{
+  "id": "exact-parts-become-python",
+  "description": "Anything that must be exact is generated as Python, not left as prose for the model to compute.",
+  "type": "contains",
+  "kind": "accuracy",
+  "file": "SKILL.md",
+  "patterns": [
+    "Anything that must be exact is Python",
+    "cannot be reproduced and cannot be tested",
+    "python/<module>\\.py"
+  ],
+  "provenance": "author rule: analytical work must be deterministic, so it must be code the tests can run"
+}

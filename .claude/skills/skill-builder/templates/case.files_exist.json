@@ -1,0 +1,7 @@
+{
+  "id": "ships-its-templates",
+  "description": "The files the workflow tells the agent to copy are actually present.",
+  "type": "files_exist",
+  "paths": ["templates/EXAMPLE.md"],
+  "provenance": "workflow step N instructs the agent to scaffold from these"
+}

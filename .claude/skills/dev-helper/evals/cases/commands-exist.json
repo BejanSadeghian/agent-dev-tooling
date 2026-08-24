@@ -1,0 +1,10 @@
+{
+  "id": "commands-exist",
+  "description": "Every npm command this skill tells the author to run is defined in package.json.",
+  "type": "command",
+  "kind": "performance",
+  "cmd": "node -e \"const fs=require('node:fs');const pkg=JSON.parse(fs.readFileSync('../../../package.json','utf8'));const doc=fs.readFileSync('SKILL.md','utf8');const used=[...doc.matchAll(/npm run ([a-z:-]+)/g)].map(m=>m[1]);const missing=[...new Set(used)].filter(s=>!pkg.scripts[s]);if(missing.length){console.error('undefined npm scripts: '+missing.join(', '));process.exit(1)}console.log('all '+new Set(used).size+' commands defined')\"",
+  "expectExitCode": 0,
+  "expectStdout": ["all \\d+ commands defined"],
+  "provenance": "hard rule: telling a non-technical author to run a command that does not exist is worse than telling them nothing"
+}

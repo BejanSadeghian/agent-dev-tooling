@@ -1,0 +1,8 @@
+{
+  "id": "no-invented-answers",
+  "description": "The interview reference forbids inventing answers the author never gave.",
+  "type": "contains",
+  "file": "references/interview.md",
+  "patterns": ["Never invent an answer"],
+  "provenance": "hard rule: an unanswered question is a note in the record, not a confident sentence in SKILL.md"
+}

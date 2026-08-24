@@ -1,0 +1,9 @@
+{
+  "id": "uses-the-friendly-commands",
+  "description": "The workflow routes through the npm commands, which check before they save.",
+  "type": "contains",
+  "kind": "accuracy",
+  "file": "SKILL.md",
+  "patterns": ["npm run status", "npm run start", "npm run save", "npm run ship", "npm run doctor"],
+  "provenance": "hard rule: raw git skips the gate and gives errors the author cannot read"
+}

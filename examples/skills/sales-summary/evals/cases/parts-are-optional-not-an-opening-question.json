@@ -1,0 +1,10 @@
+{
+  "id": "parts-are-optional-not-an-opening-question",
+  "description": "Every artifact is produced by default; leaving one out is offered afterwards, not asked up front.",
+  "type": "contains",
+  "kind": "edge",
+  "covers": ["category-summary", "summary-brief"],
+  "file": "SKILL.md",
+  "patterns": ["Produce every artifact by default", "Do not open with that question"],
+  "provenance": "author rule: optional parts are an option they may take, never an up-front question"
+}

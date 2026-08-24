@@ -1,0 +1,14 @@
+{
+  "id": "performance-report-is-required",
+  "description": "Performance tests measure time and memory across at least three real input sizes and report the growth rate.",
+  "type": "contains",
+  "kind": "performance",
+  "file": "SKILL.md",
+  "patterns": [
+    "assert_scaling",
+    "assert_memory_scaling",
+    "At least three",
+    "compute time, throughput and peak memory at each input size"
+  ],
+  "provenance": "author rule: test results must report compute time with respect to input data size"
+}

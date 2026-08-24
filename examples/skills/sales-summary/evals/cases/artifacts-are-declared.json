@@ -1,0 +1,10 @@
+{
+  "id": "artifacts-are-declared",
+  "description": "Both artifacts stay declared in the manifest with their producing function.",
+  "type": "json_shape",
+  "kind": "accuracy",
+  "covers": ["category-summary", "summary-brief"],
+  "file": "skill.json",
+  "requiredKeys": ["artifacts.id", "artifacts.path", "artifacts.producedBy", "python.entrypoints"],
+  "provenance": "hard rule: an artifact nobody declared is an artifact nobody tests"
+}

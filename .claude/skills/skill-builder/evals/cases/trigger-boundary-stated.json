@@ -1,0 +1,8 @@
+{
+  "id": "trigger-boundary-stated",
+  "description": "The skill states explicit non-triggers so a near-miss prompt does not fire it.",
+  "type": "contains",
+  "file": "SKILL.md",
+  "patterns": ["Do \\*\\*not\\*\\* use for", "test-generator"],
+  "provenance": "author feedback: overlapping skills fired on each other's prompts"
+}

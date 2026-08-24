@@ -1,0 +1,34 @@
+{
+  "skill": "sales-summary",
+  "contentHash": "be09b96405b7b30dcf6f97861a76b51b09263d0f30a129670c269b19ac22db49",
+  "passed": true,
+  "total": 5,
+  "failed": 0,
+  "ranAt": "2026-08-24T21:18:50.019Z",
+  "cases": [
+    {
+      "id": "artifacts-are-declared",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "module-runs-end-to-end",
+      "passed": true,
+      "kind": "performance"
+    },
+    {
+      "id": "no-arithmetic-in-the-prompt",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "parts-are-optional-not-an-opening-question",
+      "passed": true,
+      "kind": "edge"
+    },
+    {
+      "id": "python-tests",
+      "passed": true
+    }
+  ]
+}

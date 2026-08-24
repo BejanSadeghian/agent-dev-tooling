@@ -1,0 +1,7 @@
+{
+  "name": "csv_escape_probe",
+  "fields": [
+    { "name": "id", "type": "int", "min": 1, "max": 9 },
+    { "name": "token", "type": "string", "minLength": 3, "maxLength": 5 }
+  ]
+}

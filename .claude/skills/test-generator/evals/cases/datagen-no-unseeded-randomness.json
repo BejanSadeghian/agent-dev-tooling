@@ -1,0 +1,8 @@
+{
+  "id": "datagen-no-unseeded-randomness",
+  "description": "The generator never reaches for an unseeded random source or the wall clock.",
+  "type": "not_contains",
+  "file": "scripts/datagen.mjs",
+  "patterns": ["Math\\.random", "Date\\.now", "new Date\\(\\)"],
+  "provenance": "hard rule: determinism is the whole contract of this generator"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "csv-escapes-separators",
+  "description": "CSV output quotes cells containing commas, quotes, or newlines and doubles embedded quotes.",
+  "type": "command",
+  "cmd": "node scripts/datagen.mjs --spec evals/fixtures/csv-escape.spec.json --rows 0 --edge-cases --format csv | grep -F '\"a,b\"\"c'",
+  "expectExitCode": 0,
+  "provenance": "an unescaped separator silently shifts every downstream column"
+}

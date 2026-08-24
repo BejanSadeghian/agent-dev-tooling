@@ -1,0 +1,86 @@
+{
+  "_comment": "Machine-readable contract for skill layout, artifacts, generated Python code, test coverage, and the rubric. SKILL_FORMAT.md and RUBRIC.md are the human-readable spec; keep the three in sync. Edit THIS file to change what the pre-commit hook and CI enforce.",
+  "skillsDirs": [".claude/skills", "examples/skills"],
+  "layout": {
+    "requiredFiles": ["SKILL.md"],
+    "allowedDirs": ["references", "templates", "scripts", "assets", "evals", "python", "artifacts"],
+    "allowUnknownDirs": false,
+    "maxSkillMdBytes": 40000
+  },
+  "frontmatter": {
+    "required": ["name", "description"],
+    "allowed": ["name", "description", "license", "allowed-tools", "metadata"],
+    "name": {
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64,
+      "mustMatchDirName": true
+    },
+    "description": {
+      "minLength": 40,
+      "maxLength": 1024,
+      "mustMatchOneOf": ["Use when", "Use this", "Use for", "Use whenever"]
+    }
+  },
+  "body": {
+    "requiredHeadings": ["## When to use", "## Workflow"],
+    "forbiddenPatterns": ["\\bTODO\\b", "\\bFIXME\\b", "<placeholder>", "Lorem ipsum"],
+    "maxWords": 5000
+  },
+  "manifest": {
+    "file": "skill.json",
+    "requiredFields": ["name", "kind", "artifacts"],
+    "kinds": ["analysis", "artifact", "orchestration", "utility"],
+    "artifact": {
+      "requiredFields": ["id", "path", "kind"],
+      "kinds": ["data", "document", "chart", "code", "report", "config"],
+      "idPattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    }
+  },
+  "coverage": {
+    "kinds": ["accuracy", "edge", "performance"],
+    "caseKindField": "kind",
+    "caseCoversField": "covers",
+    "pythonMarkers": { "covers": "COVERS", "kind": "KIND" },
+    "requireKindsForArtifacts": ["accuracy", "edge", "performance"],
+    "requireKindsForPython": ["accuracy", "edge", "performance"]
+  },
+  "python": {
+    "dir": "python",
+    "testsDir": "python/tests",
+    "harnessPath": "harness",
+    "testFilePattern": "^test_.*\\.py$",
+    "runner": "auto"
+  },
+  "perf": {
+    "stateDir": ".skill-state/perf",
+    "minSizes": 3,
+    "maxExponentDefault": 1.35,
+    "timeToleranceRatio": 2.5,
+    "exponentTolerance": 0.35
+  },
+  "sequences": {
+    "dir": "sequences",
+    "requireResolvableSkills": true,
+    "requireWiredArtifacts": true
+  },
+  "evals": {
+    "dir": "evals/cases",
+    "extension": ".json",
+    "minCases": 1,
+    "requiredCaseFields": ["id", "description", "type"]
+  },
+  "rubric": {
+    "requireEvalsGreen": true,
+    "requireEvalsFreshAfterEdit": true,
+    "requireArtifactCoverage": true,
+    "requirePythonCoverage": true,
+    "requirePerfMeasurements": true,
+    "requireChangelogEntry": false,
+    "stateDir": ".skill-state"
+  },
+  "health": {
+    "staleAfterDays": 120,
+    "triggerOverlapWarn": 0.55,
+    "minCasesPerSkillWarn": 3
+  }
+}

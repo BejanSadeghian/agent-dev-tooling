@@ -1,0 +1,15 @@
+node_modules/
+*.log
+.DS_Store
+tmp/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Skill outputs written while running a skill for real — never committed.
+outputs/
+
+# NOT ignored, on purpose: .skill-state/ is the evidence that each skill's tests
+# were run after its last edit. It must be committed with the change.

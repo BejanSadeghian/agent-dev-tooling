@@ -1,0 +1,9 @@
+{
+  "id": "helper-script-runs-offline",
+  "description": "The skill's helper script produces its documented output for a fixed seed.",
+  "type": "command",
+  "cmd": "node scripts/example.mjs --seed 1",
+  "expectExitCode": 0,
+  "expectStdout": ["expected fragment"],
+  "provenance": "the script is a hard dependency of workflow step N"
+}

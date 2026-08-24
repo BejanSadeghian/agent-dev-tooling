@@ -1,0 +1,43 @@
+name: add reviewers
+
+# Belt and braces alongside .github/CODEOWNERS: whoever is listed in
+# setup/reviewers.json is asked to review every pull request, even one opened
+# from the web UI rather than `npm run ship`.
+
+on:
+  pull_request_target:
+    types: [opened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  request-review:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - name: Ask the configured reviewers
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          if [ ! -f setup/reviewers.json ]; then
+            echo "no setup/reviewers.json — run: bash setup/configure-gh.sh"
+            exit 0
+          fi
+          # A reviewer cannot review their own pull request; GitHub rejects the whole call.
+          PEOPLE="$(node -e '
+            const cfg = require("./setup/reviewers.json");
+            const author = process.env.AUTHOR;
+            console.log((cfg.reviewers ?? []).filter((r) => r !== author).join(","));
+          ')"
+          TEAMS="$(node -e 'console.log((require("./setup/reviewers.json").teams ?? []).join(","))')"
+          [ -n "$PEOPLE" ] && gh pr edit "$PR" --add-reviewer "$PEOPLE" || true
+          [ -n "$TEAMS" ] && gh pr edit "$PR" --add-reviewer "$TEAMS" || true
+          echo "requested: ${PEOPLE:-none} ${TEAMS:-}"

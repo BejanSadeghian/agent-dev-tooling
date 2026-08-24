@@ -1,0 +1,8 @@
+{
+  "id": "kebab-case-id",
+  "description": "What must still be true, in one sentence.",
+  "type": "contains",
+  "file": "SKILL.md",
+  "patterns": ["a short distinctive phrase from the rule"],
+  "provenance": "why this case exists: author feedback DATE / hard rule from the interview"
+}

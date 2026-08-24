@@ -1,0 +1,8 @@
+{
+  "id": "stays-minimal",
+  "description": "The example stays a copyable skeleton: frontmatter, the required headings, and a scaffold workflow.",
+  "type": "contains",
+  "file": "SKILL.md",
+  "patterns": ["## When to use", "## Workflow", "Copy this directory"],
+  "provenance": "hard rule: this skill exists to be copied and to be a fixture for the tooling"
+}

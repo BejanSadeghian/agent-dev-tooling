@@ -1,0 +1,5 @@
+{
+  "_comment": "Copy to setup/reviewers.json, or generate it with: bash setup/configure-gh.sh",
+  "reviewers": ["your-teammate", "another-teammate"],
+  "teams": []
+}

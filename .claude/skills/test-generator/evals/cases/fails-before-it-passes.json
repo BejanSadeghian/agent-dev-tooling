@@ -1,0 +1,8 @@
+{
+  "id": "fails-before-it-passes",
+  "description": "The workflow requires watching a regression test fail on the unfixed code before it is accepted.",
+  "type": "contains",
+  "file": "SKILL.md",
+  "patterns": ["Prove it fails for the right reason", "A test that has never failed proves nothing"],
+  "provenance": "hard rule: a test written from a guess guards a guess"
+}

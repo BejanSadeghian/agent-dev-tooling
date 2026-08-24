@@ -1,0 +1,9 @@
+{
+  "id": "generator-types-documented",
+  "description": "Every field type the generator implements is documented in the data-generation reference.",
+  "type": "command",
+  "cmd": "node -e \"const fs=require('node:fs');const src=fs.readFileSync('scripts/datagen.mjs','utf8');const block=src.slice(src.indexOf('const GENERATORS'),src.indexOf('// Boundary/adversarial'));const types=[...block.matchAll(/^  ([a-z_]+): \\(/gm)].map(m=>m[1]);const doc=fs.readFileSync('references/data-generation.md','utf8');const missing=types.filter(t=>!doc.includes('\\`'+t+'\\`'));if(missing.length){console.error('undocumented types: '+missing.join(', '));process.exit(1)}console.log('documented '+types.length+' types')\"",
+  "expectExitCode": 0,
+  "expectStdout": ["documented \\d+ types"],
+  "provenance": "a field type nobody can find is a field type nobody uses"
+}

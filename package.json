@@ -1,0 +1,33 @@
+{
+  "name": "dev-tooling-env",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Dev tooling environment for authoring agent skills: interactive skill and test generators, deterministic Python with accuracy/edge/performance tests, a format + rubric gate, a pre-commit hook, CI, and friendly git commands for non-technical authors.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "setup": "bash setup/install.sh",
+    "status": "node scripts/dev.mjs status",
+    "start": "node scripts/dev.mjs start",
+    "save": "node scripts/dev.mjs save",
+    "ship": "node scripts/dev.mjs ship",
+    "sync": "node scripts/dev.mjs sync",
+    "doctor": "node scripts/dev.mjs doctor",
+    "lint": "node scripts/lint.mjs",
+    "check": "node scripts/verify-all.mjs",
+    "skill:new": "node scripts/new-skill.mjs",
+    "test:new": "node scripts/gen-tests.mjs",
+    "validate": "node scripts/validate-skill.mjs",
+    "regression": "node scripts/run-regression.mjs",
+    "python": "node scripts/run-python-tests.mjs",
+    "rubric": "node scripts/check-rubric.mjs",
+    "health": "node scripts/health.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "verify": "npm run test && node scripts/verify-all.mjs",
+    "ci": "npm run test && node scripts/lint.mjs && node scripts/validate-skill.mjs && node scripts/run-regression.mjs --no-record && node scripts/check-rubric.mjs && node scripts/health.mjs",
+    "python:harness": "node --test \"tests/harness.test.mjs\""
+  },
+  "license": "MIT"
+}

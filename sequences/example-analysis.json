@@ -1,0 +1,13 @@
+{
+  "id": "example-analysis",
+  "title": "Example analysis chain",
+  "description": "How a chain of skills is declared: each step consumes what an earlier step produced, so every artifact can be generated and tested on its own. Extend this file (or add another) when a real chain exists.",
+  "inputs": ["raw-transactions"],
+  "steps": [
+    {
+      "skill": "sales-summary",
+      "consumes": ["raw-transactions"],
+      "produces": ["category-summary", "summary-brief"]
+    }
+  ]
+}

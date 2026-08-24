@@ -1,0 +1,51 @@
+---
+name: SKILL_NAME
+description: >-
+  WHAT it does, in one sentence, third person. THEN the boundary. THEN the trigger:
+  Use when SOMEONE WANTS X, Y, or Z.
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+---
+
+# HUMAN READABLE TITLE
+
+One or two lines: the job this skill does and the principle behind how it does it.
+
+## When to use
+
+Use when:
+
+- TRIGGER CONDITION ONE
+- TRIGGER CONDITION TWO
+
+Do **not** use for: NEAR MISS ONE (use OTHER SKILL instead), NEAR MISS TWO.
+
+## Inputs
+
+| Input | Required | Notes |
+|---|---|---|
+| INPUT | yes/no | WHERE IT COMES FROM |
+
+## Workflow
+
+### 1. FIRST STEP
+
+What to read, what to run, what to produce. Imperative, second person, one tool or file named.
+
+### 2. SECOND STEP
+
+Branch conditions stated with their default: "If CONDITION, do X; otherwise do Y."
+
+### 3. GATE IT
+
+The commands that prove the work is done, in order, with the expected result.
+
+## Outputs
+
+- ARTIFACT and where it lands.
+
+## References
+
+- `references/DOC.md` — WHAT IT COVERS AND WHEN TO OPEN IT.

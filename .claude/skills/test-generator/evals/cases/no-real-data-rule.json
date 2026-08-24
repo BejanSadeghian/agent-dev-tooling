@@ -1,0 +1,11 @@
+{
+  "id": "no-real-data-rule",
+  "description": "The skill forbids copying production or personal data into fixtures.",
+  "type": "contains",
+  "kind": "edge",
+  "file": "SKILL.md",
+  "patterns": [
+    "never copy real data"
+  ],
+  "provenance": "hard rule: fixtures are committed and public; production rows must never be"
+}

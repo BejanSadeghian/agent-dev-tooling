@@ -1,0 +1,14 @@
+{
+  "id": "refuses-destructive-git",
+  "description": "The skill still forbids force-push, hard reset, rebase, and committing to main.",
+  "type": "contains",
+  "kind": "edge",
+  "file": "SKILL.md",
+  "patterns": [
+    "git push --force",
+    "git reset --hard",
+    "git rebase",
+    "commit directly to `main`"
+  ],
+  "provenance": "hard rule: the author cannot recover from these, and would not know they had happened"
+}

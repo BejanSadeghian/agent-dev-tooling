@@ -1,0 +1,9 @@
+{
+  "id": "never-disables-the-gate",
+  "description": "The skill refuses to switch the pre-commit checks off to get a save through.",
+  "type": "contains",
+  "kind": "edge",
+  "file": "SKILL.md",
+  "patterns": ["Never\\*\\* switch the pre-commit checks off", "CI still enforces the same gate"],
+  "provenance": "hard rule: skipping the gate only moves the failure to CI, where they cannot read it"
+}

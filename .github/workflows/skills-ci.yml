@@ -1,0 +1,106 @@
+name: skills
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: format · tests · rubric · health
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Nothing to install: the Node tooling has no dependencies and the Python
+      # harness is stdlib-only. pytest is optional; the tests are unittest classes.
+      - name: Tooling unit tests
+        run: npm test
+
+      # 1. Syntax in every language here, plus the house rules. No eslint required:
+      #    see scripts/lint.mjs --list for what each rule is for and why.
+      - name: Lint
+        run: npm run lint
+
+      # 2. Same check as the pre-commit hook: does every skill match SKILL_FORMAT.md?
+      - name: Validate skill format
+        run: node scripts/validate-skill.mjs
+
+      # 3. Every JSON case, every Python accuracy/edge/performance test, and every
+      #    scaling budget. --no-record so CI never rewrites .skill-state: the committed
+      #    state is the evidence the author ran the suite themselves.
+      - name: Run regression suites
+        run: node scripts/run-regression.mjs --no-record
+
+      # 4. Rubric R1-R10: nothing untested, stale, or missing artifact/Python coverage.
+      - name: Check rubric
+        run: node scripts/check-rubric.mjs
+
+      # 5. The library as a whole: overlapping triggers, duplicate artifacts,
+      #    broken sequences, stale or thinly covered skills.
+      - name: Library health
+        run: node scripts/health.mjs
+
+      # 6. Nothing in the tree may have been rewritten by the steps above.
+      - name: Assert working tree is clean
+        run: git diff --exit-code
+
+      - name: Report — health and performance vs input size
+        if: always()
+        run: |
+          {
+            echo "## Skill gate"
+            echo
+            echo '| Gate | Spec |'
+            echo '|---|---|'
+            echo '| format | `SKILL_FORMAT.md` / `skill.config.json` |'
+            echo '| rubric | `RUBRIC.md` R1-R10 |'
+            echo '| tests | JSON cases + Python accuracy/edge/performance |'
+            echo
+            node scripts/health.mjs --markdown
+            echo
+            echo "## Performance — compute time and memory vs input size"
+            echo
+            echo '```'
+            node scripts/run-python-tests.mjs || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  hook-parity:
+    name: pre-commit hook parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Proves the gate a developer runs locally is the gate CI runs.
+      - name: Run the pre-commit hook against this commit's file list
+        # The hook normally reads `git diff --cached`; SKILL_GATE_FILES feeds it
+        # this commit's changed files instead, so CI runs the identical gate.
+        run: |
+          bash scripts/setup-hooks.sh
+          FILES="$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-files)"
+          echo "$FILES"
+          SKILL_GATE_FILES="$FILES" hooks/pre-commit

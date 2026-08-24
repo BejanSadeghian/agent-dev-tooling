@@ -1,0 +1,8 @@
+{
+  "id": "feedback-becomes-a-case",
+  "description": "Every piece of author feedback lands as both a skill edit and a regression case.",
+  "type": "contains",
+  "file": "SKILL.md",
+  "patterns": ["a regression case asserting", "One case per \\*\\*piece of author feedback\\*\\*"],
+  "provenance": "hard rule: the ratchet — a mistake made once can never come back"
+}

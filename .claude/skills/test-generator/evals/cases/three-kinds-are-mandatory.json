@@ -1,0 +1,15 @@
+{
+  "id": "three-kinds-are-mandatory",
+  "description": "Every artifact and Python entrypoint gets accuracy, edge-case and performance tests.",
+  "type": "contains",
+  "kind": "accuracy",
+  "file": "SKILL.md",
+  "patterns": [
+    "all three kinds",
+    "`accuracy`",
+    "`edge`",
+    "`performance`",
+    "npm run test:new"
+  ],
+  "provenance": "author rule: all tests must cover accuracy, edge cases, and processing/memory efficiency"
+}
