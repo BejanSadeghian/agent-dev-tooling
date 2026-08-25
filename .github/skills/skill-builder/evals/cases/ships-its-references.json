@@ -1,0 +1,17 @@
+{
+  "id": "ships-its-references",
+  "description": "Every reference and template the workflow tells the agent to open actually exists.",
+  "type": "files_exist",
+  "kind": "performance",
+  "paths": [
+    "references/interview.md",
+    "references/refinement.md",
+    "references/regression-tests.md",
+    "references/the-pair-contract.md",
+    "references/python-determinism.md",
+    "assets/templates/SKILL.md.template",
+    "assets/templates/interview-notes.md",
+    "assets/templates/case.contains.json"
+  ],
+  "provenance": "hard rule: workflow steps 2, 4, 5, 6, 7 dereference these paths"
+}

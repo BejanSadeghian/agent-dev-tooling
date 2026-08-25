@@ -1,33 +1,45 @@
-# dev-tooling-env
+# Skill development environment
 
-An environment for building agent skills and keeping them honest as the library grows.
+Skills are **developed here and used elsewhere**. Every use case ships as a pair, built to the
+[agentskills.io](https://agentskills.io) layout, gated deterministically, tested by a clean
+sub-agent, and pushed to the repo that will use it.
 
-A **skill** here is four things that ship together: the instructions an assistant follows
-(`SKILL.md`), a declaration of what it produces (`skill.json`), the deterministic Python for
-anything that must be exact (`python/`), and the tests that prove all of it still works
-(`evals/cases/` + `python/tests/`).
+**If you are an agent landing in this repo:** the contract you must follow is
+`.framework/FRAMEWORK.md` (machine-mirrored in `.framework/framework.json`, which the pre-commit
+hook and CI enforce). The three skills in `.github/skills/` — `skill-builder`, `test-generator`,
+`dev-helper` — are your tools for working here. Two rules above all: every use case is a
+doer/interpreter pair, and you never execute a skill you are developing in your own context —
+`npm run subagent` does that with a fresh agent.
 
-| Part | What it is |
+## The pair
+
+| Half | What it is |
 |---|---|
-| `.claude/skills/skill-builder/` | Interviews you, then generates the whole skill: docs, manifest, Python, artifacts, and all three kinds of test. |
-| `.claude/skills/test-generator/` | Generates accuracy, edge-case and performance tests, deterministic fixtures, and the time/memory report. |
-| `.claude/skills/dev-helper/` | Runs git and GitHub for you: branch, check, save, upload, pull request with reviewers. |
-| `harness/skillharness/` | The Python test harness: accuracy assertions, an edge-case catalogue, and time/memory measurement. Stdlib only. |
-| `hooks/pre-commit` | Blocks a commit whose skills break the format spec or the rubric. |
-| `.github/workflows/skills-ci.yml` | The same gate in CI, plus every suite, the health report, and hook parity. |
+| `<use-case>-doer` | As low-level and procedural as possible. Deterministic Python in `scripts/` turns input data into ONE structured artifact whose shape is committed in `references/schema.md`. It always conforms; anything the input forced is reported in the artifact's `deviations` field, never absorbed into a new shape. Verified exactly: accuracy, edge cases, performance. |
+| `<use-case>-interpreter` | Reads that artifact and produces a two-part output: **Facts** (each traceable to the artifact, deviations included), then **Interpretations** (judgment applying its lens, adapted by `references/variations/`). A reader can always tell data from opinion. |
 
-The contract lives in **`SKILL_FORMAT.md`** (layout, manifest, test kinds, sequences) and
-**`RUBRIC.md`** (what "ready" means), both mirrored machine-readably in **`skill.config.json`** —
-that JSON file is what the hook and CI actually read.
+A missing half is a warning, never a blocker — `npm run health` keeps naming it.
 
-**New here and not a developer?** Read `docs/GUIDE-FOR-HUMANS.md` instead of this page.
+## The three zones
+
+```text
+development/          skills being built — invisible to Copilot, gated by hook + CI
+.github/skills/       the dev tools — what YOUR authoring agent uses (Copilot discovers these)
+<target repo>         where finished pairs get shipped: npm run publish -- <use-case>
+```
+
+Testing a skill under development never happens in the authoring chat:
+`npm run subagent -- <use-case> "a real task"` launches a fresh Copilot CLI process that reads the
+latest skill from disk, saves the transcript under the skill's `evals/runs/`, and checks the
+output deterministically (schema conformance; Facts before Interpretations). Add `--discovery` to
+test that the description alone triggers the skill.
 
 ## Quickstart
 
 ```bash
-bash setup/install.sh          # checks tools, wires the hooks, runs everything once
-bash setup/configure-gh.sh     # who reviews your work
-npm run check                  # lint · format · tests · rubric · health
+npm run setup                  # checks tools, wires the hooks, runs everything once
+npm run skill:new              # interview → generate a complete pair into development/
+npm run check                  # lint · format+roles · tests · rubric · health
 ```
 
 Day to day:
@@ -35,112 +47,25 @@ Day to day:
 ```bash
 npm run status                 # where you are, what to do next
 npm run start "topic"          # a branch for this piece of work
-npm run skill:new              # interview → generate a complete skill
-npm run test:new -- <skill>    # find and fill test gaps
-npm run check                  # everything
+npm run subagent -- <uc> "..." # clean sub-agent run of the skill under development
+npm run test:new -- <skill>    # find and fill coverage gaps
 npm run save "what I did"      # checks, commits, uploads
-npm run ship "title"           # pull request, reviewers attached
-npm run health                 # is the library drifting?
-npm run lint -- --list         # what the lint checks, and why
+npm run ship "title"           # pull request for this repo's changes
+npm run publish -- <uc>        # ship a green pair to the target repo
+npm run health                 # is the library drifting? incomplete pairs?
 ```
 
-Inside Claude Code or Copilot: `/new-skill`, `/test-skill`, `/check`, `/ship`, `/health`.
+## What keeps it honest
 
-## What a skill looks like
+- **One contract, three enforcement points.** `.framework/framework.json` is read by
+  `npm run check`, the pre-commit hook, and CI — the same gate everywhere, plus a CI job proving
+  hook parity.
+- **Freshness rule.** Each skill's suite result and content hash are recorded in `.skill-state/`;
+  editing a skill without re-running its suite fails the gate.
+- **Exactness lives in code.** Anything that must be reproducible is deterministic Python in the
+  doer, with accuracy/edge/performance tests on the stdlib-only harness in `.framework/harness/`.
+- **Clean sub-agents only.** The developing agent's context never contaminates a test run, and
+  sub-agent runs (nondeterministic) never gate a commit.
 
-```
-.claude/skills/<skill>/
-  SKILL.md                     frontmatter + procedure
-  skill.json                   kind, artifacts, Python entrypoints, place in a sequence
-  references/                  depth, loaded on demand
-  templates/                   files the skill fills in
-  python/
-    <module>.py                the deterministic parts
-    tests/test_accuracy_*.py   is the answer right?
-    tests/test_edge_*.py       empty, null, wrong type, unicode, boundaries
-    tests/test_performance_*.py  time and memory vs input size
-  evals/cases/*.json           regression cases for the rules in SKILL.md
-.skill-state/<skill>.json      proof the suite ran, and on what content
-.skill-state/perf/<skill>.json the recorded performance report
-sequences/*.json               chains of skills, wired by artifact
-```
-
-`examples/skills/sales-summary/` is the worked example of all of it;
-`examples/skills/hello-linter/` is the smallest thing that passes.
-
-## The three rules the tooling enforces
-
-**1. Anything that must be exact is Python, not prose.** A number a language model produced cannot
-be reproduced and cannot be tested. Calculations, parsing, thresholds, ranking and reconciliation go
-in `python/`, which is deterministic by contract: no clock, no unseeded randomness, total ordering
-on every output, and errors that name the row.
-
-**2. Every artifact is part of the test.** Each output is declared in `skill.json` with an id and a
-path, and needs an accuracy test, an edge-case test, and a performance test. `npm run test:new`
-reports every gap and writes the file that closes it. Everything is generated by default; a part can
-be switched off afterwards with `--skip <id>` or `"generate": false` plus a `skipReason` — you are
-never asked to decide before there is something to look at.
-
-**3. Tests report what the code costs.** Performance tests measure wall-clock and peak memory across
-at least three input sizes and fit the growth rate:
-
-```
-summarize_sales: linear (exponent 1.02, R² 0.999) over n=2,000..32,000
-| rows | seconds | items/s | peak KiB |
-|---:|---:|---:|---:|
-| 2,000 | 0.0010 | 1,979,030 | 1 |
-| 8,000 | 0.0042 | 1,893,411 | 1 |
-| 32,000 | 0.0170 | 1,879,911 | 1 |
-```
-
-The exponent is budgeted, not the seconds — seconds vary by machine, `n^1 → n^2` does not. A later
-run that scales worse fails the suite.
-
-## The freshness rule
-
-`run-regression.mjs` hashes every file in a skill directory and records that hash with the run
-result. The rubric compares the recorded hash to the current content:
-
-- edit anything in the skill → hash changes → **stale** → hook and CI fail;
-- re-run the suite → hash re-recorded → green.
-
-CI never records state (`--no-record`), so the committed evidence has to come from the author's own
-run. Emergency escape hatch: `SKIP_SKILL_GATE=1 git commit ...` — CI runs the identical gate and
-does not honour it.
-
-## Keeping the library healthy
-
-`npm run health` is the anti-degradation report: stale skills, thin cover, artifact/test gaps,
-overlapping trigger descriptions, duplicate artifact ids, broken sequences, and performance drift —
-each with the command that fixes it. `docs/KEEPING-QUALITY.md` is the short routine that goes with
-it.
-
-## Lint
-
-`npm run lint` is deliberately small: syntax for every language here (`node --check`,
-`python3 -m py_compile`, `bash -n`) plus nine house rules that have each caught something real —
-final newline, no CRLF, no trailing whitespace, no tabs, no unfinished markers, CLI main-guard,
-libraries do not print, the harness stays deterministic, and JSON parses. `npm run lint -- --list`
-prints each rule with its reason.
-
-No style preset and no dependency: a lint nobody can run on a fresh clone is decoration. If you want
-eslint anyway, `npm i -D eslint` and it is picked up automatically via `eslint.config.mjs` — the
-house rules keep running either way.
-
-## Requirements
-
-Node 22+ and Python 3.11+. **No dependencies to install** — the Node tooling uses only built-ins and
-the Python harness is stdlib-only. Tests are `unittest` classes, so they run under
-`python3 -m unittest` out of the box and under pytest if you have it.
-
-## Using it as its own repository
-
-```bash
-cp -r dev-tooling-env /path/to/dev-tooling-env && cd /path/to/dev-tooling-env
-git init && git add -A && git commit -m "chore: initial import"
-bash setup/install.sh
-```
-
-To use the skills from another repo, copy `.claude/skills/<skill>/` there, plus `scripts/`,
-`harness/`, `hooks/`, `skill.config.json`, `SKILL_FORMAT.md` and `RUBRIC.md` if you want the gate
-too.
+Everything machinery lives in `.framework/` — spec, config, validators, harness, hook, templates,
+its own tests. The visible root stays: this file, `development/`, `package.json`.

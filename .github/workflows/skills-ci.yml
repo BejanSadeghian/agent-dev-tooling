@@ -30,29 +30,29 @@ jobs:
       - name: Tooling unit tests
         run: npm test
 
-      # 1. Syntax in every language here, plus the house rules. No eslint required:
-      #    see scripts/lint.mjs --list for what each rule is for and why.
+      # 1. Syntax in every language here, plus the house rules.
       - name: Lint
         run: npm run lint
 
-      # 2. Same check as the pre-commit hook: does every skill match SKILL_FORMAT.md?
+      # 2. Same check as the pre-commit hook: layout, frontmatter, body, and the
+      #    doer/interpreter role rules from .framework/framework.json.
       - name: Validate skill format
-        run: node scripts/validate-skill.mjs
+        run: node .framework/scripts/validate-skill.mjs
 
       # 3. Every JSON case, every Python accuracy/edge/performance test, and every
       #    scaling budget. --no-record so CI never rewrites .skill-state: the committed
       #    state is the evidence the author ran the suite themselves.
       - name: Run regression suites
-        run: node scripts/run-regression.mjs --no-record
+        run: node .framework/scripts/run-regression.mjs --no-record
 
-      # 4. Rubric R1-R10: nothing untested, stale, or missing artifact/Python coverage.
+      # 4. Rubric: nothing untested, stale, or missing artifact/Python coverage.
       - name: Check rubric
-        run: node scripts/check-rubric.mjs
+        run: node .framework/scripts/check-rubric.mjs
 
-      # 5. The library as a whole: overlapping triggers, duplicate artifacts,
-      #    broken sequences, stale or thinly covered skills.
+      # 5. The library as a whole: incomplete pairs (warn), overlapping triggers,
+      #    stale or thinly covered skills.
       - name: Library health
-        run: node scripts/health.mjs
+        run: node .framework/scripts/health.mjs
 
       # 6. Nothing in the tree may have been rewritten by the steps above.
       - name: Assert working tree is clean
@@ -66,16 +66,16 @@ jobs:
             echo
             echo '| Gate | Spec |'
             echo '|---|---|'
-            echo '| format | `SKILL_FORMAT.md` / `skill.config.json` |'
-            echo '| rubric | `RUBRIC.md` R1-R10 |'
+            echo '| format + roles | `.framework/FRAMEWORK.md` / `.framework/framework.json` |'
+            echo '| rubric | freshness, coverage, performance budgets |'
             echo '| tests | JSON cases + Python accuracy/edge/performance |'
             echo
-            node scripts/health.mjs --markdown
+            node .framework/scripts/health.mjs --markdown
             echo
             echo "## Performance — compute time and memory vs input size"
             echo
             echo '```'
-            node scripts/run-python-tests.mjs || true
+            node .framework/scripts/run-python-tests.mjs || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -100,7 +100,7 @@ jobs:
         # The hook normally reads `git diff --cached`; SKILL_GATE_FILES feeds it
         # this commit's changed files instead, so CI runs the identical gate.
         run: |
-          bash scripts/setup-hooks.sh
+          bash .framework/scripts/setup-hooks.sh
           FILES="$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-files)"
           echo "$FILES"
-          SKILL_GATE_FILES="$FILES" hooks/pre-commit
+          SKILL_GATE_FILES="$FILES" .framework/hooks/pre-commit

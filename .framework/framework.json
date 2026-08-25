@@ -1,0 +1,95 @@
+{
+  "_comment": "Machine-readable contract for the skill framework: agentskills.io layout, the doer/interpreter pair, schema conformance, test coverage, and the freshness rubric. .framework/FRAMEWORK.md is the human-readable spec; keep the two in sync. Edit THIS file to change what the pre-commit hook and CI enforce.",
+  "skillsDirs": ["development", ".github/skills"],
+  "productSkillsDir": "development",
+  "layout": {
+    "requiredFiles": ["SKILL.md"],
+    "allowedDirs": ["assets", "references", "scripts", "evals"],
+    "allowUnknownDirs": false,
+    "requiredDirs": ["references/variations"],
+    "maxSkillMdBytes": 40000
+  },
+  "frontmatter": {
+    "required": ["name", "description"],
+    "allowed": ["name", "description", "license", "allowed-tools", "metadata"],
+    "name": {
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64,
+      "mustMatchDirName": true
+    },
+    "description": {
+      "minLength": 40,
+      "maxLength": 1024,
+      "mustMatchOneOf": ["Use when", "Use this", "Use for", "Use whenever"]
+    }
+  },
+  "body": {
+    "requiredHeadings": ["## When to use", "## Workflow"],
+    "forbiddenPatterns": ["\\bTODO\\b", "\\bFIXME\\b", "<placeholder>", "Lorem ipsum"],
+    "maxWords": 5000
+  },
+  "roles": {
+    "suffixes": { "doer": "-doer", "interpreter": "-interpreter" },
+    "requireRoleIn": ["development"],
+    "doer": {
+      "schemaFile": "references/schema.md",
+      "schemaMustContain": ["deviations"],
+      "requireScripts": true
+    },
+    "interpreter": {
+      "requiredBodyPatterns": ["## Facts", "## Interpretations", "schema\\.md"]
+    }
+  },
+  "coverage": {
+    "kinds": ["accuracy", "edge", "performance"],
+    "caseKindField": "kind",
+    "caseCoversField": "covers",
+    "pythonMarkers": { "covers": "COVERS", "kind": "KIND" },
+    "requireKindsForArtifacts": ["accuracy", "edge", "performance"],
+    "requireKindsForPython": ["accuracy", "edge", "performance"]
+  },
+  "python": {
+    "dir": "scripts",
+    "testsDir": "scripts/tests",
+    "harnessPath": ".framework/harness",
+    "testFilePattern": "^test_.*\\.py$",
+    "runner": "auto",
+    "maxExponentDefault": 1.35
+  },
+  "perf": {
+    "stateDir": ".skill-state/perf",
+    "minSizes": 3,
+    "maxExponentDefault": 1.35,
+    "timeToleranceRatio": 2.5,
+    "exponentTolerance": 0.35
+  },
+  "evals": {
+    "dir": "evals/cases",
+    "runsDir": "evals/runs",
+    "extension": ".json",
+    "minCases": 1,
+    "requiredCaseFields": ["id", "description", "type"]
+  },
+  "rubric": {
+    "requireEvalsGreen": true,
+    "requireEvalsFreshAfterEdit": true,
+    "requireArtifactCoverage": true,
+    "requirePythonCoverage": true,
+    "requirePerfMeasurements": true,
+    "stateDir": ".skill-state"
+  },
+  "health": {
+    "staleAfterDays": 120,
+    "triggerOverlapWarn": 0.55,
+    "minCasesPerSkillWarn": 3
+  },
+  "subagent": {
+    "bin": "copilot",
+    "promptFlag": "-p",
+    "extraArgs": ["--no-ask-user"]
+  },
+  "ship": {
+    "targetsFile": ".framework/targets.json",
+    "defaultDest": ".github/skills"
+  }
+}

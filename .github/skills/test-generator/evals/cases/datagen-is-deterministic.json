@@ -1,0 +1,8 @@
+{
+  "id": "datagen-is-deterministic",
+  "description": "Same spec and seed produce byte-identical output across runs.",
+  "type": "command",
+  "cmd": "diff <(node scripts/datagen.mjs --spec assets/templates/spec.example.json --seed 42 --rows 25) <(node scripts/datagen.mjs --spec assets/templates/spec.example.json --seed 42 --rows 25)",
+  "expectExitCode": 0,
+  "provenance": "hard rule: a fixture that changes between runs makes every failure ambiguous"
+}

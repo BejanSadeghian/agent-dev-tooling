@@ -11,5 +11,12 @@ __pycache__/
 # Skill outputs written while running a skill for real — never committed.
 outputs/
 
+# Captured sub-agent runs: transient evidence, judged then discarded.
+evals/runs/
+
+# Reviewer list and ship targets are per-clone, not shared.
+.framework/setup/reviewers.json
+.framework/targets.json
+
 # NOT ignored, on purpose: .skill-state/ is the evidence that each skill's tests
 # were run after its last edit. It must be committed with the change.

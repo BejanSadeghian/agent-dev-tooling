@@ -1,10 +1,10 @@
 {
   "skill": "skill-builder",
-  "contentHash": "0a93032bb1d1db059294a28abe8440d370059fcd6a49cc499b8616a571d8c98a",
+  "contentHash": "b003a48f6cbc2abe9c4d2d9ea67e06ca5eef9410485b67df47dab6bcc842db4d",
   "passed": true,
   "total": 10,
   "failed": 0,
-  "ranAt": "2026-08-24T21:18:50.019Z",
+  "ranAt": "2026-08-25T16:24:02.917Z",
   "cases": [
     {
       "id": "application-run-required",

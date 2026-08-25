@@ -1,7 +1,0 @@
-{
-  "name": "dev-helper",
-  "kind": "utility",
-  "summary": "Runs git and GitHub for a non-technical author: branch, check, save, upload, open a reviewed pull request.",
-  "artifacts": [],
-  "generation": { "generatedBy": "hand-written", "skipped": [] }
-}
