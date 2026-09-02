@@ -150,8 +150,8 @@ The gate below is purely deterministic.
 ## 9. Freshness rule and the gate
 
 `npm run regression` runs each skill's JSON cases and Python tests, hashes every (non-transient)
-file in the skill directory, and records the result in `.skill-state/<skill>.json` (performance in
-`.skill-state/perf/<skill>.json`). The rubric fails if the current hash differs from the recorded
+file in the skill directory, and records the result in `.framework/state/<skill>.json` (performance in
+`.framework/state/perf/<skill>.json`). The rubric fails if the current hash differs from the recorded
 one — **you edited the skill and did not re-run its suite**. The state files are committed with
 the change; they are the evidence.
 

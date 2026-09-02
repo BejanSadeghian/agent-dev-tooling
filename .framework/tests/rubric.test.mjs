@@ -84,7 +84,7 @@ test('a corrupt state file fails the rubric instead of throwing', (t) => {
   const repo = makeRepo();
   t.after(repo.cleanup);
   record(repo);
-  fs.writeFileSync(path.join(repo.root, '.skill-state', 'demo-skill.json'), 'not json');
+  fs.writeFileSync(path.join(repo.root, '.framework/state', 'demo-skill.json'), 'not json');
   assert.match(messages(check(repo)), /is not valid JSON/);
 });
 

@@ -115,7 +115,7 @@ test('everything generated passes format, tests and rubric with no hand-editing'
   assert.match(tests.stdout, /python-tests/);
   const rubric = run('check-rubric.mjs');
   assert.equal(rubric.status, 0, rubric.stdout);
-  assert.ok(fs.existsSync(path.join(scratch, '.skill-state/perf/unit-economics-doer.json')), 'no performance report recorded');
+  assert.ok(fs.existsSync(path.join(scratch, '.framework/state/perf/unit-economics-doer.json')), 'no performance report recorded');
 });
 
 test('--only doer generates just the missing half', (t) => {

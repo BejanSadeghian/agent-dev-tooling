@@ -73,8 +73,8 @@ A missing half is a warning, never a blocker — the health report keeps naming 
 | --- | --- |
 | `development/` | The workshop: skills being built, one directory per skill, in pairs. Deliberately invisible to your assistant's skill list, so a work in progress only ever runs inside a clean sub-agent. |
 | `.github/skills/` | The assistant's tools for working *here*: `skill-builder`, `test-generator`, `dev-helper`. This is what Copilot discovers and loads. |
-| `.skill-state/` | The evidence drawer: after a skill's tests run, the result is recorded here with a fingerprint of the skill's files at that moment. That is how the gate catches "edited but not re-tested". It is committed with your change — never edited by hand. |
-| `.framework/` | The machinery: the spec (`FRAMEWORK.md`), the one contract every check reads (`framework.json`), the validators, the Python test harness, the pre-commit hook, and the tooling's own tests. |
+| `.framework/` | The machinery — never edited by hand. The spec (`FRAMEWORK.md`), the one contract every check reads (`framework.json`), the validators, the Python test harness, the pre-commit hook, and the tooling's own tests. |
+| `.framework/state/` | The inspection stickers. After a skill's tests pass, the test runner records the result here with a fingerprint of exactly the version it tested. Change the skill and the sticker no longer matches — the gate refuses the work until the tests run again. Stickers travel with your change as proof; only the test runner writes them. |
 
 ## What keeps it honest
 

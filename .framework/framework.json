@@ -57,7 +57,7 @@
     "maxExponentDefault": 1.35
   },
   "perf": {
-    "stateDir": ".skill-state/perf",
+    "stateDir": ".framework/state/perf",
     "minSizes": 3,
     "maxExponentDefault": 1.35,
     "timeToleranceRatio": 2.5,
@@ -76,7 +76,7 @@
     "requireArtifactCoverage": true,
     "requirePythonCoverage": true,
     "requirePerfMeasurements": true,
-    "stateDir": ".skill-state"
+    "stateDir": ".framework/state"
   },
   "health": {
     "staleAfterDays": 120,

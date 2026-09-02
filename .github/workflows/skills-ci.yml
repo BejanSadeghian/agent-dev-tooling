@@ -40,7 +40,7 @@ jobs:
         run: node .framework/scripts/validate-skill.mjs
 
       # 3. Every JSON case, every Python accuracy/edge/performance test, and every
-      #    scaling budget. --no-record so CI never rewrites .skill-state: the committed
+      #    scaling budget. --no-record so CI never rewrites .framework/state: the committed
       #    state is the evidence the author ran the suite themselves.
       - name: Run regression suites
         run: node .framework/scripts/run-regression.mjs --no-record

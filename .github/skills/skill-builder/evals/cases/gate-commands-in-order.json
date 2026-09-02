@@ -7,7 +7,7 @@
   "patterns": [
     "npm run check",
     "npm run save",
-    "\\.skill-state/<skill>\\.json"
+    "\\.framework/state/<skill>\\.json"
   ],
   "provenance": "hard rule: the recorded run is the evidence the suite ran after the last edit"
 }

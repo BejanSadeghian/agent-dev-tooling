@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Runs each skill's regression suite — the JSON cases plus, when the skill owns
 // deterministic Python code, its Python tests (accuracy, edge cases, performance)
-// — and records the result in .skill-state/<skill>.json plus the performance
-// report in .skill-state/perf/<skill>.json.
+// — and records the result in .framework/state/<skill>.json plus the performance
+// report in .framework/state/perf/<skill>.json.
 //
 // Usage: node scripts/run-regression.mjs [skill-name ...] [--no-record] [--json] [--skip-python]
 import { runCase } from './lib/cases.mjs';

@@ -58,7 +58,7 @@ one place where a hard human-facing limit exists.
 
 ## What the recorded report catches
 
-`npm run regression` writes `.skill-state/perf/<skill>.json` and compares the next run against it:
+`npm run regression` writes `.framework/state/perf/<skill>.json` and compares the next run against it:
 
 - **exponent grew by more than the tolerance** → the suite fails. A `O(n)` function that became
   `O(n²)` is caught even though both are fast on a small fixture.

@@ -181,7 +181,7 @@ npm run check
 ```
 
 Format and roles → tests (cases, Python, performance budgets) → rubric → library health. Fix until
-clean, then `npm run save`. The refreshed `.skill-state/<skill>.json` files are part of the change:
+clean, then `npm run save`. The refreshed `.framework/state/<skill>.json` files are part of the change:
 they are the evidence the suite ran after the last edit. When the pair is done and reviewed,
 `npm run publish -- <use-case>` ships it to the repo that will use it.
 

@@ -114,7 +114,7 @@ Rules:
 - **Budget the exponent, not the seconds.** Seconds vary by machine; `n^1.0 → n^2.0` is a real
   regression anywhere. `npm run regression` records both and fails the suite when scaling worsens.
 
-The recorded report is `.skill-state/perf/<skill>.json`, and `npm run python -- <skill>` prints it:
+The recorded report is `.framework/state/perf/<skill>.json`, and `npm run python -- <skill>` prints it:
 compute time, throughput and peak memory at each input size, plus the fitted growth rate.
 
 ### 6. Generate the data deterministically

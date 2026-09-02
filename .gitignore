@@ -18,5 +18,5 @@ evals/runs/
 .framework/setup/reviewers.json
 .framework/targets.json
 
-# NOT ignored, on purpose: .skill-state/ is the evidence that each skill's tests
+# NOT ignored, on purpose: .framework/state/ is the evidence that each skill's tests
 # were run after its last edit. It must be committed with the change.

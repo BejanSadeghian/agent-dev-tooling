@@ -79,7 +79,7 @@ COVERS = ["category-summary", "summarize.summarize_sales"]
 ## Running
 
 ```bash
-node scripts/run-regression.mjs <skill-name>    # runs + records .skill-state/<skill-name>.json
+node scripts/run-regression.mjs <skill-name>    # runs + records .framework/state/<skill-name>.json
 node scripts/run-regression.mjs --no-record     # dry run, records nothing
 node scripts/check-rubric.mjs <skill-name>      # proves it was run after the last edit
 ```

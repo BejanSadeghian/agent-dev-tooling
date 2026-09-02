@@ -57,7 +57,7 @@ function makeGitRepo(t) {
   fs.writeFileSync(path.join(skillDir, 'references/variations/default.md'), '# Variation: default\n\nBaseline.\n');
   fs.writeFileSync(
     path.join(skillDir, 'evals/cases/stays-minimal.json'),
-    JSON.stringify({ id: 'stays-minimal', description: 'keeps its copy line', type: 'contains', file: 'SKILL.md', patterns: ['Copy this directory'] }, null, 2),
+    JSON.stringify({ id: 'stays-minimal', description: 'keeps its copy line', type: 'contains', file: 'SKILL.md', patterns: ['Copy this directory'] }, null, 2) + '\n',
   );
 
   const git = (...args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' });
@@ -97,7 +97,7 @@ test('the hook FAILS when the skill no longer matches the format spec', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.writeFileSync(skillMd, fs.readFileSync(skillMd, 'utf8').replace('## Workflow', '## Steps'));
   sh('node .framework/scripts/run-regression.mjs hook-demo', dir);
-  const result = sh('git add .github/skills/hook-demo .skill-state && .framework/hooks/pre-commit', dir);
+  const result = sh('git add .github/skills/hook-demo .framework/state && .framework/hooks/pre-commit', dir);
   assert.equal(result.code, 1);
   assert.match(result.out, /missing required heading "## Workflow"/);
 });
@@ -106,7 +106,7 @@ test('the hook FAILS when a regression case goes red', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.writeFileSync(skillMd, fs.readFileSync(skillMd, 'utf8').replace('Copy this directory', 'Duplicate this folder'));
   sh('node .framework/scripts/run-regression.mjs hook-demo', dir);
-  const result = sh('git add .github/skills/hook-demo .skill-state && .framework/hooks/pre-commit', dir);
+  const result = sh('git add .github/skills/hook-demo .framework/state && .framework/hooks/pre-commit', dir);
   assert.equal(result.code, 1);
   assert.match(result.out, /stays-minimal/);
 });
@@ -115,7 +115,7 @@ test('the hook FAILS when the refreshed state file is left unstaged', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.appendFileSync(skillMd, '\n2. Another line.\n');
   sh('git add .github/skills/hook-demo', dir);
-  sh('node .framework/scripts/run-regression.mjs hook-demo', dir); // refreshes .skill-state, leaves it unstaged
+  sh('node .framework/scripts/run-regression.mjs hook-demo', dir); // refreshes .framework/state, leaves it unstaged
   const result = sh('.framework/hooks/pre-commit', dir);
   assert.equal(result.code, 1);
   assert.match(result.out, /has unstaged changes/);

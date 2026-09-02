@@ -23,8 +23,9 @@ while IFS= read -r line; do
   [[ -n "$line" ]] && SKILLS+=("$line")
 done < <(node .framework/scripts/changed-skills.mjs <<<"$STAGED")
 
-# Tooling changed? Run the tooling's own tests.
-if grep -qE '^(\.framework/|package\.json$)' <<<"$STAGED"; then
+# Tooling changed? Run the tooling's own tests. (.framework/state/ is test
+# evidence written by the runner, not tooling — it changes on every skill edit.)
+if grep -E '^(\.framework/|package\.json$)' <<<"$STAGED" | grep -qvE '^\.framework/state/'; then
   echo "pre-commit: tooling changed → lint + node --test .framework/tests/"
   node .framework/scripts/lint.mjs
   node --test ".framework/tests/*.test.mjs"
@@ -50,7 +51,7 @@ node .framework/scripts/check-rubric.mjs "${SKILLS[@]}" || FAILED=1
 
 # 4. The refreshed state file must be part of THIS commit, not left dirty in the tree.
 for skill in "${SKILLS[@]}"; do
-  state=".skill-state/${skill}.json"
+  state=".framework/state/${skill}.json"
   [[ -f "$state" ]] || continue
   if ! git diff --quiet -- "$state"; then
     echo "pre-commit: $state has unstaged changes — stage it with the skill change (git add $state)"
@@ -63,7 +64,7 @@ if [[ $FAILED -ne 0 ]]; then
 
 pre-commit: skill gate FAILED.
   fix format    → see .framework/FRAMEWORK.md
-  re-run suites → npm run regression -- <skill>   (then: git add .skill-state/<skill>.json)
+  re-run suites → npm run regression -- <skill>   (then: git add .framework/state/<skill>.json)
   emergency     → SKIP_SKILL_GATE=1 git commit ...   (CI runs the same gate and will not skip)
 MSG
   exit 1
