@@ -32,11 +32,15 @@ export function discoverSkills(config, root = REPO_ROOT) {
 /** Map a changed file path (repo-relative) back to the skill that owns it, or null. */
 export function skillForPath(config, relPath) {
   const norm = relPath.split(path.sep).join('/');
+  const namePattern = new RegExp(config.frontmatter.name.pattern);
   for (const rel of config.skillsDirs) {
     const prefix = `${rel.replace(/\/$/, '')}/`;
     if (!norm.startsWith(prefix)) continue;
-    const name = norm.slice(prefix.length).split('/')[0];
-    if (name && !name.startsWith('.')) return name;
+    const remainder = norm.slice(prefix.length);
+    const name = remainder.split('/')[0];
+    // A loose file directly in the root (development/README.md) is not a skill,
+    // and neither is anything whose name breaks the kebab-case rule.
+    if (name && remainder.includes('/') && namePattern.test(name)) return name;
   }
   return null;
 }

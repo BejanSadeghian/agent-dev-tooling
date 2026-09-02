@@ -15,6 +15,11 @@ test('returns null for files outside any skills root', () => {
   assert.equal(skillForPath(config, '.github/skills/.hidden/SKILL.md'), null);
 });
 
+test('a loose file directly in a skills root is not a skill', () => {
+  assert.equal(skillForPath(config, 'development/README.md'), null);
+  assert.equal(skillForPath(config, 'development/Not_A_Skill/SKILL.md'), null);
+});
+
 test('every configured skills root is discovered', () => {
   const names = discoverSkills(config).map((s) => s.name);
   assert.ok(names.includes('skill-builder'));
