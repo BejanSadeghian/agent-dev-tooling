@@ -1,0 +1,35 @@
+# robot.txt — instructions for AI agents working in this repo
+# Humans: you want README.md. Agents: read README.md too (the concepts live
+# there); this file is only what applies specifically to you.
+
+## Your contract
+
+- The framework spec is .framework/FRAMEWORK.md; the machine-readable mirror is
+  .framework/framework.json. The pre-commit hook and CI enforce the JSON — when you change one,
+  change the other in the same commit.
+- Your tools are the skills in .github/skills/: skill-builder (create/refine a use case),
+  test-generator (coverage gaps, fixtures, performance), dev-helper (git/GitHub for the author).
+  Use them; do not improvise their jobs.
+
+## Two rules above all
+
+1. Every use case is a PAIR: <use-case>-doer (deterministic scripts/ code -> one artifact
+   conforming to references/schema.md, deviations reported, never absorbed) and
+   <use-case>-interpreter (Facts first, each traceable to the artifact, then Interpretations).
+2. NEVER execute a skill you are developing in your own context. You know what it was meant to
+   say, so you would compensate for its gaps. Test only via:
+     npm run subagent -- <use-case> "<task>"   (--role interpreter | --discovery)
+
+## Working rules
+
+- New pairs are generated into development/ with `npm run skill:new` — do not hand-scaffold.
+- After ANY edit to a skill, re-run its suite (`npm run regression -- <skill>`) and commit the
+  refreshed .framework/state/<skill>.json with the change; the gate rejects stale suites.
+- Never edit .framework/state/ by hand — it is machine-written evidence, and a forged sticker
+  fails anyway because the content fingerprint will not match.
+- Never weaken or skip the gate to get a commit through (SKIP_SKILL_GATE is for the human's
+  explicit emergency use; CI does not skip).
+- Author feedback lands twice: as a skill edit AND as a regression case, so the mistake cannot
+  return.
+- Ship only green pairs: `npm run publish -- <use-case>` (targets in .framework/targets.json).
+- The gate in full: `npm run check` = lint -> format+roles -> tests -> rubric -> health.

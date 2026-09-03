@@ -7,11 +7,8 @@ interprets the result — and nothing ships until its checks are green.
 You do not need to know git, terminals, or Python to work here. The recommended way to do
 everything is to talk to an AI assistant, which does the technical parts for you.
 
-**If you are an agent landing in this repo:** the contract is `.framework/FRAMEWORK.md`
-(machine-mirrored in `.framework/framework.json`, enforced by the pre-commit hook and CI). The
-skills in `.github/skills/` — `skill-builder`, `test-generator`, `dev-helper` — are your tools.
-Two rules above all: every use case is a doer/interpreter pair, and you never execute a skill you
-are developing in your own context — the sub-agent runner does that.
+> **AI agents:** your instructions are in [`robot.txt`](robot.txt). Read this page too — the
+> concepts live here — but the rules that apply specifically to you live there.
 
 ## Getting started — recommended (no CLI needed)
 
@@ -41,7 +38,10 @@ Two things worth knowing:
 
 ## Getting started — advanced (direct CLI)
 
-Everything the assistant does maps to an npm command you can run yourself:
+There is nothing to `npm install` — the tooling has zero package dependencies (npm is only the
+command runner, and the Python harness is stdlib-only). You need the runtimes: Node 22+,
+Python 3.11+, git; `npm run setup` checks them and says what is missing. On Windows, use Git Bash
+or WSL. Everything the assistant does maps to an npm command you can run yourself:
 
 ```bash
 npm run setup                  # one-time: check tools, wire the safety hooks, run everything once
