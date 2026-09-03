@@ -1,5 +1,7 @@
 # Regression tests for a skill
 
+> Source of truth for the whole testing framework: `.framework/TESTING.md`.
+
 The suite answers one question: *if someone edits this skill six months from now, what must still
 be true?* Cases live in `evals/cases/*.json`, one object per file. Types and fields are specified
 in `.framework/FRAMEWORK.md`.

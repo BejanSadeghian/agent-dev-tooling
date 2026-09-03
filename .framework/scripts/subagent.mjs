@@ -122,7 +122,7 @@ function main(argv) {
   console.log(dim('A fresh process with no conversation context, reading the latest skill from disk.\n'));
 
   const started = Date.now();
-  const result = spawnSync(bin, [promptFlag, prompt, ...extraArgs], {
+  const result = spawnSync(bin, [...(config.subagent.preArgs ?? []), promptFlag, prompt, ...extraArgs], {
     cwd: REPO_ROOT,
     encoding: 'utf8',
     timeout: 15 * 60_000,

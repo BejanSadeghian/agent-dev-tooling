@@ -26,7 +26,13 @@ doctor reports the safety hooks were off, run `npm run setup`.
    <use-case>-interpreter (Facts first, each traceable to the artifact, then Interpretations).
 2. NEVER execute a skill you are developing in your own context. You know what it was meant to
    say, so you would compensate for its gaps. Test only via:
-     npm run subagent -- <use-case> "<task>"   (--role interpreter | --discovery)
+     npm run subagent -- <use-case> "<task>"   (--role interpreter | --discovery)  # quick loop
+     npm run scenario -- <use-case> [name]     # acceptance: fixtures -> multi-step run in a
+                                               # fresh sandbox, checkpoints over artifacts AND
+                                               # transcript, 3 trials, one report; run before
+                                               # shipping. Turn the first real task into a
+                                               # committed scenario (evals/scenarios/<name>/).
+                                               # Only the human may --accept/--reject a verdict.
 
 ## Working rules
 

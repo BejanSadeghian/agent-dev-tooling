@@ -25,6 +25,7 @@
     "rubric": "node .framework/scripts/check-rubric.mjs",
     "health": "node .framework/scripts/health.mjs",
     "subagent": "node .framework/scripts/subagent.mjs",
+    "scenario": "node .framework/scripts/scenario.mjs",
     "publish": "node .framework/scripts/publish.mjs",
     "test": "node --test \".framework/tests/*.test.mjs\"",
     "verify": "npm run test && node .framework/scripts/verify-all.mjs",

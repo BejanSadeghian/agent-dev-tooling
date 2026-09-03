@@ -54,6 +54,9 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 - A **fresh, separate agent** (which never saw your chat) runs the skill.
 - You get its transcript and the result it produced.
 - An automatic verdict: right shape? Facts separated from Interpretations?
+- Say **"make this a repeatable test"** to save the task as a scenario: it re-runs three times
+  from scratch, and you get one report card showing what held up and what wavered — a verdict
+  you can overrule, with your reason kept on record.
 
 **Done when:** you have read the result. Messy first runs are normal.
 
@@ -110,6 +113,7 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 | "Set this repo up on my computer" | Checks your computer has what it needs, offers to install anything missing, and switches on the safety checks |
 | "I want to build a skill for ___" | Interviews you about it (one question at a time), then generates the whole pair with its tests |
 | "Test it on a real task: ___" | Runs the skill with a **fresh, separate agent** and shows you what it produced |
+| "Make this a repeatable test" | Saves the task as a scenario: three fresh runs, one report card with a pass grid, a verdict you can overrule |
 | "It should have done X instead" | Fixes the skill AND adds a test so that mistake can never come back |
 | "Check my work" | Runs every check and explains anything that fails, in plain words |
 | "Save my work" | Checks first, then saves and uploads it on its own branch |
@@ -155,6 +159,26 @@ These are what your assistant reaches for when you ask for things — you never 
 | `skill-builder` | Builds a use case end to end: reads your material, interviews you, generates the pair, then improves it through fresh-agent test runs — every piece of your feedback becomes both a fix and a test. It is forbidden from running a skill it is building in its own chat. |
 | `test-generator` | Fills test gaps and makes safe, realistic practice data (never real or random data). Any bug you report becomes a test that fails first, then passes — so it can never quietly return. |
 | `dev-helper` | Handles saving, uploading, and review requests for people who do not use git — in plain language, refusing the dangerous moves. |
+
+## How testing works
+
+Three layers, from smallest to most lifelike — full details live in the framework's
+[testing framework](.framework/TESTING.md), which is the source of truth:
+
+1. **Exact tests on the code.** The doer's mechanical work is checked for being exactly right,
+   for surviving weird input, and for staying fast as data grows.
+2. **Rule checks on the documents.** Every hard rule a skill states — and every piece of feedback
+   you ever gave — is pinned so it cannot quietly disappear.
+3. **Scenario tests on the agent itself.** A saved task with its own starting files runs in a
+   **fresh workspace with a fresh agent, three times**. Checks look at everything that came out —
+   including the in-between artifacts and *how* the agent worked, not just the final answer — and
+   an AI judge grades the result against your standards. You get **one report card per scenario**
+   with a pass grid across the three runs, and you can overrule its verdict (your reason is kept
+   on record). These run before shipping; they never block saving.
+
+All practice data is **made up and reproducible** — never real, never random. Your real files can
+be used for one-off runs but are never saved into the repo. That contract is the
+[data generation framework](.framework/DATA.md).
 
 ## What keeps it honest
 

@@ -4,6 +4,10 @@ The contract every skill in this repo must satisfy. `framework.json` (next to th
 machine-readable mirror — the pre-commit hook and CI both read that file, so **change the JSON in
 the same commit you change this page**.
 
+Two subjects have their own source-of-truth pages next to this one: **how skills are tested**
+lives in [`TESTING.md`](TESTING.md) and **how test data is made** lives in [`DATA.md`](DATA.md).
+The testing sections below are the short version; those pages win on detail.
+
 ## 1. The two ideas
 
 **Every use case ships as a pair.**
@@ -49,6 +53,7 @@ Skills live one directory deep under a configured root (`skillsDirs`: `skills/` 
     tests/test_{accuracy,edge,performance}_<module>.py
   evals/
     cases/*.json      # required (>= 1) — the JSON regression suite for this skill
+    scenarios/        # optional — agent-level scenario evals: <name>/scenario.json + fixtures/
     runs/             # captured sub-agent transcripts (gitignored)
 ```
 
@@ -146,8 +151,30 @@ disk, captures the transcript under `evals/runs/`, and judges the output determi
 - interpreter runs (`--role interpreter`): `## Facts` appears before `## Interpretations`;
 - `--discovery` omits the skill path to test that the description alone triggers.
 
-Sub-agent runs are LLM-in-the-loop and therefore nondeterministic: they never gate pre-commit.
-The gate below is purely deterministic.
+That is the quick loop. The acceptance layer is **scenario evals** — they test the agent USING
+the skill, holistically and repeatably, across multiple steps:
+
+- A scenario is committed inside the skill: `evals/scenarios/<name>/scenario.json` (steps,
+  prompts, checkpoints) plus `fixtures/` (the starting workspace).
+- Each trial stages the fixtures into a **fresh sandbox** and walks the steps in order — the
+  interpreter step consumes whatever the doer step actually produced, so intermediate artifacts
+  are part of what is tested.
+- Checkpoints run after each step, over artifacts (`files_exist`, `contains`, `json_shape`,
+  `command`) AND over the transcript (`transcript_contains`, `transcript_not_contains`,
+  `transcript_order` — e.g. proof the script ran, proof numbers were not hand-computed), plus a
+  `judge` type: an LLM grades the output against a rubric written in the scenario, replying
+  PASS/FAIL with reasons.
+- Trials repeat (default 3) because one run of a stochastic system proves nothing. The machine
+  verdict is strict — every checkpoint, every trial — and there is ONE verdict per scenario: the
+  report is a checkpoint × trial grid with a rate column, so a 2/3 shows up as *inconsistent* and
+  names exactly which expectation wavered.
+- A human can override the verdict, on the record (`npm run scenario -- <uc> <name> --accept
+  "reason"`); the machine verdict stays visible underneath. Reports and verdicts live in
+  `.framework/state/scenarios/` and are committed; full transcripts stay in `evals/runs/`
+  (gitignored).
+
+Sub-agent runs and scenarios are LLM-in-the-loop and therefore nondeterministic: they never gate
+pre-commit. Run scenarios before shipping. The gate below is purely deterministic.
 
 ## 9. Freshness rule and the gate
 

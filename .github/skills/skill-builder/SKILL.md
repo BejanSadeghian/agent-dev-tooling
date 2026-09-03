@@ -158,6 +158,12 @@ turn each answer into exactly one of:
 
 Iterate until a sub-agent run needs no improvisation. Two clean runs beats ten edits.
 
+Then make it repeatable: turn the first real task into a committed **scenario**
+(`evals/scenarios/<name>/` — fixtures plus steps with checkpoints over artifacts AND transcript;
+spec in `.framework/TESTING.md`). `npm run scenario -- <use-case>` runs it three times in fresh
+sandboxes and writes one report with a checkpoint × trial grid. Run scenarios before shipping.
+Never record an `--accept`/`--reject` override yourself — that decision is the author's alone.
+
 ### 7. Cover every artifact and module
 
 ```bash
@@ -202,6 +208,8 @@ determinism, and a clean facts/interpretation boundary.
 
 ## References
 
+- `.framework/TESTING.md` — the testing framework (source of truth): layers, scenarios, verdicts.
+- `.framework/DATA.md` — the data generation framework (source of truth): fixtures, seeds, rules.
 - `references/interview.md` — the question set, in order, with follow-ups.
 - `references/the-pair-contract.md` — the pair contract: schema, deviations, handoff.
 - `references/python-determinism.md` — what becomes doer Python, and how it must behave.

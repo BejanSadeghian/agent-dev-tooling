@@ -85,8 +85,14 @@
   },
   "subagent": {
     "bin": "copilot",
+    "preArgs": [],
     "promptFlag": "-p",
     "extraArgs": ["--no-ask-user"]
+  },
+  "scenarios": {
+    "dir": "evals/scenarios",
+    "trials": 3,
+    "stateDir": ".framework/state/scenarios"
   },
   "ship": {
     "targetsFile": ".framework/targets.json",
