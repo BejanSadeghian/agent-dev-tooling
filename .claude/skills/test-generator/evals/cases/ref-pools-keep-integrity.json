@@ -1,9 +1,0 @@
-{
-  "id": "ref-pools-keep-integrity",
-  "description": "Every ref value points at a row that exists in the referenced pool.",
-  "type": "command",
-  "cmd": "tmp=$(mktemp -d) && node scripts/datagen.mjs --spec templates/spec.example.json --seed 5 --rows 10 --out \"$tmp/users.json\" >/dev/null && node scripts/datagen.mjs --spec evals/fixtures/orders.spec.json --seed 5 --rows 40 --ref \"users.id=$tmp/users.json\" --out \"$tmp/orders.json\" >/dev/null && node -e \"const fs=require('node:fs');const ids=new Set(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).map(u=>u.id));const orphans=JSON.parse(fs.readFileSync(process.argv[2],'utf8')).filter(o=>!ids.has(o.user_id));if(orphans.length){console.error('orphans: '+orphans.length);process.exit(1)}console.log('referential integrity ok')\" \"$tmp/users.json\" \"$tmp/orders.json\" && rm -rf \"$tmp\"",
-  "expectExitCode": 0,
-  "expectStdout": ["referential integrity ok"],
-  "provenance": "hard rule: generated child rows must not orphan unless the test asked for orphans"
-}

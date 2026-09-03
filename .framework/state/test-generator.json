@@ -1,0 +1,62 @@
+{
+  "skill": "test-generator",
+  "contentHash": "af88714fae3bd359fe23850e5b8d6883471dce679999ed8c492e6d03c3afb81c",
+  "passed": true,
+  "total": 12,
+  "failed": 0,
+  "ranAt": "2026-09-03T01:45:56.529Z",
+  "cases": [
+    {
+      "id": "csv-escapes-separators",
+      "passed": true
+    },
+    {
+      "id": "datagen-is-deterministic",
+      "passed": true
+    },
+    {
+      "id": "datagen-no-unseeded-randomness",
+      "passed": true
+    },
+    {
+      "id": "datagen-seed-changes-output",
+      "passed": true
+    },
+    {
+      "id": "edge-corpus-covers-adversarial-inputs",
+      "passed": true
+    },
+    {
+      "id": "fails-before-it-passes",
+      "passed": true
+    },
+    {
+      "id": "generator-types-documented",
+      "passed": true
+    },
+    {
+      "id": "no-real-data-rule",
+      "passed": true,
+      "kind": "edge"
+    },
+    {
+      "id": "performance-report-is-required",
+      "passed": true,
+      "kind": "performance"
+    },
+    {
+      "id": "ref-pools-keep-integrity",
+      "passed": true
+    },
+    {
+      "id": "ships-its-references",
+      "passed": true,
+      "kind": "performance"
+    },
+    {
+      "id": "three-kinds-are-mandatory",
+      "passed": true,
+      "kind": "accuracy"
+    }
+  ]
+}

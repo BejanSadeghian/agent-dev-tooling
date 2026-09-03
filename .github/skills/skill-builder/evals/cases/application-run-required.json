@@ -1,0 +1,13 @@
+{
+  "id": "application-run-required",
+  "description": "Refinement requires a clean sub-agent run on a real task and asking about the output, not the document.",
+  "type": "contains",
+  "kind": "accuracy",
+  "file": "SKILL.md",
+  "patterns": [
+    "Test with a clean sub-agent",
+    "npm run subagent",
+    "about the \\*output\\*"
+  ],
+  "provenance": "hard rule: a skill that has never been run by a fresh agent is a hypothesis"
+}

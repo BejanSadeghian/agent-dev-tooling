@@ -1,0 +1,13 @@
+{
+  "id": "artifacts-are-declared-and-tested",
+  "description": "The doer's artifact shape is committed in schema.md and carries accuracy, edge-case and performance tests.",
+  "type": "contains",
+  "kind": "accuracy",
+  "file": "SKILL.md",
+  "patterns": [
+    "references/schema\\.md",
+    "edge-case, and a performance test",
+    "npm run test:new"
+  ],
+  "provenance": "author rule: the pair is split precisely so the artifact is exactly verifiable"
+}

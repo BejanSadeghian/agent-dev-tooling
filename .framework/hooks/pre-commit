@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Gate: every skill touched by this commit must match the framework spec
+# (.framework/FRAMEWORK.md) — including "its regression suite was run after this
+# edit". Wire it up once with: bash .framework/scripts/setup-hooks.sh
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+if [[ "${SKIP_SKILL_GATE:-}" == "1" ]]; then
+  echo "pre-commit: SKILL_GATE skipped (SKIP_SKILL_GATE=1)"
+  exit 0
+fi
+
+# The staged file list — overridable so CI can run this exact gate over a
+# push/PR diff (see .github/workflows/skills-ci.yml, job "hook-parity").
+STAGED="${SKILL_GATE_FILES:-$(git diff --cached --name-only --diff-filter=ACMR)}"
+[[ -z "$STAGED" ]] && { echo "pre-commit: nothing staged"; exit 0; }
+
+# Which skills does this commit touch? (no mapfile: macOS ships bash 3.2)
+SKILLS=()
+while IFS= read -r line; do
+  [[ -n "$line" ]] && SKILLS+=("$line")
+done < <(node .framework/scripts/changed-skills.mjs <<<"$STAGED")
+
+# Tooling changed? Run the tooling's own tests. (.framework/state/ is test
+# evidence written by the runner, not tooling — it changes on every skill edit.)
+if grep -E '^(\.framework/|package\.json$)' <<<"$STAGED" | grep -qvE '^\.framework/state/'; then
+  echo "pre-commit: tooling changed → lint + node --test .framework/tests/"
+  node .framework/scripts/lint.mjs
+  node --test ".framework/tests/*.test.mjs"
+fi
+
+if [[ ${#SKILLS[@]} -eq 0 ]]; then
+  echo "pre-commit: no skills touched"
+  exit 0
+fi
+
+echo "pre-commit: gating ${#SKILLS[@]} skill(s): ${SKILLS[*]}"
+
+FAILED=0
+
+# 1. Format — layout, frontmatter, body, and the doer/interpreter role rules.
+node .framework/scripts/validate-skill.mjs "${SKILLS[@]}" || FAILED=1
+
+# 2. Suite actually green right now (verify only — recording here would defeat the freshness rule).
+node .framework/scripts/run-regression.mjs --no-record "${SKILLS[@]}" || FAILED=1
+
+# 3. Rubric — includes R5: the recorded run must post-date the latest edit.
+node .framework/scripts/check-rubric.mjs "${SKILLS[@]}" || FAILED=1
+
+# 4. The refreshed state file must be part of THIS commit, not left dirty in the tree.
+for skill in "${SKILLS[@]}"; do
+  state=".framework/state/${skill}.json"
+  [[ -f "$state" ]] || continue
+  if ! git diff --quiet -- "$state"; then
+    echo "pre-commit: $state has unstaged changes — stage it with the skill change (git add $state)"
+    FAILED=1
+  fi
+done
+
+if [[ $FAILED -ne 0 ]]; then
+  cat <<'MSG'
+
+pre-commit: skill gate FAILED.
+  fix format    → see .framework/FRAMEWORK.md
+  re-run suites → npm run regression -- <skill>   (then: git add .framework/state/<skill>.json)
+  emergency     → SKIP_SKILL_GATE=1 git commit ...   (CI runs the same gate and will not skip)
+MSG
+  exit 1
+fi
+
+echo "pre-commit: skill gate passed"

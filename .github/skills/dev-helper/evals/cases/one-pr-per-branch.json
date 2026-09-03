@@ -1,0 +1,12 @@
+{
+  "id": "one-pr-per-branch",
+  "description": "After a review comment, a re-publish joins the existing pull request instead of opening a second one.",
+  "type": "contains",
+  "kind": "accuracy",
+  "file": "SKILL.md",
+  "patterns": [
+    "joins the existing pull\\s+request",
+    "never open a\\s+second one"
+  ],
+  "provenance": "author feedback: a second PR for the same branch splits the review and loses history"
+}

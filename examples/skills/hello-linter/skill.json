@@ -1,7 +1,0 @@
-{
-  "name": "hello-linter",
-  "kind": "utility",
-  "summary": "Smallest skill that passes the format spec and the rubric — copy it to start a new one by hand.",
-  "artifacts": [],
-  "generation": { "generatedBy": "hand-written", "skipped": [] }
-}

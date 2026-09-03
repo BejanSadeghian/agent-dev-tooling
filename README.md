@@ -1,146 +1,185 @@
-# dev-tooling-env
+# Skill development environment
 
-An environment for building agent skills and keeping them honest as the library grows.
+This repo is where agent skills get **built and tested** before they ship to the repos that use
+them. Every use case becomes a pair of skills — one that processes data exactly, one that
+interprets the result — and nothing ships until its checks are green.
 
-A **skill** here is four things that ship together: the instructions an assistant follows
-(`SKILL.md`), a declaration of what it produces (`skill.json`), the deterministic Python for
-anything that must be exact (`python/`), and the tests that prove all of it still works
-(`evals/cases/` + `python/tests/`).
+You do not need to know git, terminals, or code to work here. You talk to an AI assistant; it
+does the technical parts for you.
 
-| Part | What it is |
-|---|---|
-| `.claude/skills/skill-builder/` | Interviews you, then generates the whole skill: docs, manifest, Python, artifacts, and all three kinds of test. |
-| `.claude/skills/test-generator/` | Generates accuracy, edge-case and performance tests, deterministic fixtures, and the time/memory report. |
-| `.claude/skills/dev-helper/` | Runs git and GitHub for you: branch, check, save, upload, pull request with reviewers. |
-| `harness/skillharness/` | The Python test harness: accuracy assertions, an edge-case catalogue, and time/memory measurement. Stdlib only. |
-| `hooks/pre-commit` | Blocks a commit whose skills break the format spec or the rubric. |
-| `.github/workflows/skills-ci.yml` | The same gate in CI, plus every suite, the health report, and hook parity. |
+> **AI agents:** your instructions are in [`robot.txt`](robot.txt). Read this page too — the
+> concepts live here — but the rules that apply specifically to you live there.
 
-The contract lives in **`SKILL_FORMAT.md`** (layout, manifest, test kinds, sequences) and
-**`RUBRIC.md`** (what "ready" means), both mirrored machine-readably in **`skill.config.json`** —
-that JSON file is what the hook and CI actually read.
+## Getting started: your first skill, step by step
 
-**New here and not a developer?** Read `docs/GUIDE-FOR-HUMANS.md` instead of this page.
+> **Before anything:** clone this repo and open it in VS Code with Copilot Chat (or Claude
+> Code). Clone once — after that, just reopen the folder.
 
-## Quickstart
+Work through the steps in order. (Prefer a terminal? The same walkthrough with the actual
+commands and their output is in [docs/advanced.md](docs/advanced.md).)
 
-```bash
-bash setup/install.sh          # checks tools, wires the hooks, runs everything once
-bash setup/configure-gh.sh     # who reviews your work
-npm run check                  # lint · format · tests · rubric · health
-```
+### Step 1 — initialize
 
-Day to day:
+> Prompt: "Set this repo up on my computer."
 
-```bash
-npm run status                 # where you are, what to do next
-npm run start "topic"          # a branch for this piece of work
-npm run skill:new              # interview → generate a complete skill
-npm run test:new -- <skill>    # find and fill test gaps
-npm run check                  # everything
-npm run save "what I did"      # checks, commits, uploads
-npm run ship "title"           # pull request, reviewers attached
-npm run health                 # is the library drifting?
-npm run lint -- --list         # what the lint checks, and why
-```
+**What happens:**
 
-Inside Claude Code or Copilot: `/new-skill`, `/test-skill`, `/check`, `/ship`, `/health`.
+- Checks your computer has what this repo needs (Node, Python, git).
+- Anything missing: shows you one install command, asks permission first.
+- Switches on the safety checks and runs everything once.
+- Safe to repeat — an already-set-up computer just gets confirmed.
 
-## What a skill looks like
+**Done when:** everything passed — optional items (reviewers, the Copilot CLI for test runs) can be installed when first needed, and the assistant will offer.
 
-```
-.claude/skills/<skill>/
-  SKILL.md                     frontmatter + procedure
-  skill.json                   kind, artifacts, Python entrypoints, place in a sequence
-  references/                  depth, loaded on demand
-  templates/                   files the skill fills in
-  python/
-    <module>.py                the deterministic parts
-    tests/test_accuracy_*.py   is the answer right?
-    tests/test_edge_*.py       empty, null, wrong type, unicode, boundaries
-    tests/test_performance_*.py  time and memory vs input size
-  evals/cases/*.json           regression cases for the rules in SKILL.md
-.skill-state/<skill>.json      proof the suite ran, and on what content
-.skill-state/perf/<skill>.json the recorded performance report
-sequences/*.json               chains of skills, wired by artifact
-```
+### Step 2 — build a skill
 
-`examples/skills/sales-summary/` is the worked example of all of it;
-`examples/skills/hello-linter/` is the smallest thing that passes.
+> Prompt: "I want to build a skill for ___" — describe the job in your own words; paste any
+> notes or examples you have.
 
-## The three rules the tooling enforces
+**What happens:**
 
-**1. Anything that must be exact is Python, not prose.** A number a language model produced cannot
-be reproduced and cannot be tested. Calculations, parsing, thresholds, ranking and reconciliation go
-in `python/`, which is deterministic by contract: no clock, no unseeded randomness, total ordering
-on every output, and errors that name the row.
+- It reads everything you gave it first, and plays back what it learned.
+- Then an interview about the gaps only, one question at a time — and you steer it ("focus on
+  the trigger", "skip that").
+- Answer from real examples; say "I don't know" rather than guessing.
+- Generates two skill folders (doer + interpreter) into `skills/`, tests included.
+- Comes back with follow-ups while it turns placeholders into your real rules.
 
-**2. Every artifact is part of the test.** Each output is declared in `skill.json` with an id and a
-path, and needs an accuracy test, an edge-case test, and a performance test. `npm run test:new`
-reports every gap and writes the file that closes it. Everything is generated by default; a part can
-be switched off afterwards with `--skip <id>` or `"generate": false` plus a `skipReason` — you are
-never asked to decide before there is something to look at.
+**Done when:** the pair exists in `skills/` and its checks pass.
 
-**3. Tests report what the code costs.** Performance tests measure wall-clock and peak memory across
-at least three input sizes and fit the growth rate:
+### Step 3 — test it
 
-```
-summarize_sales: linear (exponent 1.02, R² 0.999) over n=2,000..32,000
-| rows | seconds | items/s | peak KiB |
-|---:|---:|---:|---:|
-| 2,000 | 0.0010 | 1,979,030 | 1 |
-| 8,000 | 0.0042 | 1,893,411 | 1 |
-| 32,000 | 0.0170 | 1,879,911 | 1 |
-```
+> Prompt: "Test it on a real task: ___" — a genuine task, not an invented one.
 
-The exponent is budgeted, not the seconds — seconds vary by machine, `n^1 → n^2` does not. A later
-run that scales worse fails the suite.
+**What happens:**
 
-## The freshness rule
+- A **fresh, separate agent** (which never saw your chat) runs the skill.
+- You get its transcript and the result it produced.
+- An automatic verdict: right shape? Facts separated from Interpretations?
+- Say **"make this a repeatable test"** to save the task as a scenario: it re-runs three times
+  from scratch, and you get one report card showing what held up and what wavered — a verdict
+  you can overrule, with your reason kept on record.
 
-`run-regression.mjs` hashes every file in a skill directory and records that hash with the run
-result. The rubric compares the recorded hash to the current content:
+**Done when:** you have read the result. Messy first runs are normal.
 
-- edit anything in the skill → hash changes → **stale** → hook and CI fail;
-- re-run the suite → hash re-recorded → green.
+### Step 4 — edit with feedback
 
-CI never records state (`--no-record`), so the committed evidence has to come from the author's own
-run. Emergency escape hatch: `SKIP_SKILL_GATE=1 git commit ...` — CI runs the identical gate and
-does not honour it.
+> Prompt: "It should have done X instead" — one piece of feedback at a time, about the output.
 
-## Keeping the library healthy
+**What happens:**
 
-`npm run health` is the anti-degradation report: stale skills, thin cover, artifact/test gaps,
-overlapping trigger descriptions, duplicate artifact ids, broken sequences, and performance drift —
-each with the command that fixes it. `docs/KEEPING-QUALITY.md` is the short routine that goes with
-it.
+- Each item becomes a fix AND a test that would have caught it.
+- The test fails first, then passes — so the mistake can never return.
+- The skill's tests re-run and the fresh result is recorded.
 
-## Lint
+**Done when:** two test runs in a row need no fixes.
 
-`npm run lint` is deliberately small: syntax for every language here (`node --check`,
-`python3 -m py_compile`, `bash -n`) plus nine house rules that have each caught something real —
-final newline, no CRLF, no trailing whitespace, no tabs, no unfinished markers, CLI main-guard,
-libraries do not print, the harness stays deterministic, and JSON parses. `npm run lint -- --list`
-prints each rule with its reason.
+### Step 5 — validate
 
-No style preset and no dependency: a lint nobody can run on a fresh clone is decoration. If you want
-eslint anyway, `npm i -D eslint` and it is picked up automatically via `eslint.config.mjs` — the
-house rules keep running either way.
+> Prompt: "Check my work."
 
-## Requirements
+**What happens:**
 
-Node 22+ and Python 3.11+. **No dependencies to install** — the Node tooling uses only built-ins and
-the Python harness is stdlib-only. Tests are `unittest` classes, so they run under
-`python3 -m unittest` out of the box and under pytest if you have it.
+- Every check runs: format, pair rules, all tests, nothing-edited-without-retesting.
+- Anything wrong is explained in plain words, with the fix.
 
-## Using it as its own repository
+**Done when:** all checks passed.
 
-```bash
-cp -r dev-tooling-env /path/to/dev-tooling-env && cd /path/to/dev-tooling-env
-git init && git add -A && git commit -m "chore: initial import"
-bash setup/install.sh
-```
+### Step 6 — publish
 
-To use the skills from another repo, copy `.claude/skills/<skill>/` there, plus `scripts/`,
-`harness/`, `hooks/`, `skill.config.json`, `SKILL_FORMAT.md` and `RUBRIC.md` if you want the gate
-too.
+> Prompt: "Publish ___ to our team's repo."
+
+**What happens:**
+
+- The checks run one more time; nothing goes out unless they confirm.
+- If they don't confirm, it's still your call: say "publish anyway — because ___" and your
+  reason goes on the record.
+- Your work is quietly saved and uploaded first, so nothing is ever lost.
+- The pair is copied to the receiving repo (it asks for the address once, then remembers), and a
+  review request opens there.
+
+**Done when:** you have the receiving repo's review link.
+
+## Quick reference — things you can say
+
+| Say something like | What the assistant does |
+| --- | --- |
+| "Set this repo up on my computer" | Checks your computer has what it needs, offers to install anything missing, and switches on the safety checks |
+| "I want to build a skill for ___" | Interviews you about it (one question at a time), then generates the whole pair with its tests |
+| "Test it on a real task: ___" | Runs the skill with a **fresh, separate agent** and shows you what it produced |
+| "Make this a repeatable test" | Saves the task as a scenario: three fresh runs, one report card with a pass grid, a verdict you can overrule |
+| "Accept that test result anyway — because ___" | Records your override on the report card, with your reason and name; the machine's verdict stays visible underneath |
+| "Waive C3 on that report — because ___" | Accepts just that one failing check (each row on the report card has a short ID); everything else still counts |
+| "It should have done X instead" | Fixes the skill AND adds a test so that mistake can never come back |
+| "Check my work" | Runs every check and explains anything that fails, in plain words |
+| "Publish ___ to our team's repo" | Confirms the checks, saves your work, delivers the pair with a review request — one ask |
+| "Publish anyway — because ___" | Your right to override failing checks; your reason goes on the record |
+| "How is the library doing?" | Shows the health report: anything untested, stale, or half a pair |
+
+Two things worth knowing:
+
+- **Nothing is published without its checks confirming.** The assistant cannot deliver failing
+  work on its own — only you can say "publish anyway", and your reason is recorded.
+- **You develop in one chat, but testing happens in a fresh one.** The assistant that wrote a
+  skill already knows what it *meant* to say, so it would paper over the gaps. Testing always
+  uses a separate agent that has never seen your conversation.
+
+## The pair
+
+| Half | What it is |
+| --- | --- |
+| The **doer** | Does the mechanical work: turns input data into one structured result whose exact shape is agreed in advance. It never bends that shape — anything odd about the input is listed in a "deviations" note instead. Because it is mechanical, it can be tested for being exactly right. |
+| The **interpreter** | Reads the doer's result and writes two clearly separated sections: **Facts** (only what the data shows, each pointing back to it) and **Interpretations** (what it means). A reader can always tell data from opinion. |
+
+A pair missing one half is flagged in the health report, but never blocks your work.
+
+## What the folders are
+
+| Folder | In plain words |
+| --- | --- |
+| `skills/` | The workshop: skills being built, in pairs. It appears when you build your first one. Kept invisible to your assistant on purpose, so a work in progress only ever runs in that fresh, separate agent. |
+| `.github/skills/` | The assistant's own tools for working here (described below). |
+| `.framework/` | The machinery that checks everything — never edited by hand. |
+| `.framework/state/` | The inspection stickers: proof of when each skill's tests last passed, and of exactly which version was tested. Change a skill and its sticker stops matching, so the tests must run again. Only the machinery writes these. |
+
+What is *inside* each skill folder is defined in the framework spec — jump to
+[Skill layout](.framework/FRAMEWORK.md#2-skill-layout-agentskillsio).
+
+## The built-in skills
+
+These are what your assistant reaches for when you ask for things — you never use them directly:
+
+| Skill | What it does |
+| --- | --- |
+| `skill-builder` | Builds a use case end to end: reads your material, interviews you, generates the pair, then improves it through fresh-agent test runs — every piece of your feedback becomes both a fix and a test. It is forbidden from running a skill it is building in its own chat. |
+| `test-generator` | Fills test gaps and makes safe, realistic practice data (never real or random data). Any bug you report becomes a test that fails first, then passes — so it can never quietly return. |
+| `dev-helper` | Handles saving, uploading, and review requests for people who do not use git — in plain language, refusing the dangerous moves. |
+
+## How testing works
+
+Three layers, from smallest to most lifelike — full details live in the framework's
+[testing framework](.framework/framework-testing.md), which is the source of truth:
+
+1. **Exact tests on the code.** The doer's mechanical work is checked for being exactly right,
+   for surviving weird input, and for staying fast as data grows.
+2. **Rule checks on the documents.** Every hard rule a skill states — and every piece of feedback
+   you ever gave — is pinned so it cannot quietly disappear.
+3. **Scenario tests on the agent itself.** A saved task with its own starting files runs in a
+   **fresh workspace with a fresh agent, three times**. Checks look at everything that came out —
+   including the in-between artifacts and *how* the agent worked, not just the final answer — and
+   an AI judge grades the result against your standards. You get **one report card per scenario**
+   with a pass grid across the three runs, and you can overrule its verdict (your reason is kept
+   on record). These run before shipping; they never block saving.
+
+All practice data is **made up and reproducible** — never real, never random. Your real files can
+be used for one-off runs but are never saved into the repo. That contract is the
+[data generation framework](.framework/framework-data.md).
+
+## What keeps it honest
+
+- **One rulebook, checked in three places:** on your computer as you work, before anything is
+  saved, and again on GitHub.
+- **Freshness rule:** a skill edited without re-running its tests cannot be saved.
+- **Exactness lives in code:** anything that must be reproducible is real, tested code — never
+  something a model computed in its reply.
+- **Fresh agents only:** the chat that builds a skill never gets to grade it.

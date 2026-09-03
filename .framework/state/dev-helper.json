@@ -1,0 +1,35 @@
+{
+  "skill": "dev-helper",
+  "contentHash": "523f7a96c1e4a5164ff7d40609a6ff877fa6eb299289c7647e4b1b5baba051b2",
+  "passed": true,
+  "total": 5,
+  "failed": 0,
+  "ranAt": "2026-09-03T01:45:56.529Z",
+  "cases": [
+    {
+      "id": "commands-exist",
+      "passed": true,
+      "kind": "performance"
+    },
+    {
+      "id": "never-disables-the-gate",
+      "passed": true,
+      "kind": "edge"
+    },
+    {
+      "id": "one-pr-per-branch",
+      "passed": true,
+      "kind": "accuracy"
+    },
+    {
+      "id": "refuses-destructive-git",
+      "passed": true,
+      "kind": "edge"
+    },
+    {
+      "id": "uses-the-friendly-commands",
+      "passed": true,
+      "kind": "accuracy"
+    }
+  ]
+}

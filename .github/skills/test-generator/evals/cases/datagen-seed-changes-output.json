@@ -1,0 +1,8 @@
+{
+  "id": "datagen-seed-changes-output",
+  "description": "A different seed produces different data, so the generator is actually seeded rather than constant.",
+  "type": "command",
+  "cmd": "if diff -q <(node scripts/datagen.mjs --spec assets/templates/spec.example.json --seed 1 --rows 25) <(node scripts/datagen.mjs --spec assets/templates/spec.example.json --seed 2 --rows 25) >/dev/null; then echo 'seeds produced identical output'; exit 1; fi",
+  "expectExitCode": 0,
+  "provenance": "guards the inverse of datagen-is-deterministic: a generator that ignores the seed would pass that case"
+}
