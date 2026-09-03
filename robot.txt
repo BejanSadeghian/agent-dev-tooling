@@ -31,6 +31,7 @@ doctor reports the safety hooks were off, run `npm run setup`.
 ## Working rules
 
 - New pairs are generated into development/ with `npm run skill:new` — do not hand-scaffold.
+  The folder does not exist until the first pair is generated; the generator creates it.
 - After ANY edit to a skill, re-run its suite (`npm run regression -- <skill>`) and commit the
   refreshed .framework/state/<skill>.json with the change; the gate rejects stale suites.
 - Never edit .framework/state/ by hand — it is machine-written evidence, and a forged sticker

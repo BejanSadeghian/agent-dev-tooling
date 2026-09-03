@@ -93,7 +93,8 @@ an explicit yes. If the doer's "does" needs an "and", it is two use cases — sa
 npm run skill:new
 ```
 
-It asks the same questions and writes both skills into `development/`: the doer (`SKILL.md`,
+It asks the same questions and writes both skills into `development/` (creating the folder if
+this is the first pair): the doer (`SKILL.md`,
 `references/schema.md`, `references/variations/`, `scripts/<module>.py`, an accuracy test, an
 edge-case test, a performance test, seed regression cases, the interview record) and the
 interpreter (`SKILL.md` with the Facts/Interpretations contract, `references/variations/`,

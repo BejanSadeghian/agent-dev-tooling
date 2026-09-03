@@ -24,9 +24,10 @@ The role is detected from the directory-name suffix; there is no manifest. A ski
 - `.github/skills/` — the dev tools (`skill-builder`, `test-generator`, `dev-helper`), each
   directly at this level, where GitHub Copilot discovers them. These are the skills the authoring
   agent uses.
-- `development/` — product skills being built. Deliberately NOT auto-discovered: a work in
-  progress never leaks into the authoring agent's skill list, and the authoring agent never
-  executes one in its own context — `npm run subagent` launches a clean sub-agent instead.
+- `development/` — product skills being built (created by `npm run skill:new` when the first
+  pair is generated). Deliberately NOT auto-discovered: a work in progress never leaks into the
+  authoring agent's skill list, and the authoring agent never executes one in its own context —
+  `npm run subagent` launches a clean sub-agent instead.
 - When a pair is green, `npm run publish -- <use-case>` ships it to a target repo (configured in
   `targets.json`, default destination `.github/skills/`).
 
@@ -59,7 +60,7 @@ layout check and the freshness hash.
 YAML frontmatter, first line of the file:
 
 | Key | Required | Rule |
-|---|---|---|
+| --- | --- | --- |
 | `name` | yes | `^[a-z0-9]+(-[a-z0-9]+)*$`, equals directory name, <= 64 chars |
 | `description` | yes | 40–1024 chars, third person, WHAT + WHEN, must contain a trigger clause (`Use when` / `Use this` / `Use for` / `Use whenever`) |
 | `license`, `allowed-tools`, `metadata` | no | Unknown keys are a hard error. |
@@ -101,7 +102,7 @@ and under pytest when available.
 ## 6. Test kinds and coverage
 
 | Kind | Question it answers |
-|---|---|
+| --- | --- |
 | `accuracy` | Is the output right, and does it conform to the schema? |
 | `edge` | Empty, single, null, missing, wrong type, unicode, oversized, boundary values. |
 | `performance` | How do compute time and peak memory grow with input size? |
@@ -124,7 +125,7 @@ One JSON object per file: `id`, `description`, `type` required. Types — see
 `scripts/lib/cases.mjs`:
 
 | type | passes when |
-|---|---|
+| --- | --- |
 | `files_exist` | every `paths[]` entry exists inside the skill dir |
 | `contains` / `not_contains` | every / no `patterns[]` regex matches `file` |
 | `json_shape` | `file` parses as JSON and has `requiredKeys[]` (dot paths) |
