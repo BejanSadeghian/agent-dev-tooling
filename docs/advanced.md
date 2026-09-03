@@ -7,6 +7,49 @@ command runner, and the Python harness is stdlib-only). You need the runtimes: N
 Python 3.11+, git; `npm run doctor` checks them and prints the install command for anything
 missing. On Windows, use Git Bash or WSL.
 
+## The walkthrough, in commands
+
+The same steps as the README's getting-started guide. Each shows the command and what its output
+looks like when things go right.
+
+**1. Initialize** — `npm run setup`. It checks each tool (`ok git`, `ok Node.js v22...`), wires
+the pre-commit hook (`git hooks path -> .framework/hooks`), then runs every check once. Ends with
+the day-to-day command list. If a runtime is missing, `npm run doctor` prints one install command
+for your package manager (brew/apt/winget) — run it, then re-run the doctor.
+
+**2. Build a pair** — `npm run skill:new`. Interactive interview in the terminal; blank line
+finishes list questions. Ends with `Generated N files across 2 skill(s): <uc>-doer,
+<uc>-interpreter`, the file list, and a validation run over what it wrote. Then replace the
+scaffolded parts: the real schema fields in `references/schema.md`, the real logic in
+`scripts/<module>.py`, real expectations in `scripts/tests/`, the real lens in the interpreter's
+SKILL.md.
+
+**3. Test with a clean sub-agent** — `npm run subagent -- <uc> "a real task"`. Needs the Copilot
+CLI installed (`copilot`); the run transcript is saved under the skill's `evals/runs/` and the
+output ends with deterministic checks, e.g. `ok outputs/<uc>.json parses and carries records +
+deviations`. Variants: `--role interpreter` (checks `## Facts` comes before
+`## Interpretations`), `--discovery` (does not name the skill — tests that the description
+triggers).
+
+**4. Edit + lock in feedback** — make the fix, add a regression case (JSON in `evals/cases/` or a
+Python test), then `npm run regression -- <skill>`. Expect `PASS <skill> (n/n)` and `recorded 1
+run(s) in .framework/state/` — commit that state file with your change or the gate rejects it as
+stale.
+
+**5. Validate** — `npm run check`. Five stages in order (lint, format, tests, rubric, health);
+each failure names the skill and the fixing command. Ends `All checks passed.`
+
+**6. Save** — `npm run start "topic"` once per piece of work (creates branch `skill/topic`), then
+`npm run save "what I did"`. Save re-runs the checks, commits with a conventional message, and
+pushes; ends `Saved and uploaded.` On a failure: `Something is not right yet, so nothing was
+saved.`
+
+**7. Review + ship** — `npm run ship "title"` opens the PR in this repo (ends `Review request
+opened: <url>`). `npm run publish -- <uc>` ships a green pair to the consuming repo: first run
+tells you to create `.framework/targets.json` (it prints the exact shape); after that it
+re-verifies the pair, copies both halves to the target's `.github/skills/` on branch
+`skill/<uc>`, and opens the PR there.
+
 | Command | What it does |
 | --- | --- |
 | `npm run setup` | One-time: checks the runtimes, switches on the pre-commit safety checks, runs every check once to prove the clone works. |
