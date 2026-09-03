@@ -16,16 +16,21 @@ Work through these in order. Each step tells you what to say to your assistant, 
 while it works, and how you know it worked. (Prefer a terminal? The same walkthrough with the
 actual commands and their output is in [docs/advanced.md](docs/advanced.md).)
 
-### Step 0 — open the repo in an assistant (once)
+### Step 0 — open the repo in an assistant
 
-Install [VS Code](https://code.visualstudio.com) with GitHub Copilot (or use Claude Code). In
-VS Code choose **Clone Git Repository**, paste this repo's address, open the folder, then open
-the Copilot Chat panel. The assistant reads this repo's rules and tools automatically — you never
-have to tell it how things work here.
+**First time only:** install [VS Code](https://code.visualstudio.com) with GitHub Copilot (or use
+Claude Code). In VS Code choose **Clone Git Repository**, paste this repo's address, open the
+folder, then open the Copilot Chat panel. The assistant reads this repo's rules and tools
+automatically — you never have to tell it how things work here.
+
+**Every time after that:** do NOT clone again — that makes a second copy and your work ends up
+split across folders. Just open VS Code, pick this repo from **File → Open Recent**, and open the
+chat. Not sure where you left off? Ask: **"Where am I — what should I do next?"**
 
 ### Step 1 — initialize
 
-**Say:** "Set this repo up on my computer."
+**Say:** "Set this repo up on my computer." (Safe to say every time — if the computer is already
+set up, it simply confirms everything and changes nothing.)
 
 **What happens:** it checks that your computer has the three things this repo needs (Node,
 Python, git). If something is missing it shows you one install command and asks permission before
