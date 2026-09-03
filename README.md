@@ -143,6 +143,9 @@ A pair missing one half is flagged in the health report, but never blocks your w
 | `.framework/` | The machinery that checks everything — never edited by hand. |
 | `.framework/state/` | The inspection stickers: proof of when each skill's tests last passed, and of exactly which version was tested. Change a skill and its sticker stops matching, so the tests must run again. Only the machinery writes these. |
 
+What is *inside* each skill folder is defined in the framework spec — jump to
+[Skill layout](.framework/FRAMEWORK.md#2-skill-layout-agentskillsio).
+
 ## The built-in skills
 
 These are what your assistant reaches for when you ask for things — you never use them directly:

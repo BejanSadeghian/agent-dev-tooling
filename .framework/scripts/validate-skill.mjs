@@ -31,7 +31,7 @@ export function validateSkill(config, skill) {
     const abs = path.join(skill.dir, required);
     const hasFiles = fs.existsSync(abs) && fs.readdirSync(abs).some((f) => !f.startsWith('.'));
     if (!hasFiles) {
-      err(`missing ${required}/ — every skill ships its variations (domain, use-case, regional adaptations); add at least one file`);
+      err(`missing ${required}/ — the contract requires it with at least one file`);
     }
   }
 

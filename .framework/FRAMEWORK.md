@@ -41,9 +41,10 @@ Skills live one directory deep under a configured root (`skillsDirs`: `skills/` 
   SKILL.md            # required — the only file the agent always reads
   assets/             # static fixtures, sample data, images, file templates
   references/         # deep-dive docs loaded on demand
-    variations/       # required — domain / use-case / regional adaptations, one file each
-    schema.md         # doers only — the committed artifact shape (must define "deviations")
-  scripts/            # executable code; the doer's deterministic Python and its tests
+    variations/       # optional — domain / use-case / regional adaptations, one file each
+    schema.md         # any required input/output schemas; a doer MUST commit its
+                      #   artifact schema here, and it must define "deviations"
+  scripts/            # executable code the skill runs; deterministic Python and its tests
     <module>.py
     tests/test_{accuracy,edge,performance}_<module>.py
   evals/

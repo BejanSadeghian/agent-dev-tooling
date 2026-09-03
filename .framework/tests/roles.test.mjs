@@ -95,10 +95,10 @@ test('an interpreter must instruct the two-part output and name the schema', (t)
   assert.match(messages(validateSkill(loadConfig(bad.root), bad.skill)), /## Interpretations/);
 });
 
-test('a skill without references/variations fails the format check', (t) => {
+test('references/variations is optional — its absence is not a format error', (t) => {
   const repo = makeRepo({ variations: null });
   t.after(repo.cleanup);
-  assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /missing references\/variations\//);
+  assert.deepEqual(validateSkill(loadConfig(repo.root), repo.skill).filter((f) => f.level !== 'warn'), []);
 });
 
 test('a doer owes all three kinds for its artifact and each module; tests close the gaps', (t) => {

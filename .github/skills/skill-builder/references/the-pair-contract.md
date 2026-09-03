@@ -52,7 +52,7 @@ The interpreter's input contract IS the doer's `references/schema.md`:
 | `evals/cases/` | ≥ 1, seeded by the generator | ≥ 1, structural: two-part output, schema reference |
 | accuracy / edge / performance | required for the artifact and every module in `scripts/` | — |
 | `references/schema.md` | required, must define `deviations` | consumed, referenced from SKILL.md |
-| `references/variations/` | required | required |
+| `references/variations/` | optional — add when real variations exist | optional — add when real variations exist |
 
 The pair itself is checked by `npm run health`: a doer without its interpreter (or the reverse) is
 a **warning, never a blocker** — half a pair may land on a branch, but the report keeps naming it

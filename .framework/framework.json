@@ -6,7 +6,7 @@
     "requiredFiles": ["SKILL.md"],
     "allowedDirs": ["assets", "references", "scripts", "evals"],
     "allowUnknownDirs": false,
-    "requiredDirs": ["references/variations"],
+    "requiredDirs": [],
     "maxSkillMdBytes": 40000
   },
   "frontmatter": {
