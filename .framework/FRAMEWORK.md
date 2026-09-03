@@ -48,6 +48,8 @@ Skills live one directory deep under a configured root (`skillsDirs`: `skills/` 
     variations/       # optional — domain / use-case / regional adaptations, one file each
     schema.md         # any required input/output schemas; a doer MUST commit its
                       #   artifact schema here, and it must define "deviations"
+    source-material/  # provenance — what the author gave to build this use case
+    interview-notes.md# provenance — the interview answers behind every rule
   scripts/            # executable code the skill runs; deterministic Python and its tests
     <module>.py
     tests/test_{accuracy,edge,performance}_<module>.py
@@ -60,6 +62,14 @@ Skills live one directory deep under a configured root (`skillsDirs`: `skills/` 
 No other top-level directories are allowed inside a skill (`allowUnknownDirs: false`). Transient
 dirs (`outputs/`, `__pycache__/`, `.pytest_cache/`, `evals/runs/`) are invisible to both the
 layout check and the freshness hash.
+
+**Provenance is pair-level and lives in the doer** — `references/source-material/` and
+`references/interview-notes.md` belong to the use case, and the doer is their one canonical home
+(never duplicated into the interpreter). Provenance and scenario evals are development-only:
+`npm run publish` strips `references/source-material/`, `references/interview-notes.md`,
+`evals/scenarios/`, and `evals/runs/` from the shipped copy — the consuming repo receives only
+what an agent needs to use the skill. Real or personal data never enters the repo at all
+(`framework-data.md`); the interview notes record where it lives instead.
 
 ## 3. `SKILL.md`
 

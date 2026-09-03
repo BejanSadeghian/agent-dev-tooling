@@ -27,11 +27,16 @@ function loadTargets(config) {
   }
 }
 
-function copySkill(srcDir, destDir) {
+// Development-only provenance: it belongs in the workshop, never in the shipped
+// skill. The consuming repo gets only what an agent needs to USE the skill.
+const DEV_ONLY = new Set(['runs', 'source-material', 'interview-notes.md', 'scenarios']);
+
+export function copySkill(srcDir, destDir) {
   fs.rmSync(destDir, { recursive: true, force: true });
   fs.cpSync(srcDir, destDir, {
     recursive: true,
-    filter: (src) => !src.split(path.sep).includes('runs') && !path.basename(src).startsWith('.DS_Store'),
+    filter: (src) =>
+      !src.split(path.sep).some((part) => DEV_ONLY.has(part)) && !path.basename(src).startsWith('.DS_Store'),
   });
 }
 
