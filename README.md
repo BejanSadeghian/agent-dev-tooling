@@ -1,5 +1,9 @@
 # Skill development environment
 
+> Seeing plain text full of `#` marks? That's fine — `#` just marks a heading. This page looks
+> best on the project's GitHub website, or in VS Code: right-click `README.md` → **Open
+> Preview**.
+
 This project (a "repo" — a shared folder that lives on GitHub) is where agent **skills** get
 built and tested. A skill is a set of instructions an AI assistant can follow to do one job
 well — for example: *read a timesheet export and flag overtime*, or *turn raw survey answers
@@ -21,20 +25,23 @@ does the technical parts for you.
 
 **Have these two things first** (five minutes with whoever asked you to do this, if you don't):
 
-- A **GitHub account**. Any GitHub account comes with Copilot's free tier, which is enough
-  for this guide — so if nobody answers tonight, a free account from
+- A **GitHub account**. Any GitHub account includes the free version of **Copilot** — the AI
+  assistant this guide is built around (think ChatGPT, but living inside your editor where it
+  can actually do the work). That free version is enough for this guide — so if nobody answers tonight, a free account from
   [github.com/signup](https://github.com/signup) still gets you through Steps 0–5. For the
   final delivery step you'll want company access; send whoever set you this task this exact
   sentence: *"I need a GitHub account in our organization with a Copilot seat, plus access to
   the skills repo and our team's delivery repo."*
-- The **web address of your team's repo** — where finished skills get delivered (last step
-  only; everything before it works without it).
+- The **web address of your team's repo** — where finished skills get delivered. It looks
+  like `github.com/yourcompany/team-skills`. Last step only; everything before it works
+  without it.
 
 **Then set up (once):**
 
 1. Install [VS Code](https://code.visualstudio.com) — a free program where the AI assistant
    lives. Open it, click the little person icon in the bottom-left corner, and sign in with
-   your GitHub account so **Copilot** works.
+   your GitHub account so **Copilot** works. (A browser window will open asking you to
+   authorize — approve it. Bouncing once or twice between VS Code and the browser is normal.)
 2. Get this project into VS Code:
    - **If the project folder is already on your computer** (someone sent or set it up):
      **File → Open Folder**, pick it, done. (Emailed as a .zip? Double-click the zip in
@@ -47,10 +54,12 @@ does the technical parts for you.
      ("Clone" just means "get my own copy" — you can't break anything.)
 3. Open the **Copilot Chat panel**: the speech-bubble icon in the left icon column, or press
    **Control+Command+I** on a Mac (**Ctrl+Alt+I** on Windows).
-4. At the bottom of the chat panel is a small mode dropdown — set it to **Agent**. In other
-   modes the chat only *talks about* work; Agent mode *does* the work.
+4. At the bottom of the chat panel is a small dropdown that says **Ask**, **Edit**, or
+   **Agent** — set it to **Agent**. The other two only *talk about* work; Agent mode *does*
+   the work.
 5. **Prove it works** before anything else — type: **"What folder are you working in?"**
-   The right answer ends in **agent-dev-tooling** (this project's name). Anything else:
+   The right answer ends in **agent-dev-tooling** (this project's name — a tacked-on ending
+   like `-main` is fine too). Anything else:
    - It named a different folder (like "Downloads")? **File → Open Folder**, pick the folder
      actually named agent-dev-tooling, ask again.
    - It gave you instructions instead of an answer? The mode dropdown isn't on **Agent** —
@@ -74,7 +83,7 @@ From here on, the assistant does everything — work through the steps in order.
 terminal? The same walkthrough with the actual commands is in
 [docs/advanced.md](docs/advanced.md).)
 
-### Step 1 — initialize
+### Step 1 — get set up
 
 > Prompt: "Set this repo up on my computer."
 
@@ -90,13 +99,15 @@ terminal? The same walkthrough with the actual commands is in
 - Switches on the safety checks and runs everything once.
 - Safe to repeat — an already-set-up computer just gets confirmed.
 
-**Done when:** everything passed. Items marked "optional" can wait — the assistant offers them when first needed.
+**Done when:** the chat shows the checks finishing with the words **"All checks passed."** Items marked "optional" can wait — the assistant offers them when first needed.
 
 ### Step 2 — build a skill
 
 > Prompt: "I want to build a skill for ___" — describe the job in your own words. Have notes
-> or example files? Drag them into the chat, or just say where they are ("there's an example
-> in my Downloads called timesheet-march.xlsx").
+> or example files? Drag them from Finder straight into the chat box (yes, that works), or
+> just say where they are ("there's an example in my Downloads called timesheet-march.xlsx").
+> Everyday examples are fine here; keep genuinely sensitive files for Step 3, which explains
+> how they're kept private.
 
 **What happens:**
 
@@ -155,7 +166,7 @@ company's AI policy.
 - Every check runs: format, pair rules, all tests, nothing-edited-without-retesting.
 - Anything wrong is explained in plain words, with the fix.
 
-**Done when:** all checks passed.
+**Done when:** the chat shows **"All checks passed."**
 
 ### Step 6 — publish
 
@@ -202,6 +213,8 @@ Two things worth knowing:
 - **You develop in one chat, but testing happens in a fresh one.** The assistant that wrote a
   skill already knows what it *meant* to say, so it would paper over the gaps. Testing always
   uses a separate agent that has never seen your conversation.
+- **Stuck or confused at any point?** Say "Where am I — what should I do next?" in THIS chat.
+  A browser chatbot can only pretend to know — it cannot see your computer.
 
 ## The pair
 
