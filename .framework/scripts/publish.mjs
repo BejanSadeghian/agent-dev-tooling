@@ -138,7 +138,13 @@ function main(argv) {
 
   if (isRemote) {
     console.log(bold(`\nCloning ${target.repo}`));
-    execFileSync('git', ['clone', '--depth', '1', target.repo, workdir], { stdio: 'inherit' });
+    const cloned = spawnSync('git', ['clone', '--depth', '1', target.repo, workdir], { stdio: 'inherit' });
+    if (cloned.status !== 0) {
+      console.error(red('\nThe team repo would not let this account in — this is almost always missing access, not a mistake you made.'));
+      console.error(green('Your work is already saved and uploaded to this workshop repo — nothing is lost.'));
+      console.error(`Ask whoever gave you this task for access to ${target.repo}, then run: npm run publish -- ${useCase}`);
+      return 1;
+    }
   } else if (!fs.existsSync(workdir)) {
     console.error(red(`target path does not exist: ${workdir}`));
     return 1;
@@ -179,7 +185,13 @@ function main(argv) {
   }
 
   console.log(bold('\nPushing and opening the pull request'));
-  execFileSync('git', ['push', '-u', 'origin', branch, '--force-with-lease'], { cwd: workdir, stdio: 'inherit' });
+  const targetPush = spawnSync('git', ['push', '-u', 'origin', branch, '--force-with-lease'], { cwd: workdir, stdio: 'inherit' });
+  if (targetPush.status !== 0) {
+    console.error(red('\nThe team repo refused the upload — this is almost always missing WRITE access, not a mistake you made.'));
+    console.error(green('Your work is already saved and uploaded to this workshop repo — nothing is lost.'));
+    console.error(`Ask whoever gave you this task for write access to ${target.repo}, then run: npm run publish -- ${useCase}`);
+    return 1;
+  }
   const pr = spawnSync(
     'gh',
     ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Publishes the \`${useCase}\` doer/interpreter pair from the skill development environment. ${overridden ? `**Checks were overridden by ${overrideBy}:** ${overrideReason}` : 'All checks were green at publish time.'}`],

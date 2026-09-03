@@ -82,6 +82,9 @@ Work through `references/interview.md`. The shape:
   probed with "if this were 2% off, would you notice?" (yes = doer Python, per
   `references/python-determinism.md`); the lens extracted from an accepted output versus a
   rejected one.
+- **Persist as you go.** Every few answers, save progress to gitignored `tmp/interview-<use-case>.json`;
+  on session start, check `tmp/` for a partial interview and offer to resume — a closed laptop
+  never loses an answer.
 - **Stop when the answers stop changing your draft** — or when the author says done.
 
 ### 3. Confirm the boundary before generating

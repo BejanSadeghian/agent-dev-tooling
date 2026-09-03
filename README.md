@@ -21,10 +21,12 @@ does the technical parts for you.
 
 **Have these two things first** (five minutes with whoever asked you to do this, if you don't):
 
-- A **GitHub account with Copilot access**. If your company uses GitHub, use the account they
-  gave you. Not sure you have it? Send whoever set you this task this exact sentence: *"I need
-  a GitHub account in our organization with a Copilot seat, plus access to the skills repo and
-  our team's delivery repo."* That is the complete list — get it answered **before** tomorrow.
+- A **GitHub account**. Any GitHub account comes with Copilot's free tier, which is enough
+  for this guide — so if nobody answers tonight, a free account from
+  [github.com/signup](https://github.com/signup) still gets you through Steps 0–5. For the
+  final delivery step you'll want company access; send whoever set you this task this exact
+  sentence: *"I need a GitHub account in our organization with a Copilot seat, plus access to
+  the skills repo and our team's delivery repo."*
 - The **web address of your team's repo** — where finished skills get delivered (last step
   only; everything before it works without it).
 
@@ -48,9 +50,17 @@ does the technical parts for you.
 4. At the bottom of the chat panel is a small mode dropdown — set it to **Agent**. In other
    modes the chat only *talks about* work; Agent mode *does* the work.
 5. **Prove it works** before anything else — type: **"What folder are you working in?"**
-   The answer should name this project's folder. If it can't tell you, or you got a wall of
-   instructions instead of an answer, you're in the wrong mode or the wrong window — fix that
-   before Step 1, or every step after will only *pretend* to happen.
+   The right answer ends in **agent-dev-tooling** (this project's name). Anything else:
+   - It named a different folder (like "Downloads")? **File → Open Folder**, pick the folder
+     actually named agent-dev-tooling, ask again.
+   - It gave you instructions instead of an answer? The mode dropdown isn't on **Agent** —
+     set it and ask again.
+   - No speech-bubble icon at all? Your Copilot sign-in didn't finish — click the person icon
+     (bottom-left) and sign in again.
+
+   Don't start Step 1 until this answers correctly — otherwise every step after will only
+   *pretend* to happen. And if the wrong-mode chat handed you instructions or commands:
+   ignore them completely — once you're in Agent mode, just ask again and it does the work.
 
 > **Every "Prompt" in this guide gets typed into that Copilot Chat panel — never into ChatGPT
 > or a browser.** A chat outside this folder cannot see your computer and will happily
@@ -72,12 +82,15 @@ terminal? The same walkthrough with the actual commands is in
 
 - Checks your computer has three standard free tools this project needs (called Node,
   Python, and git — you never use them directly).
-- Anything missing: it asks your permission, then installs. Saying yes is safe; on a locked
-  company machine, forward what it names to IT.
+- Anything missing: it asks your permission, then installs. Saying yes to what the assistant
+  proposes is safe (your Mac may also ask for your password — normal). Unsure what any
+  button or popup is? Ask the assistant "what am I approving?" before clicking. On a locked
+  company machine, forward what it names to IT — these tools also have per-user installs that
+  need no admin rights, and what the assistant shows you names them.
 - Switches on the safety checks and runs everything once.
 - Safe to repeat — an already-set-up computer just gets confirmed.
 
-**Done when:** everything passed — optional extras (the reviewer list, the fresh-agent test runner) can be installed when first needed, and the assistant will offer.
+**Done when:** everything passed. Items marked "optional" can wait — the assistant offers them when first needed.
 
 ### Step 2 — build a skill
 
@@ -127,11 +140,11 @@ company's AI policy.
 
 - One item at a time — a list of five gets five shallow fixes; one at a time gets five real ones.
 - Each item becomes a fix AND a test that would have caught it.
-- You may see a red "failed" flash by — that is deliberate: the new test is shown failing
-  once to prove it can catch the mistake, then it passes forever.
+- The assistant will tell you when a red "failed" is deliberate (a new test shown failing
+  once to prove it can catch the mistake). A red nobody explained is real — ask about it.
 - The skill's tests re-run and the fresh result is recorded.
 
-**Done when:** you prompt **"Test it again"** (same task) and two runs in a row come back clean.
+**Done when:** you prompt **"Test it again"** (same task) and two runs in a row come back clean — the automatic verdict passes and you have nothing left to correct.
 
 ### Step 5 — validate
 
@@ -146,7 +159,8 @@ company's AI policy.
 
 ### Step 6 — publish
 
-> Prompt: "Publish ___ to our team's repo."
+> Prompt: "Publish ___ to our team's repo" — the blank is the skill's name from Step 2, but
+> "publish my skill" works too; the assistant knows which one you built.
 
 **What happens:**
 
@@ -157,8 +171,12 @@ company's AI policy.
 - The pair is copied to the receiving repo (it asks for the address once, then remembers), and a
   review request opens there.
 
-**Done when:** you have the review link. Send it to your team lead — people on that side
-approve it there. Your part is finished.
+**Done when:** the assistant puts a web link in the chat — that page is where your team
+reviews and approves the delivery. Send the link to your team lead. Your part is finished.
+
+(If publishing stops with a permissions message instead of a link: your account can't write to
+the team repo yet. Nothing is lost — your work is saved. Send the Step 0 access sentence to
+your lead, then say "publish" again once access is granted.)
 
 ## Quick reference — things you can say
 

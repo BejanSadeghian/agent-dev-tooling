@@ -76,6 +76,7 @@ Every failure names a skill and the command that fixes it. Say it back in their 
 | `R8 artifact "x" has no accuracy test` | Something the skill produces is untested | `npm run test:new -- <skill>` |
 | `scaling regressed: n^1.0 → n^2.1` | The code got much slower on big inputs | Look at what changed in the doer's `scripts/`, then re-measure |
 | `missing required heading "## Workflow"` | The skill file lost a required section | Put the section back |
+| `Permission ... denied` / `403` at publish | Their account cannot write to the team repo yet — nothing is lost, their work is saved | Pause; they request access with the README's Step 0 sentence, then `npm run publish` again |
 
 Fix the cause, then run `npm run check` again. Report the result in one line.
 

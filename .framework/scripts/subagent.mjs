@@ -113,7 +113,7 @@ function main(argv) {
   const { bin, promptFlag, extraArgs } = config.subagent;
   if (spawnSync(bin, ['--version'], { stdio: 'ignore' }).error) {
     console.error(red(`the "${bin}" CLI is not installed — the clean sub-agent needs it.`));
-    console.error('Install GitHub Copilot CLI (https://docs.github.com/en/copilot/how-tos/copilot-cli), or point .framework/framework.json "subagent.bin" at another agent CLI with a -p style prompt flag.');
+    console.error('Install it with: npm install -g @github/copilot   (docs: https://docs.github.com/en/copilot/how-tos/copilot-cli) — or point .framework/framework.json "subagent.bin" at another agent CLI with a -p style prompt flag.');
     return 1;
   }
 

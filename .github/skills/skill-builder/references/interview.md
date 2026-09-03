@@ -23,6 +23,10 @@ Before any question:
 Everything after this is gap work. A question about something the material already covers is a
 wasted question and tells the author you did not read.
 
+**Persist as you go.** After every few answers, write what you have so far to
+`tmp/interview-<use-case>.json` (gitignored) — a closed laptop must never lose an answer. At the
+start of any session, check `tmp/` for a partial interview and offer to resume it.
+
 ## 1. Build the gap map, and let the author steer
 
 Compare the material against what a finished pair needs to know:

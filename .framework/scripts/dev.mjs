@@ -129,7 +129,7 @@ function doctor() {
   record(
     'Copilot CLI for clean test runs (optional)',
     has('copilot'),
-    'testing skills with a fresh agent needs it: https://docs.github.com/en/copilot/how-tos/copilot-cli',
+    'testing skills with a fresh agent needs it — install: npm install -g @github/copilot (docs: https://docs.github.com/en/copilot/how-tos/copilot-cli)',
   );
 
   const wired = hooksWired();
