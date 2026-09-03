@@ -29,7 +29,7 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 - Switches on the safety checks and runs everything once.
 - Safe to repeat — an already-set-up computer just gets confirmed.
 
-**Done when:** everything passed. ("Reviewers not configured" is fine for now.)
+**Done when:** everything passed — optional items (reviewers, the Copilot CLI for test runs) can be installed when first needed, and the assistant will offer.
 
 ### Step 2 — build a skill
 

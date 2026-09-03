@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { REPO_ROOT, discoverSkills, loadConfig } from './lib/skills.mjs';
+import { REPO_ROOT, TRANSIENT_DIRS, discoverSkills, loadConfig } from './lib/skills.mjs';
 import { bold, dim, green, red, yellow } from './lib/report.mjs';
 
 function loadTargets(config) {
@@ -29,14 +29,17 @@ function loadTargets(config) {
 
 // Development-only provenance: it belongs in the workshop, never in the shipped
 // skill. The consuming repo gets only what an agent needs to USE the skill.
+// Transient run debris (caches, outputs) never ships either.
 const DEV_ONLY = new Set(['runs', 'source-material', 'interview-notes.md', 'scenarios']);
 
 export function copySkill(srcDir, destDir) {
   fs.rmSync(destDir, { recursive: true, force: true });
   fs.cpSync(srcDir, destDir, {
     recursive: true,
-    filter: (src) =>
-      !src.split(path.sep).some((part) => DEV_ONLY.has(part)) && !path.basename(src).startsWith('.DS_Store'),
+    filter: (src) => {
+      const parts = path.relative(srcDir, src).split(path.sep).filter(Boolean);
+      return !parts.some((part) => DEV_ONLY.has(part) || TRANSIENT_DIRS.has(part) || part.startsWith('.'));
+    },
   });
 }
 
@@ -60,7 +63,8 @@ function main(argv) {
   const targetName = targetFlag === -1 ? null : argv[targetFlag + 1];
   const overrideFlag = argv.indexOf('--override');
   const overrideReason = overrideFlag === -1 ? null : argv[overrideFlag + 1];
-  const useCase = argv.filter((a, i) => !a.startsWith('-') && i !== targetFlag + 1 && i !== overrideFlag + 1)[0];
+  const consumed = new Set([targetFlag, overrideFlag].filter((i) => i !== -1).map((i) => i + 1));
+  const useCase = argv.filter((a, i) => !a.startsWith('-') && !consumed.has(i))[0];
   const config = loadConfig();
 
   if (!useCase) {

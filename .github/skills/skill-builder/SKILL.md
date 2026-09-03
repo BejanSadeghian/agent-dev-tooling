@@ -92,11 +92,18 @@ an explicit yes. If the doer's "does" needs an "and", it is two use cases — sa
 
 ### 4. Generate the pair
 
+Write the interview's outcome into an answers file, then generate non-interactively:
+
 ```bash
-npm run skill:new
+npm run skill:new -- --answers /tmp/answers.json --yes
 ```
 
-It asks the same questions and writes both skills into `skills/` (creating the folder if
+The answers file carries what the interview produced — keys: `useCase`, `what`, `trigger`,
+`nonTrigger`, `fields[]` (each `"name: type — meaning"`), `steps[]`, `interprets`,
+`interpreterTrigger`, `interpreterNonTrigger`, `lens`. (Run without flags only in a real
+terminal; a non-interactive bare run refuses rather than generating an unnamed skill.)
+
+It writes both skills into `skills/` (creating the folder if
 this is the first pair): the doer (`SKILL.md`,
 `references/schema.md`, `references/variations/`, `scripts/<module>.py`, an accuracy test, an
 edge-case test, a performance test, seed regression cases, the interview record) and the

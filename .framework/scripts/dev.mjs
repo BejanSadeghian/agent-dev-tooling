@@ -126,6 +126,11 @@ function doctor() {
   record('Node.js 22+ is installed', Number(process.versions.node.split('.')[0]) >= 22, 'install Node 22 or newer: https://nodejs.org', 'node');
   record('Python 3 is installed', spawnSync('python3', ['--version'], { stdio: 'ignore' }).status === 0, 'install Python 3.11+: https://python.org', 'python');
   record('GitHub command line (optional)', has('gh'), 'install gh, then run: bash .framework/setup/configure-gh.sh', 'gh');
+  record(
+    'Copilot CLI for clean test runs (optional)',
+    has('copilot'),
+    'testing skills with a fresh agent needs it: https://docs.github.com/en/copilot/how-tos/copilot-cli',
+  );
 
   const wired = hooksWired();
   if (!wired) {

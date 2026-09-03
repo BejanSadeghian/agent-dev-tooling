@@ -19,7 +19,7 @@ commands — never hand-roll their jobs:
 | The user wants | Use skill | Commands |
 | --- | --- | --- |
 | Set up this computer | — | `npm run doctor`, then `npm run setup` |
-| Build a new skill / use case | `skill-builder` | interview first, then `npm run skill:new` (writes the pair into `skills/`, creating it if absent) |
+| Build a new skill / use case | `skill-builder` | interview first, then `npm run skill:new -- --answers <file> --yes` (you fill the answers file from the interview; writes the pair into `skills/`) |
 | Test a skill being built | `skill-builder` | `npm run subagent -- <use-case> "<real task>"` (`--role interpreter`, `--discovery`) — NEVER run the skill yourself |
 | Run a repeatable acceptance eval | `skill-builder` | `npm run scenario -- <use-case> [name]` — 3 fresh-sandbox trials, one report; record `--accept`/`--reject` only at the human's explicit direction, with their reason |
 | Fix a skill after feedback | `skill-builder` | edit + a regression case for each item, then `npm run regression -- <skill>` |

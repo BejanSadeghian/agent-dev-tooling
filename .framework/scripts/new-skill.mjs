@@ -121,6 +121,15 @@ async function main(argv) {
   const spec = await collect(prompter, args);
   prompter.close();
 
+  if (!spec.useCase) {
+    console.error(red('\nNo use-case name. A non-interactive run must supply the answers:'));
+    console.error('  npm run skill:new -- <use-case-name>                       # name only, defaults for the rest');
+    console.error('  npm run skill:new -- --answers answers.json --yes          # full control');
+    console.error(dim('  answers.json keys: useCase, what, trigger, nonTrigger, fields[], steps[],'));
+    console.error(dim('                     interprets, interpreterTrigger, interpreterNonTrigger, lens'));
+    return 1;
+  }
+
   const baseDir = args.root ? path.resolve(args.root) : path.resolve(REPO_ROOT, config.productSkillsDir);
   const doerDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.doer}`);
   const interpreterDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.interpreter}`);
