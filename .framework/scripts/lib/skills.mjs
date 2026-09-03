@@ -38,7 +38,7 @@ export function skillForPath(config, relPath) {
     if (!norm.startsWith(prefix)) continue;
     const remainder = norm.slice(prefix.length);
     const name = remainder.split('/')[0];
-    // A loose file directly in the root (development/README.md) is not a skill,
+    // A loose file directly in the root (skills/README.md) is not a skill,
     // and neither is anything whose name breaks the kebab-case rule.
     if (name && remainder.includes('/') && namePattern.test(name)) return name;
   }

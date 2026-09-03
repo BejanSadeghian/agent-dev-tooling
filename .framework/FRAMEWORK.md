@@ -16,7 +16,7 @@ the same commit you change this page**.
   separated.
 
 The role is detected from the directory-name suffix; there is no manifest. A skill under
-`development/` with neither suffix fails the format check. A pair missing one half is a
+`skills/` with neither suffix fails the format check. A pair missing one half is a
 **warning, never a blocker** (`npm run health` keeps naming it).
 
 **Skills are developed here, used elsewhere.**
@@ -24,7 +24,7 @@ The role is detected from the directory-name suffix; there is no manifest. A ski
 - `.github/skills/` — the dev tools (`skill-builder`, `test-generator`, `dev-helper`), each
   directly at this level, where GitHub Copilot discovers them. These are the skills the authoring
   agent uses.
-- `development/` — product skills being built (created by `npm run skill:new` when the first
+- `skills/` — product skills being built (created by `npm run skill:new` when the first
   pair is generated). Deliberately NOT auto-discovered: a work in progress never leaks into the
   authoring agent's skill list, and the authoring agent never executes one in its own context —
   `npm run subagent` launches a clean sub-agent instead.
@@ -33,7 +33,7 @@ The role is detected from the directory-name suffix; there is no manifest. A ski
 
 ## 2. Skill layout (agentskills.io)
 
-Skills live one directory deep under a configured root (`skillsDirs`: `development/` and
+Skills live one directory deep under a configured root (`skillsDirs`: `skills/` and
 `.github/skills/`). The directory name **is** the skill name.
 
 ```text

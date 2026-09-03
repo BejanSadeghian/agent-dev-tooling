@@ -6,7 +6,7 @@ const config = loadConfig();
 
 test('maps a file inside a skill back to the skill', () => {
   assert.equal(skillForPath(config, '.github/skills/skill-builder/references/interview.md'), 'skill-builder');
-  assert.equal(skillForPath(config, 'development/demo-doer/SKILL.md'), 'demo-doer');
+  assert.equal(skillForPath(config, 'skills/demo-doer/SKILL.md'), 'demo-doer');
 });
 
 test('returns null for files outside any skills root', () => {
@@ -16,8 +16,8 @@ test('returns null for files outside any skills root', () => {
 });
 
 test('a loose file directly in a skills root is not a skill', () => {
-  assert.equal(skillForPath(config, 'development/README.md'), null);
-  assert.equal(skillForPath(config, 'development/Not_A_Skill/SKILL.md'), null);
+  assert.equal(skillForPath(config, 'skills/README.md'), null);
+  assert.equal(skillForPath(config, 'skills/Not_A_Skill/SKILL.md'), null);
 });
 
 test('every configured skills root is discovered', () => {

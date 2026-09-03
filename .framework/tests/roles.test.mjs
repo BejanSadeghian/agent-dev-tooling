@@ -19,7 +19,7 @@ const PY_TEST = (kind) => `KIND = "${kind}"\nCOVERS = ["sales-summary", "sales_s
 function makeDoerRepo(overrides = {}) {
   return makeRepo({
     name: 'sales-summary-doer',
-    skillsRoot: 'development',
+    skillsRoot: 'skills',
     skillMd: doerSkillMd('sales-summary-doer'),
     schemaMd: VALID_SCHEMA_MD,
     scripts: { 'sales_summary.py': 'def build(rows):\n    return {"records": [], "deviations": []}\n' },
@@ -32,8 +32,8 @@ test('roles are detected from the name suffix; tools are role-exempt', (t) => {
   t.after(repo.cleanup);
   const config = loadConfig(repo.root);
   assert.equal(roleOf(config, repo.skill), 'doer');
-  assert.equal(roleOf(config, { name: 'sales-summary-interpreter', root: 'development' }), 'interpreter');
-  assert.equal(roleOf(config, { name: 'sales-summary', root: 'development' }), null);
+  assert.equal(roleOf(config, { name: 'sales-summary-interpreter', root: 'skills' }), 'interpreter');
+  assert.equal(roleOf(config, { name: 'sales-summary', root: 'skills' }), null);
   assert.equal(roleOf(config, { name: 'dev-helper', root: '.github/skills' }), 'tool');
   assert.equal(useCaseOf(config, 'sales-summary-doer'), 'sales-summary');
   assert.equal(counterpartName(config, repo.skill), 'sales-summary-interpreter');
@@ -54,7 +54,7 @@ test('a lone doer draws a pair warning; a complete pair draws none', (t) => {
 });
 
 test('a product skill without a role suffix fails the format check', (t) => {
-  const repo = makeRepo({ name: 'sales-summary', skillsRoot: 'development' });
+  const repo = makeRepo({ name: 'sales-summary', skillsRoot: 'skills' });
   t.after(repo.cleanup);
   assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /must be one half of a pair/);
 });
@@ -80,7 +80,7 @@ test('a doer with no scripts/ fails the format check', (t) => {
 test('an interpreter must instruct the two-part output and name the schema', (t) => {
   const good = makeRepo({
     name: 'sales-summary-interpreter',
-    skillsRoot: 'development',
+    skillsRoot: 'skills',
     skillMd: interpreterSkillMd('sales-summary-interpreter'),
   });
   t.after(good.cleanup);
@@ -88,7 +88,7 @@ test('an interpreter must instruct the two-part output and name the schema', (t)
 
   const bad = makeRepo({
     name: 'sales-summary-interpreter',
-    skillsRoot: 'development',
+    skillsRoot: 'skills',
     skillMd: interpreterSkillMd('sales-summary-interpreter').replace('## Interpretations', '## Opinions'),
   });
   t.after(bad.cleanup);
@@ -129,7 +129,7 @@ test('python test files declaring KIND and COVERS close doer gaps', (t) => {
 test('interpreters and tools owe no three-kind coverage', (t) => {
   const repo = makeRepo({
     name: 'sales-summary-interpreter',
-    skillsRoot: 'development',
+    skillsRoot: 'skills',
     skillMd: interpreterSkillMd('sales-summary-interpreter'),
   });
   t.after(repo.cleanup);

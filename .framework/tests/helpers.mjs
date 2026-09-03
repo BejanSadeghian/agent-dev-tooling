@@ -106,7 +106,7 @@ export function makeRepo({
 } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-tooling-'));
   const base = JSON.parse(fs.readFileSync(new URL('../framework.json', import.meta.url), 'utf8'));
-  const merged = { ...base, ...config, skillsDirs: config.skillsDirs ?? [...new Set([skillsRoot, 'development'])] };
+  const merged = { ...base, ...config, skillsDirs: config.skillsDirs ?? [...new Set([skillsRoot, 'skills'])] };
   fs.mkdirSync(path.join(root, '.framework'), { recursive: true });
   fs.writeFileSync(path.join(root, '.framework/framework.json'), JSON.stringify(merged, null, 2));
 
@@ -148,7 +148,7 @@ export function makeRepo({
 /** Add a second skill to an existing makeRepo() repo, same conformance defaults. */
 export function addSkill(repo, {
   name,
-  skillsRoot = 'development',
+  skillsRoot = 'skills',
   skillMd,
   cases = [VALID_CASE],
   variations = { 'default.md': '# Variation: default\n\nBaseline behaviour.\n' },

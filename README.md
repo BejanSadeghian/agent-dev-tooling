@@ -12,106 +12,96 @@ does the technical parts for you.
 
 ## Getting started: your first skill, step by step
 
-Work through these in order. Each step tells you what to say to your assistant, what happens
-while it works, and how you know it worked. (Prefer a terminal? The same walkthrough with the
-actual commands and their output is in [docs/advanced.md](docs/advanced.md).)
+> **Before anything:** clone this repo and open it in VS Code with Copilot Chat (or Claude
+> Code). Clone once — after that, just reopen the folder.
 
-### Step 0 — open the repo in an assistant
-
-**First time only:** install [VS Code](https://code.visualstudio.com) with GitHub Copilot (or use
-Claude Code). In VS Code choose **Clone Git Repository**, paste this repo's address, open the
-folder, then open the Copilot Chat panel. The assistant reads this repo's rules and tools
-automatically — you never have to tell it how things work here.
-
-**Every time after that:** do NOT clone again — that makes a second copy and your work ends up
-split across folders. Just open VS Code, pick this repo from **File → Open Recent**, and open the
-chat. Not sure where you left off? Ask: **"Where am I — what should I do next?"**
+Work through the steps in order. (Prefer a terminal? The same walkthrough with the actual
+commands and their output is in [docs/advanced.md](docs/advanced.md).)
 
 ### Step 1 — initialize
 
-**Say:** "Set this repo up on my computer." (Safe to say every time — if the computer is already
-set up, it simply confirms everything and changes nothing.)
+> Prompt: "Set this repo up on my computer."
 
-**What happens:** it checks that your computer has the three things this repo needs (Node,
-Python, git). If something is missing it shows you one install command and asks permission before
-running it. Then it switches on the safety checks and runs every check once to prove the setup
-works.
+**What happens:**
 
-**Done when:** it tells you everything passed. If it mentions "reviewers are not configured yet",
-that is fine — it matters only when you ask for a review later.
+- Checks your computer has what this repo needs (Node, Python, git).
+- Anything missing: shows you one install command, asks permission first.
+- Switches on the safety checks and runs everything once.
+- Safe to repeat — an already-set-up computer just gets confirmed.
+
+**Done when:** everything passed. ("Reviewers not configured" is fine for now.)
 
 ### Step 2 — build a skill
 
-**Say:** "I want to build a skill for ___" — and describe the job in your own words. Paste in any
-notes, examples, or documents you have.
+> Prompt: "I want to build a skill for ___" — describe the job in your own words; paste any
+> notes or examples you have.
 
-**What happens:** an interview, one question at a time — what the skill is called, when it should
-fire, when it must NOT fire, what fields the result carries, what the steps are, and how the
-result should be judged. Usually 8–15 questions. Answer from real examples ("last time I did
-this, I…"); say "I don't know" rather than guessing — it will propose a default. Then it
-generates **two** skill folders (the doer and the interpreter), with the result's agreed shape
-and all the tests, and fills in the real logic from your answers.
+**What happens:**
 
-**Done when:** it shows you the new pair inside `development/` and says the generated checks
-pass. Expect it to come back with a few follow-up questions while it replaces placeholders with
-your real rules — that is normal.
+- An interview, one question at a time — usually 8–15 questions.
+- Answer from real examples; say "I don't know" rather than guessing.
+- Generates two skill folders (doer + interpreter) into `skills/`, tests included.
+- Comes back with follow-ups while it turns placeholders into your real rules.
+
+**Done when:** the pair exists in `skills/` and its checks pass.
 
 ### Step 3 — test it
 
-**Say:** "Test it on a real task: ___" — a genuine task from your queue, not an invented one.
+> Prompt: "Test it on a real task: ___" — a genuine task, not an invented one.
 
-**What happens:** it hands the task to a **fresh, separate agent** that has never seen your
-conversation (this matters: your own chat knows what the skill *meant* to say and would paper
-over gaps). You get the transcript of what that agent did, the result it produced, and an
-automatic verdict: did the result match the agreed shape, and are Facts separated from
-Interpretations.
+**What happens:**
 
-**Done when:** you have read the result and formed an opinion. A messy first run is expected —
-that is what the next step is for.
+- A **fresh, separate agent** (which never saw your chat) runs the skill.
+- You get its transcript and the result it produced.
+- An automatic verdict: right shape? Facts separated from Interpretations?
+
+**Done when:** you have read the result. Messy first runs are normal.
 
 ### Step 4 — edit with feedback
 
-**Say:** "It should have done X instead" / "It broke on this file" / "That number is wrong" —
-one piece of feedback at a time, about the output.
+> Prompt: "It should have done X instead" — one piece of feedback at a time, about the output.
 
-**What happens:** every piece of feedback becomes TWO things: a fix to the skill and a new test
-that would have caught it — written to fail first, then pass once fixed. So a mistake made once
-can never quietly return. It re-runs the skill's tests and records the fresh result.
+**What happens:**
 
-**Done when:** a test run (step 3 again) needs no improvising and you would sign off on the
-output. Two clean runs in a row is the bar.
+- Each item becomes a fix AND a test that would have caught it.
+- The test fails first, then passes — so the mistake can never return.
+- The skill's tests re-run and the fresh result is recorded.
+
+**Done when:** two test runs in a row need no fixes.
 
 ### Step 5 — validate
 
-**Say:** "Check my work."
+> Prompt: "Check my work."
 
-**What happens:** every check runs — the skill's format, the pair rules, every test, and whether
-anything was edited without re-testing. Anything wrong is explained in plain words with what
-fixes it.
+**What happens:**
 
-**Done when:** it says all checks passed.
+- Every check runs: format, pair rules, all tests, nothing-edited-without-retesting.
+- Anything wrong is explained in plain words, with the fix.
+
+**Done when:** all checks passed.
 
 ### Step 6 — save
 
-**Say:** "Save my work."
+> Prompt: "Save my work."
 
-**What happens:** the checks run again first; only if everything passes does it save your work
-and upload it to GitHub on its own branch (never on the shared main branch). If a check fails,
-nothing is saved and it tells you why.
+**What happens:**
+
+- Checks run again first; a failure means nothing is saved.
+- Work is saved and uploaded on its own branch, never the shared one.
 
 **Done when:** it confirms "saved and uploaded".
 
 ### Step 7 — review and ship
 
-**Say:** "Ask for a review" — it opens a review request on GitHub with your configured reviewers,
-so a person approves the work before it joins the shared branch.
+> Prompt: "Ask for a review." — then, once approved: "Ship ___ to our team's repo."
 
-Then, when the pair is approved and green: **"Ship ___ to our team's repo."** The first time, it
-will ask you for the address of the repo that should receive skills and remember it. It verifies
-the pair passes everything, copies it over on its own branch, and opens a review request there
-too. That receiving repo is where people actually use the skill.
+**What happens:**
 
-**Done when:** it gives you the link to the review request in the receiving repo.
+- A review request opens on GitHub so a person approves before merge.
+- Shipping asks for the receiving repo's address the first time, then remembers it.
+- The pair is re-verified, copied over, and a review request opens there too.
+
+**Done when:** you have the receiving repo's review link.
 
 ## Quick reference — things you can say
 
@@ -148,7 +138,7 @@ A pair missing one half is flagged in the health report, but never blocks your w
 
 | Folder | In plain words |
 | --- | --- |
-| `development/` | The workshop: skills being built, in pairs. It appears when you build your first one. Kept invisible to your assistant on purpose, so a work in progress only ever runs in that fresh, separate agent. |
+| `skills/` | The workshop: skills being built, in pairs. It appears when you build your first one. Kept invisible to your assistant on purpose, so a work in progress only ever runs in that fresh, separate agent. |
 | `.github/skills/` | The assistant's own tools for working here (described below). |
 | `.framework/` | The machinery that checks everything — never edited by hand. |
 | `.framework/state/` | The inspection stickers: proof of when each skill's tests last passed, and of exactly which version was tested. Change a skill and its sticker stops matching, so the tests must run again. Only the machinery writes these. |

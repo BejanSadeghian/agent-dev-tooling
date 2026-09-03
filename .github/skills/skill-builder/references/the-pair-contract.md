@@ -60,6 +60,6 @@ until the other half exists (`npm run skill:new -- --only <role>` scaffolds it).
 
 ## Naming
 
-`development/<use-case>-doer/` and `development/<use-case>-interpreter/`. The suffix is how the
+`skills/<use-case>-doer/` and `skills/<use-case>-interpreter/`. The suffix is how the
 tooling detects roles — there is no manifest. A product skill with neither suffix fails the format
 check.

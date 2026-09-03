@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Interactive use-case generator. Asks the questions, then writes the whole PAIR:
-//   development/<use-case>-doer/         SKILL.md, references/schema.md, variations,
+//   skills/<use-case>-doer/         SKILL.md, references/schema.md, variations,
 //                                        deterministic scripts/, three kinds of test,
 //                                        seed regression cases
-//   development/<use-case>-interpreter/  SKILL.md (Facts/Interpretations contract),
+//   skills/<use-case>-interpreter/  SKILL.md (Facts/Interpretations contract),
 //                                        variations, structural regression cases
 // Then validates and runs both.
 //

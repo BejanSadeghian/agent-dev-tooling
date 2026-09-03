@@ -16,12 +16,12 @@ function generate(t, answers, extraArgs = []) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-gen-'));
   const answersFile = path.join(root, 'answers.json');
   fs.writeFileSync(answersFile, JSON.stringify(answers));
-  const result = node(['.framework/scripts/new-skill.mjs', '--answers', answersFile, '--yes', '--root', path.join(root, 'development'), '--no-verify', ...extraArgs]);
+  const result = node(['.framework/scripts/new-skill.mjs', '--answers', answersFile, '--yes', '--root', path.join(root, 'skills'), '--no-verify', ...extraArgs]);
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   return {
     root,
-    doerDir: path.join(root, 'development', `${answers.useCase}-doer`),
-    interpreterDir: path.join(root, 'development', `${answers.useCase}-interpreter`),
+    doerDir: path.join(root, 'skills', `${answers.useCase}-doer`),
+    interpreterDir: path.join(root, 'skills', `${answers.useCase}-interpreter`),
     result,
   };
 }
@@ -101,9 +101,9 @@ test('everything generated passes format, tests and rubric with no hand-editing'
   t.after(() => fs.rmSync(scratch, { recursive: true, force: true }));
   fs.cpSync(path.join(REPO_ROOT, '.framework/scripts'), path.join(scratch, '.framework/scripts'), { recursive: true });
   fs.cpSync(path.join(REPO_ROOT, '.framework/harness'), path.join(scratch, '.framework/harness'), { recursive: true });
-  fs.cpSync(doerDir, path.join(scratch, 'development/unit-economics-doer'), { recursive: true });
-  fs.cpSync(interpreterDir, path.join(scratch, 'development/unit-economics-interpreter'), { recursive: true });
-  fs.writeFileSync(path.join(scratch, '.framework/framework.json'), JSON.stringify({ ...config, skillsDirs: ['development'] }, null, 2));
+  fs.cpSync(doerDir, path.join(scratch, 'skills/unit-economics-doer'), { recursive: true });
+  fs.cpSync(interpreterDir, path.join(scratch, 'skills/unit-economics-interpreter'), { recursive: true });
+  fs.writeFileSync(path.join(scratch, '.framework/framework.json'), JSON.stringify({ ...config, skillsDirs: ['skills'] }, null, 2));
 
   const run = (script) =>
     spawnSync('node', [path.join(scratch, '.framework/scripts', script)], { cwd: scratch, encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Ship a finished pair to a target repo. Skills are DEVELOPED here and USED
-// elsewhere: when a pair is green, this copies it out of development/ into the
+// elsewhere: when a pair is green, this copies it out of skills/ into the
 // target's skills folder (default: .github/skills/, where Copilot discovers it),
 // on a branch, with a pull request when the target is a remote repo.
 //

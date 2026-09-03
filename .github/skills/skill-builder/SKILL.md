@@ -93,7 +93,7 @@ an explicit yes. If the doer's "does" needs an "and", it is two use cases — sa
 npm run skill:new
 ```
 
-It asks the same questions and writes both skills into `development/` (creating the folder if
+It asks the same questions and writes both skills into `skills/` (creating the folder if
 this is the first pair): the doer (`SKILL.md`,
 `references/schema.md`, `references/variations/`, `scripts/<module>.py`, an accuracy test, an
 edge-case test, a performance test, seed regression cases, the interview record) and the
@@ -188,7 +188,7 @@ they are the evidence the suite ran after the last edit. When the pair is done a
 
 ## Outputs
 
-- The pair under `development/`, valid against `.framework/FRAMEWORK.md`: both documents, the
+- The pair under `skills/`, valid against `.framework/FRAMEWORK.md`: both documents, the
   committed schema, variations, Python, tests, cases.
 - A green suite covering every hard rule, the artifact, and every module.
 - Clean sub-agent transcripts under `evals/runs/` showing runs that needed no improvisation.

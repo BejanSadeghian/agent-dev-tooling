@@ -1,7 +1,7 @@
 {
   "_comment": "Machine-readable contract for the skill framework: agentskills.io layout, the doer/interpreter pair, schema conformance, test coverage, and the freshness rubric. .framework/FRAMEWORK.md is the human-readable spec; keep the two in sync. Edit THIS file to change what the pre-commit hook and CI enforce.",
-  "skillsDirs": ["development", ".github/skills"],
-  "productSkillsDir": "development",
+  "skillsDirs": ["skills", ".github/skills"],
+  "productSkillsDir": "skills",
   "layout": {
     "requiredFiles": ["SKILL.md"],
     "allowedDirs": ["assets", "references", "scripts", "evals"],
@@ -30,7 +30,7 @@
   },
   "roles": {
     "suffixes": { "doer": "-doer", "interpreter": "-interpreter" },
-    "requireRoleIn": ["development"],
+    "requireRoleIn": ["skills"],
     "doer": {
       "schemaFile": "references/schema.md",
       "schemaMustContain": ["deviations"],
