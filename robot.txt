@@ -39,6 +39,10 @@ doctor reports the safety hooks were off, run `npm run setup`.
 
 ## Working rules
 
+- When the human hands you a real data file to run against, put it under outputs/ (or another
+  gitignored path) BEFORE doing anything else. Publish commits the whole tree — a real file
+  left elsewhere would be uploaded and shipped. (.framework/framework-data.md is the contract.)
+
 - New pairs are generated into skills/ with `npm run skill:new` — do not hand-scaffold.
   The folder does not exist until the first pair is generated; the generator creates it.
 - After ANY edit to a skill, re-run its suite (`npm run regression -- <skill>`) and commit the
