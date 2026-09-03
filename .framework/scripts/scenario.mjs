@@ -167,6 +167,11 @@ export function runScenario(config, useCase, scenario, { root = REPO_ROOT, runAg
     fs.rmSync(sandbox, { recursive: true, force: true });
   }
 
+  // Every distinct checkpoint gets a short ID (C1, C2, ...) so a human can refer
+  // to a row without typing anything out: "waive C3 because ...".
+  const keys = [...new Map(matrix[0]?.checkpoints.map((c) => [`${c.step}:${c.id}`, true]) ?? []).keys()];
+  const cids = Object.fromEntries(keys.map((key, i) => [`C${i + 1}`, key]));
+
   const allCheckpoints = matrix.flatMap((t) => t.checkpoints);
   const verdict = allCheckpoints.length > 0 && allCheckpoints.every((c) => c.passed) ? 'pass' : 'fail';
   return {
@@ -178,6 +183,8 @@ export function runScenario(config, useCase, scenario, { root = REPO_ROOT, runAg
     threshold: `${trials}/${trials}`,
     verdict,
     override: null,
+    waivers: [],
+    cids,
     matrix,
   };
 }
@@ -199,9 +206,30 @@ export function readScenarioState(config, useCase, name, root = REPO_ROOT) {
   return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
 }
 
-/** The effective verdict: the human override when present, else the machine's. */
-export const effectiveVerdict = (result) => result.override?.verdict ?? result.verdict;
+/** Resolve a human-friendly reference (C3, or the full "step:id" key) to a checkpoint key. */
+export function resolveCheckpoint(result, ref) {
+  if (result.cids?.[ref]) return result.cids[ref];
+  const keys = Object.values(result.cids ?? {});
+  if (keys.includes(ref)) return ref;
+  throw new Error(`no checkpoint "${ref}" — the report lists them as ${Object.keys(result.cids ?? {}).join(', ')}`);
+}
 
+const isWaived = (result, key) => (result.waivers ?? []).some((w) => w.checkpoint === key);
+
+/**
+ * The effective verdict, in precedence order: a whole-verdict human override wins;
+ * otherwise a failed run counts as pass when every failing checkpoint is waived.
+ */
+export function effectiveVerdict(result) {
+  if (result.override) return result.override.verdict;
+  if (result.verdict === 'pass') return 'pass';
+  const failingKeys = [
+    ...new Set(result.matrix.flatMap((t) => t.checkpoints.filter((c) => !c.passed).map((c) => `${c.step}:${c.id}`))),
+  ];
+  return failingKeys.length > 0 && failingKeys.every((key) => isWaived(result, key)) ? 'pass' : result.verdict;
+}
+
+/** Whole-verdict override: accept or reject the scenario despite the machine. */
 export function applyOverride(config, useCase, name, { verdict, reason, by }, root = REPO_ROOT) {
   const result = readScenarioState(config, useCase, name, root);
   if (!result) throw new Error(`no recorded run for scenario "${name}" — run it first`);
@@ -211,26 +239,42 @@ export function applyOverride(config, useCase, name, { verdict, reason, by }, ro
   return result;
 }
 
+/** Waive ONE checkpoint by ID: that failure is accepted; everything else still counts. */
+export function applyWaiver(config, useCase, name, { checkpoint, reason, by }, root = REPO_ROOT) {
+  const result = readScenarioState(config, useCase, name, root);
+  if (!result) throw new Error(`no recorded run for scenario "${name}" — run it first`);
+  if (!reason) throw new Error('a waiver needs a reason — it is on the record');
+  const key = resolveCheckpoint(result, checkpoint);
+  result.waivers = (result.waivers ?? []).filter((w) => w.checkpoint !== key);
+  result.waivers.push({ checkpoint: key, reason, by, at: new Date().toISOString() });
+  writeScenarioState(config, result, root);
+  return result;
+}
+
 /** One report per scenario: verdict on top, checkpoint × trial grid as evidence. */
 export function renderReport(result) {
   const lines = [];
   const effective = effectiveVerdict(result);
+  const waivers = result.waivers ?? [];
+  const waivedNote = !result.override && result.verdict === 'fail' && effective === 'pass' ? ' (failures waived by the human — details below)' : '';
   lines.push(`# Scenario: ${result.scenario} (${result.useCase})`);
   lines.push('');
-  lines.push(`**Verdict: ${effective.toUpperCase()}**` + (result.override ? ` (human override — machine said ${result.verdict.toUpperCase()})` : ` (machine, threshold ${result.threshold})`));
+  lines.push(`**Verdict: ${effective.toUpperCase()}**` + (result.override ? ` (human override — machine said ${result.verdict.toUpperCase()})` : ` (machine, threshold ${result.threshold})${waivedNote}`));
   if (result.override) lines.push(`> Overridden by ${result.override.by} at ${result.override.at}: ${result.override.reason}`);
   lines.push('');
   lines.push(`Ran ${result.ranAt} — ${result.trials} independent trials, every checkpoint must pass in every trial.`);
   lines.push('');
 
   // checkpoint × trial grid, with a rate column: the diagnosis view.
-  const ids = [...new Map(result.matrix[0]?.checkpoints.map((c) => [`${c.step}:${c.id}`, c]) ?? []).keys()];
-  lines.push(`| Checkpoint | ${result.matrix.map((t) => `trial ${t.trial}`).join(' | ')} | rate |`);
-  lines.push(`| --- | ${result.matrix.map(() => '---').join(' | ')} | --- |`);
-  for (const key of ids) {
+  const cids = result.cids ?? {};
+  const keyToCid = Object.fromEntries(Object.entries(cids).map(([cid, key]) => [key, cid]));
+  lines.push(`| ID | Checkpoint | ${result.matrix.map((t) => `trial ${t.trial}`).join(' | ')} | rate |`);
+  lines.push(`| --- | --- | ${result.matrix.map(() => '---').join(' | ')} | --- |`);
+  for (const [cid, key] of Object.entries(cids)) {
     const cells = result.matrix.map((t) => (t.checkpoints.find((c) => `${c.step}:${c.id}` === key)?.passed ? 'pass' : '**FAIL**'));
     const passes = cells.filter((c) => c === 'pass').length;
-    lines.push(`| ${key} | ${cells.join(' | ')} | ${passes}/${result.trials} |`);
+    const waived = waivers.find((w) => w.checkpoint === key);
+    lines.push(`| ${cid} | ${key}${waived ? ' *(waived)*' : ''} | ${cells.join(' | ')} | ${passes}/${result.trials} |`);
   }
   lines.push('');
 
@@ -238,7 +282,18 @@ export function renderReport(result) {
   if (failures.length) {
     lines.push('## Failures');
     lines.push('');
-    for (const f of failures) lines.push(`- trial ${f.trial}, ${f.step}:${f.id} — ${f.message}`);
+    for (const f of failures) {
+      const cid = keyToCid[`${f.step}:${f.id}`] ?? `${f.step}:${f.id}`;
+      lines.push(`- ${cid} (trial ${f.trial}) — ${f.message}`);
+    }
+    lines.push('');
+  }
+  if (waivers.length) {
+    lines.push('## Waived by the human');
+    lines.push('');
+    for (const w of waivers) {
+      lines.push(`- ${keyToCid[w.checkpoint] ?? w.checkpoint} — by ${w.by} at ${w.at}: ${w.reason}`);
+    }
     lines.push('');
   }
 
@@ -246,8 +301,11 @@ export function renderReport(result) {
   lines.push('');
   for (const t of result.matrix) lines.push(`- trial ${t.trial}: \`${t.transcript}\``);
   lines.push('');
-  lines.push('Disagree with this verdict? Tell your assistant to accept or reject it and give your');
-  lines.push('reason — the decision is recorded here with your name on it. (Command form in docs/advanced.md.)');
+  lines.push('Disagree? Tell your assistant, using the IDs above — no need to describe anything:');
+  lines.push(`- "Waive ${Object.keys(cids)[0] ?? 'C1'} because ..." — accept that one failing check; the rest still counts.`);
+  lines.push('- "Accept this whole result because ..." / "Reject it because ..." — overrule the verdict.');
+  lines.push('');
+  lines.push('Every decision is recorded here with your name and reason. (Command form: docs/advanced.md.)');
   lines.push('');
   return lines.join('\n');
 }
@@ -258,24 +316,52 @@ function main(argv) {
   const config = loadConfig();
   const accept = argv.indexOf('--accept');
   const reject = argv.indexOf('--reject');
-  const positional = argv.filter((a, i) => !a.startsWith('--') && i !== accept + 1 && i !== reject + 1);
+  const waive = argv.indexOf('--waive');
+  const list = argv.includes('--list');
+  const consumed = new Set([accept + 1, reject + 1, waive + 1, waive === -1 ? -9 : waive + 2].filter((i) => i > 0));
+  const positional = argv.filter((a, i) => !a.startsWith('--') && !consumed.has(i));
   const [useCase, only] = positional;
 
   if (!useCase) {
-    console.log('usage: npm run scenario -- <use-case> [scenario-name] [--accept "reason" | --reject "reason"]');
+    console.log('usage: npm run scenario -- <use-case> [scenario-name] [--list]');
+    console.log('       npm run scenario -- <use-case> <name> --accept "reason" | --reject "reason"');
+    console.log('       npm run scenario -- <use-case> <name> --waive <checkpoint-id> "reason"');
     return 1;
   }
 
-  if (accept !== -1 || reject !== -1) {
+  if (list) {
+    const scenarios = loadScenarios(config, useCase);
+    if (scenarios.length === 0) {
+      console.log(`no scenarios for "${useCase}"`);
+      return 0;
+    }
+    for (const s of scenarios) {
+      const recorded = readScenarioState(config, useCase, s.name);
+      if (!recorded) {
+        console.log(`${yellow('never run')} ${s.name} ${dim(s.def.description ?? '')}`);
+        continue;
+      }
+      const effective = effectiveVerdict(recorded);
+      const failing = Object.entries(recorded.cids ?? {})
+        .filter(([, key]) => recorded.matrix.some((t) => t.checkpoints.some((c) => `${c.step}:${c.id}` === key && !c.passed)))
+        .map(([cid]) => cid);
+      console.log(`${effective === 'pass' ? green('PASS') : red('FAIL')} ${s.name} ${dim(`(machine: ${recorded.verdict}${failing.length ? `, failing: ${failing.join(', ')}` : ''})`)}`);
+    }
+    return 0;
+  }
+
+  if (accept !== -1 || reject !== -1 || waive !== -1) {
     if (!only) {
-      console.error(red('an override targets one scenario: npm run scenario -- <use-case> <name> --accept "reason"'));
+      console.error(red('a decision targets one scenario: npm run scenario -- <use-case> <name> --accept "reason"'));
       return 1;
     }
-    const reason = argv[(accept !== -1 ? accept : reject) + 1];
     const by = process.env.USER || process.env.USERNAME || 'unknown';
     try {
-      const result = applyOverride(config, useCase, only, { verdict: accept !== -1 ? 'pass' : 'fail', reason, by });
-      console.log(green(`Recorded: ${only} is now ${effectiveVerdict(result).toUpperCase()} (override by ${by}).`));
+      const result =
+        waive !== -1
+          ? applyWaiver(config, useCase, only, { checkpoint: argv[waive + 1], reason: argv[waive + 2], by })
+          : applyOverride(config, useCase, only, { verdict: accept !== -1 ? 'pass' : 'fail', reason: argv[(accept !== -1 ? accept : reject) + 1], by });
+      console.log(green(`Recorded: ${only} is now ${effectiveVerdict(result).toUpperCase()} (${waive !== -1 ? `waiver on ${argv[waive + 1]}` : 'override'} by ${by}).`));
       console.log(dim(`Commit the updated ${config.scenarios.stateDir}/${useCase}/${only}.{json,md} with your decision.`));
       return 0;
     } catch (err) {

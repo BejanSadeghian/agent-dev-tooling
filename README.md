@@ -115,6 +115,7 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 | "Test it on a real task: ___" | Runs the skill with a **fresh, separate agent** and shows you what it produced |
 | "Make this a repeatable test" | Saves the task as a scenario: three fresh runs, one report card with a pass grid, a verdict you can overrule |
 | "Accept that test result anyway — because ___" | Records your override on the report card, with your reason and name; the machine's verdict stays visible underneath |
+| "Waive C3 on that report — because ___" | Accepts just that one failing check (each row on the report card has a short ID); everything else still counts |
 | "It should have done X instead" | Fixes the skill AND adds a test so that mistake can never come back |
 | "Check my work" | Runs every check and explains anything that fails, in plain words |
 | "Save my work" | Checks first, then saves and uploads it on its own branch |

@@ -72,9 +72,18 @@ overridable per scenario). The machine verdict is strict: every checkpoint, ever
 3" is not two results, it is one result — *inconsistent*. The report is a checkpoint × trial grid
 with a rate column, so the exact expectation that wavered is named.
 
-**The human override.** `npm run scenario -- <uc> <name> --accept "reason"` (or `--reject`)
-records who/when/why; the effective verdict flips but the machine verdict stays visible
-underneath. An override without a reason is refused. Only a human overrides.
+**Human decisions, by ID.** Every checkpoint row on the report carries a short ID (`C1`,
+`C2`, …) so the human never has to describe anything — they reference rows by ID. Three
+decisions exist, all recorded with name, time, and a mandatory reason, all directed by the human
+(the assistant records them only at the human's explicit direction):
+
+- **waive a checkpoint** (`--waive C3 "reason"`) — that one failure is accepted; every other
+  checkpoint still counts, and the verdict recomputes accordingly;
+- **accept the whole verdict** (`--accept "reason"`) — overrules a machine FAIL;
+- **reject the whole verdict** (`--reject "reason"`) — overrules a machine PASS.
+
+The machine verdict always stays visible underneath. `npm run scenario -- <uc> --list` shows
+every scenario's effective verdict and its failing checkpoint IDs at a glance.
 
 **Where results live.** Verdict + grid: `.framework/state/scenarios/<use-case>/<name>.{json,md}`
 — committed, they are the acceptance record. Full transcripts: the skill's `evals/runs/` —

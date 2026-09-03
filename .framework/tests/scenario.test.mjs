@@ -7,6 +7,8 @@ import path from 'node:path';
 import test from 'node:test';
 import {
   applyOverride,
+  applyWaiver,
+  resolveCheckpoint,
   effectiveVerdict,
   evalCheckpoint,
   loadScenarios,
@@ -161,4 +163,45 @@ test('a human override flips the effective verdict, on the record, and needs a r
   const report = renderReport(overridden);
   assert.match(report, /human override — machine said FAIL/);
   assert.match(report, /too strict/);
+});
+
+test('a waiver accepts one failing checkpoint by ID; the rest still counts', (t) => {
+  const repo = makeScenarioRepo({ steps: [DOER_STEP], trials: 1 });
+  t.after(repo.cleanup);
+  const config = loadConfig(repo.root);
+  const [scenario] = loadScenarios(config, 'margin', repo.root);
+
+  // Artifact is produced but the transcript never mentions python3 -> only C3 fails.
+  const agent = ({ cwd }) => {
+    fs.mkdirSync(path.join(cwd, 'outputs'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, 'outputs/margin.json'), JSON.stringify({ records: [], deviations: [] }));
+    return { output: 'wrote the artifact by following the steps', status: 0 };
+  };
+  const result = runScenario(config, 'margin', scenario, { root: repo.root, runAgent: agent });
+  writeScenarioState(config, result, repo.root);
+  assert.equal(result.verdict, 'fail');
+  assert.equal(resolveCheckpoint(result, 'C3'), '1:ran-the-script');
+  assert.throws(() => resolveCheckpoint(result, 'C9'), /no checkpoint "C9"/);
+
+  const waived = applyWaiver(config, 'margin', 'first-run', { checkpoint: 'C3', reason: 'script mention is optional here', by: 'tester' }, repo.root);
+  assert.equal(waived.verdict, 'fail'); // machine verdict untouched
+  assert.equal(effectiveVerdict(waived), 'pass'); // all failures waived
+  const report = renderReport(waived);
+  assert.match(report, /failures waived by the human/);
+  assert.match(report, /C3 \| 1:ran-the-script \*\(waived\)\*/);
+  assert.match(report, /## Waived by the human/);
+});
+
+test('a waiver on one checkpoint does not excuse a different failing checkpoint', (t) => {
+  const repo = makeScenarioRepo({ steps: [DOER_STEP], trials: 1 });
+  t.after(repo.cleanup);
+  const config = loadConfig(repo.root);
+  const [scenario] = loadScenarios(config, 'margin', repo.root);
+  const result = runScenario(config, 'margin', scenario, {
+    root: repo.root,
+    runAgent: () => ({ output: 'nothing produced at all', status: 0 }),
+  });
+  writeScenarioState(config, result, repo.root);
+  const waived = applyWaiver(config, 'margin', 'first-run', { checkpoint: 'C3', reason: 'ok without the script mention', by: 'tester' }, repo.root);
+  assert.equal(effectiveVerdict(waived), 'fail'); // C1/C2 still failing
 });
