@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { REPO_ROOT } from '../scripts/lib/skills.mjs';
+import { installHint } from '../scripts/dev.mjs';
 
 const dev = (dir, args, env = {}) =>
   spawnSync('node', ['.framework/scripts/dev.mjs', ...args], {
@@ -111,4 +112,13 @@ test('an unknown command prints the list of commands', (t) => {
   const result = dev(dir, ['frobnicate']);
   assert.equal(result.status, 1);
   assert.match(result.stdout, /npm run save/);
+});
+
+test('installHint names the one command for whatever package manager exists', () => {
+  const only = (bin) => (cmd) => cmd === bin;
+  assert.equal(installHint(['git', 'python'], only('brew')), 'brew install git python');
+  assert.equal(installHint(['node'], only('apt-get')), 'sudo apt-get update && sudo apt-get install -y nodejs npm');
+  assert.match(installHint(['git', 'gh'], only('winget')), /winget install --id Git\.Git && winget install --id GitHub\.cli/);
+  assert.equal(installHint(['git'], () => false), null);
+  assert.equal(installHint([], only('brew')), null);
 });

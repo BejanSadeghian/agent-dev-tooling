@@ -2,6 +2,14 @@
 # Humans: you want README.md. Agents: read README.md too (the concepts live
 # there); this file is only what applies specifically to you.
 
+## Start of every session
+
+Run `npm run doctor` before any other work. It verifies the runtimes this repo needs (Node 22+,
+Python 3.11+, git; gh optional) and, when something is missing, prints the one install command for
+this machine's package manager — ask the user before running it, then re-run the doctor until
+clean. If `npm` itself is missing, Node.js is not installed: install Node 22+ first. If the
+doctor reports the safety hooks were off, run `npm run setup`.
+
 ## Your contract
 
 - The framework spec is .framework/FRAMEWORK.md; the machine-readable mirror is

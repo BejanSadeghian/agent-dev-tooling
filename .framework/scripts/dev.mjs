@@ -207,18 +207,44 @@ async function ship(argv, prompter) {
   return 0;
 }
 
+// What each package manager calls the runtimes this repo needs.
+const PKG_NAMES = {
+  git: { brew: 'git', apt: 'git', winget: 'Git.Git' },
+  node: { brew: 'node', apt: 'nodejs npm', winget: 'OpenJS.NodeJS.LTS' },
+  python: { brew: 'python', apt: 'python3', winget: 'Python.Python.3.12' },
+  gh: { brew: 'gh', apt: 'gh', winget: 'GitHub.cli' },
+};
+
+/** One copy-pasteable install command for the missing tools, using whatever
+ *  package manager this machine has. Null when no manager (or nothing) is missing. */
+export function installHint(tools, hasCmd = has) {
+  if (tools.length === 0) return null;
+  const managers = [
+    { bin: 'brew', key: 'brew', cmd: (p) => `brew install ${p.join(' ')}` },
+    { bin: 'apt-get', key: 'apt', cmd: (p) => `sudo apt-get update && sudo apt-get install -y ${p.join(' ')}` },
+    { bin: 'winget', key: 'winget', cmd: (p) => p.map((x) => `winget install --id ${x}`).join(' && ') },
+  ];
+  for (const m of managers) {
+    if (!hasCmd(m.bin)) continue;
+    return m.cmd(tools.map((t) => PKG_NAMES[t][m.key]));
+  }
+  return null;
+}
+
 function doctor() {
   say(bold('Checking this computer\n'));
   const checks = [];
-  const record = (label, ok, fix) => {
+  const missingTools = [];
+  const record = (label, ok, fix, tool) => {
     checks.push({ label, ok, fix });
+    if (!ok && tool) missingTools.push(tool);
     say(`  ${ok ? green('ok  ') : red('miss')} ${label}${ok ? '' : dim(`  → ${fix}`)}`);
   };
 
-  record('git is installed', has('git'), 'install git: https://git-scm.com/downloads');
-  record('Node.js 22+ is installed', Number(process.versions.node.split('.')[0]) >= 22, 'install Node 22 or newer: https://nodejs.org');
-  record('Python 3 is installed', spawnSync('python3', ['--version'], { stdio: 'ignore' }).status === 0, 'install Python 3.11+: https://python.org');
-  record('GitHub command line (optional)', has('gh'), 'install gh, then run: bash .framework/setup/configure-gh.sh');
+  record('git is installed', has('git'), 'install git: https://git-scm.com/downloads', 'git');
+  record('Node.js 22+ is installed', Number(process.versions.node.split('.')[0]) >= 22, 'install Node 22 or newer: https://nodejs.org', 'node');
+  record('Python 3 is installed', spawnSync('python3', ['--version'], { stdio: 'ignore' }).status === 0, 'install Python 3.11+: https://python.org', 'python');
+  record('GitHub command line (optional)', has('gh'), 'install gh, then run: bash .framework/setup/configure-gh.sh', 'gh');
 
   const wired = hooksWired();
   if (!wired) {
@@ -239,6 +265,13 @@ function doctor() {
 
   const missing = checks.filter((c) => !c.ok);
   say('');
+  const hint = installHint(missingTools);
+  if (hint) {
+    say(yellow('One command installs the missing tools on this machine:'));
+    say(`  ${hint}`);
+    say(dim('Then run: npm run doctor   (to confirm everything is in place)'));
+    say('');
+  }
   say(missing.length === 0 ? green('Everything is set up.') : yellow(`${missing.length} thing(s) to sort out — the fix is on each line above.`));
   return missing.some((c) => ['git is installed', 'Node.js 22+ is installed'].includes(c.label)) ? 1 : 0;
 }
