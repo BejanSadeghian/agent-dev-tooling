@@ -22,10 +22,11 @@ does the technical parts for you.
 **Have these two things first** (five minutes with whoever asked you to do this, if you don't):
 
 - A **GitHub account with Copilot access**. If your company uses GitHub, use the account they
-  gave you (a personal one may not have access to the team's repos). No account? Create one at
-  [github.com/signup](https://github.com/signup) and ask your team to add you.
-- The **web address of your team's repo** — where finished skills get delivered. You won't
-  need it until the very last step, so you can start without it; just know who to ask.
+  gave you. Not sure you have it? Send whoever set you this task this exact sentence: *"I need
+  a GitHub account in our organization with a Copilot seat, plus access to the skills repo and
+  our team's delivery repo."* That is the complete list — get it answered **before** tomorrow.
+- The **web address of your team's repo** — where finished skills get delivered (last step
+  only; everything before it works without it).
 
 **Then set up (once):**
 
@@ -34,18 +35,30 @@ does the technical parts for you.
    your GitHub account so **Copilot** works.
 2. Get this project into VS Code:
    - **If the project folder is already on your computer** (someone sent or set it up):
-     **File → Open Folder**, pick it, done.
-   - **If not:** the project lives at a web address (it's in your browser's address bar if
-     you're reading this on GitHub — otherwise ask the person who sent you here). In VS Code
-     choose **Clone Git Repository**, paste that address, pick where to keep it. Once — after
-     that, just **File → Open Recent**.
+     **File → Open Folder**, pick it, done. (Emailed as a .zip? Double-click the zip in
+     Downloads first — that unpacks the real folder — then Open Folder on that.)
+   - **If not:** the project lives at a web address — it's in your browser's address bar when
+     reading this on GitHub; otherwise ask the person who sent you here. In VS Code the
+     **Clone Git Repository** button is on the Welcome screen; if you don't see it, press
+     **Command+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows), type `clone`, press Enter.
+     Paste the address, pick where to keep it. Once — after that, just **File → Open Recent**.
+     ("Clone" just means "get my own copy" — you can't break anything.)
 3. Open the **Copilot Chat panel**: the speech-bubble icon in the left icon column, or press
-   **⌃⌘I** on a Mac (**Ctrl+Alt+I** on Windows).
+   **Control+Command+I** on a Mac (**Ctrl+Alt+I** on Windows).
+4. At the bottom of the chat panel is a small mode dropdown — set it to **Agent**. In other
+   modes the chat only *talks about* work; Agent mode *does* the work.
+5. **Prove it works** before anything else — type: **"What folder are you working in?"**
+   The answer should name this project's folder. If it can't tell you, or you got a wall of
+   instructions instead of an answer, you're in the wrong mode or the wrong window — fix that
+   before Step 1, or every step after will only *pretend* to happen.
 
 > **Every "Prompt" in this guide gets typed into that Copilot Chat panel — never into ChatGPT
 > or a browser.** A chat outside this folder cannot see your computer and will happily
 > pretend things worked when nothing happened. (That includes setup trouble: if something in
 > this step goes wrong, ask the person who sent you here — not a chatbot in a browser.)
+
+Closing your laptop is fine, and so is starting a brand-new chat later — everything lives in
+the folder, not the conversation, so the assistant picks up where things stand.
 
 From here on, the assistant does everything — work through the steps in order. (Prefer a
 terminal? The same walkthrough with the actual commands is in
@@ -64,18 +77,19 @@ terminal? The same walkthrough with the actual commands is in
 - Switches on the safety checks and runs everything once.
 - Safe to repeat — an already-set-up computer just gets confirmed.
 
-**Done when:** everything passed — optional items (reviewers, the Copilot CLI for test runs) can be installed when first needed, and the assistant will offer.
+**Done when:** everything passed — optional extras (the reviewer list, the fresh-agent test runner) can be installed when first needed, and the assistant will offer.
 
 ### Step 2 — build a skill
 
-> Prompt: "I want to build a skill for ___" — describe the job in your own words; paste any
-> notes or examples you have.
+> Prompt: "I want to build a skill for ___" — describe the job in your own words. Have notes
+> or example files? Drag them into the chat, or just say where they are ("there's an example
+> in my Downloads called timesheet-march.xlsx").
 
 **What happens:**
 
 - It reads everything you gave it first, and plays back what it learned.
-- Then an interview about the gaps only, one question at a time — and you steer it ("focus on
-  the trigger", "skip that").
+- Then an interview about the gaps only, one question at a time — and you steer it ("let's
+  talk about when this should be used", "skip that part").
 - Answer from real examples; say "I don't know" rather than guessing.
 - Generates two skill folders into `skills/`, tests included: the **doer** (does the
   mechanical work exactly) and the **interpreter** (says what the result means — facts first,
@@ -111,6 +125,7 @@ company's AI policy.
 
 **What happens:**
 
+- One item at a time — a list of five gets five shallow fixes; one at a time gets five real ones.
 - Each item becomes a fix AND a test that would have caught it.
 - You may see a red "failed" flash by — that is deliberate: the new test is shown failing
   once to prove it can catch the mistake, then it passes forever.
@@ -142,7 +157,8 @@ company's AI policy.
 - The pair is copied to the receiving repo (it asks for the address once, then remembers), and a
   review request opens there.
 
-**Done when:** you have the receiving repo's review link.
+**Done when:** you have the review link. Send it to your team lead — people on that side
+approve it there. Your part is finished.
 
 ## Quick reference — things you can say
 
@@ -158,7 +174,7 @@ company's AI policy.
 | "Test it again" | Re-runs the same task with a fresh agent — how you confirm a fix landed |
 | "Check my work" | Runs every check and explains anything that fails, in plain words |
 | "Publish ___ to our team's repo" | Confirms the checks, saves your work, delivers the pair with a review request — one ask |
-| "Publish anyway — because ___" | Rare. Overriding means shipping something the checks call broken — hear the explanation first. Your reason goes on the record with your name |
+| "Publish anyway — because ___" | Last resort. This ships work the checks call broken, with your name and reason attached to the delivery for everyone to see. Hear the explanation first |
 | "How is the library doing?" | Shows the health report: anything untested, stale, or half a pair |
 
 Two things worth knowing:

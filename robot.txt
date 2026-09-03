@@ -31,7 +31,13 @@ doctor reports the safety hooks were off, run `npm run setup`.
                                                # fresh sandbox, checkpoints over artifacts AND
                                                # transcript, 3 trials, one report; run before
                                                # shipping. Turn the first real task into a
-                                               # committed scenario (evals/scenarios/<name>/).
+                                               # committed scenario: author
+                                               # evals/scenarios/<name>/scenario.json + fixtures/
+                                               # per .framework/framework-testing.md (Layer 3),
+                                               # fixtures ALWAYS synthetic, never real data.
+                                               # Human decisions: --waive <id> "reason" (one
+                                               # failing check) | --accept/--reject "reason"
+                                               # (whole verdict).
                                                # Record an --accept/--reject override ONLY
                                                # when the human explicitly directs it, with
                                                # the human's own reason — never on your own
@@ -39,8 +45,9 @@ doctor reports the safety hooks were off, run `npm run setup`.
 
 ## Working rules
 
-- When the human hands you a real data file to run against, put it under outputs/ (or another
-  gitignored path) BEFORE doing anything else. Publish commits the whole tree — a real file
+- When the human's content lands in a file — a real data file, an interview answers file,
+  anything — put it under outputs/ or tmp/ (gitignored) or outside the repo BEFORE doing
+  anything else. Publish commits the whole tree — a real file
   left elsewhere would be uploaded and shipped. (.framework/framework-data.md is the contract.)
 
 - New pairs are generated into skills/ with `npm run skill:new` — do not hand-scaffold.

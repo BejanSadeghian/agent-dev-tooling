@@ -104,6 +104,7 @@ function main(argv) {
   console.log(bold(`Confirming the test state before anything ships`));
   const gate = spawnSync('node', ['.framework/scripts/verify-all.mjs', ...skills.map((s) => s.name)], { cwd: REPO_ROOT, stdio: 'inherit' });
   let overridden = false;
+  const overrideBy = process.env.USER || process.env.USERNAME || 'unknown';
   if (gate.status !== 0) {
     if (!overrideReason) {
       console.error(red('\nNot published: the checks above did not confirm.'));
@@ -122,7 +123,7 @@ function main(argv) {
     const branchNow = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
     if (branchNow === 'main') execFileSync('git', ['checkout', '-B', `skill/${useCase}`], { cwd: REPO_ROOT, stdio: 'inherit' });
     execFileSync('git', ['add', '-A'], { cwd: REPO_ROOT, stdio: 'inherit' });
-    execFileSync('git', ['commit', '-m', `feat: ${useCase} — published${overridden ? ` (checks overridden: ${overrideReason})` : ''}`], {
+    execFileSync('git', ['commit', '-m', `feat: ${useCase} — published${overridden ? ` (checks overridden by ${overrideBy}: ${overrideReason})` : ''}`], {
       cwd: REPO_ROOT,
       stdio: 'inherit',
       env: overridden ? { ...process.env, SKIP_SKILL_GATE: '1' } : process.env,
@@ -181,7 +182,7 @@ function main(argv) {
   execFileSync('git', ['push', '-u', 'origin', branch, '--force-with-lease'], { cwd: workdir, stdio: 'inherit' });
   const pr = spawnSync(
     'gh',
-    ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Publishes the \`${useCase}\` doer/interpreter pair from the skill development environment. ${overridden ? `**Checks were overridden by the publisher:** ${overrideReason}` : 'All checks were green at publish time.'}`],
+    ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Publishes the \`${useCase}\` doer/interpreter pair from the skill development environment. ${overridden ? `**Checks were overridden by ${overrideBy}:** ${overrideReason}` : 'All checks were green at publish time.'}`],
     { cwd: workdir, encoding: 'utf8' },
   );
   if (pr.status === 0) console.log(green(`\nPull request opened: ${pr.stdout.trim()}`));
