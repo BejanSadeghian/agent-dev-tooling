@@ -184,7 +184,7 @@ async function main(argv) {
   console.log('  1. Replace the scaffolded parts: the real schema fields, the real deterministic logic, the real lens.');
   console.log('  2. Make the three doer test files assert the real behaviour, not the scaffold\'s.');
   console.log(`  3. Test it with a clean sub-agent: npm run subagent -- ${spec.useCase} "a realistic task"`);
-  console.log(`  4. npm run check    ${dim('(then: npm run save)')}`);
+  console.log(`  4. npm run check    ${dim('(then: npm run publish -- <use-case>)')}`);
   return 0;
 }
 

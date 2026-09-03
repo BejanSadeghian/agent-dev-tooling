@@ -9,6 +9,5 @@ default.
 | Applies when | no more specific variation in this folder matches |
 | Adjustments | none — follow SKILL.md as written |
 
-Known variation worth a file when it first occurs: shipping to a **target repo** with
-`npm run publish` (skills leave this environment) versus `npm run ship` (a review request inside
-this environment).
+Known variation worth a file when it first occurs: publishing to a **different named target**
+(`npm run publish -- <use-case> --target <name>`) versus the default team repo.

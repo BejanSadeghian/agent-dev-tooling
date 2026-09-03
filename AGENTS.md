@@ -25,9 +25,7 @@ through these commands — never hand-roll their jobs:
 | Fix a skill after feedback | `skill-builder` | edit + a regression case for each item, then `npm run regression -- <skill>` |
 | Add or fill tests, make fixtures | `test-generator` | `npm run test:new -- <skill>`; fixtures via its seeded `scripts/datagen.mjs` |
 | Check everything | — | `npm run check` |
-| Save / upload work | `dev-helper` | `npm run save "what changed"` (refuses until checks pass) |
-| Open a pull request | `dev-helper` | `npm run ship "title"` |
-| Ship a finished pair to its target repo | `dev-helper` | `npm run publish -- <use-case>` |
+| Publish (confirm checks + save + deliver the pair) | `dev-helper` | `npm run publish -- <use-case>`; if checks fail, the HUMAN may direct `--override "their reason"` — never override on your own |
 | Library status | — | `npm run health`, `npm run status` |
 
 Command mechanics: `npm run <verb>` from the repo root; arguments go after `--`. Quote multi-word

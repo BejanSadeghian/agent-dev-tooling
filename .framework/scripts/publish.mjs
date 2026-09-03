@@ -53,11 +53,17 @@ development environment and shipped as a new version.
 function main(argv) {
   const targetFlag = argv.indexOf('--target');
   const targetName = targetFlag === -1 ? null : argv[targetFlag + 1];
-  const useCase = argv.filter((a, i) => !a.startsWith('-') && i !== targetFlag + 1)[0];
+  const overrideFlag = argv.indexOf('--override');
+  const overrideReason = overrideFlag === -1 ? null : argv[overrideFlag + 1];
+  const useCase = argv.filter((a, i) => !a.startsWith('-') && i !== targetFlag + 1 && i !== overrideFlag + 1)[0];
   const config = loadConfig();
 
   if (!useCase) {
-    console.log('usage: npm run publish -- <use-case> [--target <name>]');
+    console.log('usage: npm run publish -- <use-case> [--target <name>] [--override "reason"]');
+    return 1;
+  }
+  if (overrideFlag !== -1 && !overrideReason) {
+    console.error(red('an override needs a reason — it goes on the record: npm run publish -- <use-case> --override "why"'));
     return 1;
   }
 
@@ -86,11 +92,35 @@ function main(argv) {
     console.log(yellow(`shipping an incomplete pair: only ${skills[0].name} exists (the pair rule warns, it does not block)`));
   }
 
-  console.log(bold(`Checking the pair is green before it ships`));
+  console.log(bold(`Confirming the test state before anything ships`));
   const gate = spawnSync('node', ['.framework/scripts/verify-all.mjs', ...skills.map((s) => s.name)], { cwd: REPO_ROOT, stdio: 'inherit' });
+  let overridden = false;
   if (gate.status !== 0) {
-    console.error(red('\nNot shipped: the checks above failed. A skill ships green or not at all.'));
-    return 1;
+    if (!overrideReason) {
+      console.error(red('\nNot published: the checks above did not confirm.'));
+      console.error('Either fix what they name (the usual fix: npm run regression -- <skill>), or — your call —');
+      console.error('publish anyway with your reason on the record:  npm run publish -- ' + useCase + ' --override "why"');
+      return 1;
+    }
+    overridden = true;
+    console.log(yellow(`\nPublishing DESPITE failing checks — override on record: "${overrideReason}"`));
+  }
+
+  // Absorb "save": nothing ships that is not also safely on GitHub. Commit any
+  // pending work on a branch (never main) and push it, quietly.
+  const dirty = spawnSync('git', ['status', '--porcelain'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
+  if (dirty) {
+    const branchNow = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
+    if (branchNow === 'main') execFileSync('git', ['checkout', '-B', `skill/${useCase}`], { cwd: REPO_ROOT, stdio: 'inherit' });
+    execFileSync('git', ['add', '-A'], { cwd: REPO_ROOT, stdio: 'inherit' });
+    execFileSync('git', ['commit', '-m', `feat: ${useCase} — published${overridden ? ` (checks overridden: ${overrideReason})` : ''}`], {
+      cwd: REPO_ROOT,
+      stdio: 'inherit',
+      env: overridden ? { ...process.env, SKIP_SKILL_GATE: '1' } : process.env,
+    });
+    const pushed = spawnSync('git', ['push', '-u', 'origin', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
+    if (pushed.status !== 0) console.log(yellow('saved locally; the upload to GitHub failed — publish continues, push again later'));
+    else console.log(green('your work is saved and uploaded'));
   }
 
   const isRemote = /^(git@|https?:\/\/|ssh:\/\/)/.test(target.repo);
@@ -131,7 +161,7 @@ function main(argv) {
     console.log(yellow('\nNothing changed — the target already has this exact version.'));
     return 0;
   }
-  execFileSync('git', ['commit', '-m', `feat(skills): ship ${useCase} pair`], { cwd: workdir, stdio: 'inherit' });
+  execFileSync('git', ['commit', '-m', `feat(skills): publish ${useCase} pair${overridden ? ' (checks overridden)' : ''}`], { cwd: workdir, stdio: 'inherit' });
 
   if (!isRemote) {
     console.log(green(`\nCommitted on branch ${branch} in ${workdir}. Push and open the PR from there when ready.`));
@@ -142,7 +172,7 @@ function main(argv) {
   execFileSync('git', ['push', '-u', 'origin', branch, '--force-with-lease'], { cwd: workdir, stdio: 'inherit' });
   const pr = spawnSync(
     'gh',
-    ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Ships the \`${useCase}\` doer/interpreter pair from the skill development environment. All checks were green at ship time.`],
+    ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Publishes the \`${useCase}\` doer/interpreter pair from the skill development environment. ${overridden ? `**Checks were overridden by the publisher:** ${overrideReason}` : 'All checks were green at publish time.'}`],
     { cwd: workdir, encoding: 'utf8' },
   );
   if (pr.status === 0) console.log(green(`\nPull request opened: ${pr.stdout.trim()}`));

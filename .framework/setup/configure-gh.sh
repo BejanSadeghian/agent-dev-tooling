@@ -7,7 +7,7 @@
 #   bash .framework/setup/configure-gh.sh --protect          # also require review before merging (needs admin)
 #
 # What it writes:
-#   .framework/setup/reviewers.json   the list `npm run ship` asks for
+#   .framework/setup/reviewers.json   the list `npm run publish` asks for
 #   .github/CODEOWNERS     so GitHub adds them to every pull request by itself
 set -euo pipefail
 
@@ -64,7 +64,7 @@ fi
 mkdir -p .github
 cat > .framework/setup/reviewers.json <<JSON
 {
-  "_comment": "Who gets asked to review. Used by 'npm run ship' and by .github/workflows/add-reviewers.yml.",
+  "_comment": "Who gets asked to review. Used by 'npm run publish' and by .github/workflows/add-reviewers.yml.",
   "reviewers": [${JSON_REVIEWERS}],
   "teams": [$([ -n "$TEAM" ] && printf '"%s"' "$TEAM")]
 }
@@ -94,4 +94,4 @@ if [ "$PROTECT" -eq 1 ]; then
 fi
 
 echo
-echo "From now on: npm run ship  will open the review request and ask them for you."
+echo "From now on: npm run publish  will open the review request and ask them for you."

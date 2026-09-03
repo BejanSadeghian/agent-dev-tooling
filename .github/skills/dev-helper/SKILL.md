@@ -2,9 +2,9 @@
 name: dev-helper
 description: >-
   Runs the git and GitHub work for someone who does not use git: starts a branch, runs the checks,
-  saves and uploads changes, opens a pull request with the right reviewers, and explains each step
-  in plain language. Use when the person asks to save, commit, push, upload, branch, sync, open a
-  PR, request review, or says something is not working with git or GitHub in this repo.
+  and publishes finished pairs — one verb that confirms the tests, saves and uploads the work, and
+  delivers to the team repo. Use when the person asks to save, commit, push, upload, branch, sync,
+  publish, ship, or says something is not working with git or GitHub in this repo.
 allowed-tools:
   - Bash
   - Read
@@ -50,8 +50,7 @@ command before you know this — the right next step is entirely different on `m
 |---|---|---|
 | Start something new | `npm run start "topic"` | Fresh branch `skill/topic` from the latest `main` |
 | Check their work | `npm run check` | Format, tests, rubric, library health |
-| Save and upload | `npm run save "what I did"` | Checks first, then commits and pushes |
-| Ask for review | `npm run ship "title"` | Opens the pull request, adds the reviewers |
+| Publish a finished pair | `npm run publish -- <use-case>` | Confirms the test state, saves and uploads their work, delivers the pair to the team repo with a review request there |
 | Get the latest main | `npm run sync` | Merges `main` into their branch |
 | Fix their setup | `npm run doctor` | Checks tools, switches the hooks back on |
 
@@ -80,27 +79,33 @@ Every failure names a skill and the command that fixes it. Say it back in their 
 
 Fix the cause, then run `npm run check` again. Report the result in one line.
 
-### 5. When they ask for review
+### 5. When they want to publish
 
 ```bash
-npm run ship "what this changes"
+npm run publish -- <use-case>
 ```
 
-Then tell them: the link, who was asked to review, and that they do not need to do anything until
-someone comments. If `gh` is missing or not signed in, give them the browser link `ship` prints and
-offer to run `bash .framework/setup/configure-gh.sh`.
+One verb, three things, in order: it confirms the test state (the same checks as
+`npm run check`), quietly saves and uploads their work on its own branch, then delivers the pair
+to the team repo with a review request there. Tell them the link when it prints.
 
-### 6. After review
+If the checks do not confirm, nothing is published — read the failure back in their terms
+(section 4) and offer the fix. **The decision to publish anyway is always theirs:** if they say
+so, run `npm run publish -- <use-case> --override "their reason, in their words"` — the reason
+goes on the record in the delivery. Never override on your own judgment.
 
-- Changes requested → make the changes, `npm run save`, and say "I've updated the same request".
-  A new save always joins the existing pull request; never open a second one.
+### 6. After review on the team repo
+
+- Changes requested → make the changes here, run `npm run publish -- <use-case>` again, and say
+  "I've updated the same request". A re-publish joins the existing pull request; never open a
+  second one.
 - Approved and merged → `npm run sync` to bring `main` up to date, then start the next piece with
   `npm run start`.
 
 ## Outputs
 
-- Their work, saved and uploaded, with every check green.
-- A pull request with the configured reviewers attached.
+- Their work, saved and uploaded, with every check confirmed (or overridden by them, on record).
+- The pair delivered to the team repo with a review request open there.
 - A one-line explanation of what happened, in their language, every time.
 
 ## References

@@ -50,22 +50,6 @@ test('status warns that main is the shared branch when there are changes', (t) =
   assert.match(result.stdout, /npm run start/);
 });
 
-test('save refuses to commit to main and says what to do instead', (t) => {
-  const { dir } = makeRepo(t);
-  fs.appendFileSync(path.join(dir, 'README.md'), '\nchanged\n');
-  const result = dev(dir, ['save', 'a change']);
-  assert.equal(result.status, 1);
-  assert.match(result.stdout, /Work is never saved straight onto it/);
-  assert.match(result.stdout, /npm run start/);
-});
-
-test('ship refuses on main', (t) => {
-  const { dir } = makeRepo(t);
-  const result = dev(dir, ['ship', 'a title']);
-  assert.equal(result.status, 1);
-  assert.match(result.stdout, /start a branch first/);
-});
-
 test('start creates a skill/ branch named after the work', (t) => {
   const { dir, git } = makeRepo(t);
   const result = dev(dir, ['start', 'Margin Check v2']);
@@ -74,36 +58,12 @@ test('start creates a skill/ branch named after the work', (t) => {
   assert.match(result.stdout, /separate from main until it is reviewed/);
 });
 
-test('save refuses when the checks fail, and nothing is committed', (t) => {
-  const { dir, git } = makeRepo(t);
-  dev(dir, ['start', 'break something']);
-  // Break the format spec: `npm run save` runs the checks first, so this must
-  // never reach a commit.
-  const file = path.join(dir, '.github/skills/dev-helper/SKILL.md');
-  fs.appendFileSync(file, '\nTODO finish this later.\n');
-  const before = git('rev-parse', 'HEAD').trim();
-  const result = dev(dir, ['save', 'sneak it in']);
-  assert.equal(result.status, 1);
-  assert.match(result.stdout, /nothing was saved/);
-  assert.equal(git('rev-parse', 'HEAD').trim(), before);
-});
-
-test('save commits with a conventional message once the checks pass', (t) => {
-  const { dir, git } = makeRepo(t);
-  dev(dir, ['start', 'tidy the guide']);
-  fs.appendFileSync(path.join(dir, 'README.md'), '\nA clarifying sentence.\n');
-  const result = dev(dir, ['save', 'clarify the guide']);
-  // There is no remote in a throwaway repo, so the upload step fails — the commit must still exist.
-  assert.match(result.stdout, /Saving/);
-  assert.equal(git('log', '-1', '--pretty=%s').trim(), 'feat: clarify the guide');
-});
-
 test('doctor reports the setup and switches the safety checks back on', (t) => {
   const { dir, git } = makeRepo(t);
   spawnSync('git', ['config', '--unset', 'core.hooksPath'], { cwd: dir });
   const result = dev(dir, ['doctor']);
   assert.match(result.stdout, /git is installed/);
-  assert.match(result.stdout, /safety checks run before each save/);
+  assert.match(result.stdout, /safety checks run before anything is saved/);
   assert.equal(git('config', 'core.hooksPath').trim(), '.framework/hooks');
 });
 
@@ -111,7 +71,7 @@ test('an unknown command prints the list of commands', (t) => {
   const { dir } = makeRepo(t);
   const result = dev(dir, ['frobnicate']);
   assert.equal(result.status, 1);
-  assert.match(result.stdout, /npm run save/);
+  assert.match(result.stdout, /npm run publish/);
 });
 
 test('installHint names the one command for whatever package manager exists', () => {

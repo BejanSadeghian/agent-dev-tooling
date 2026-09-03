@@ -30,7 +30,7 @@ function main(argv) {
   console.log('');
   if (failed.length === 0) {
     console.log(green('All checks passed.'));
-    console.log(dim('Next: npm run save "what you did"'));
+    console.log(dim('Next: npm run publish -- <use-case>'));
     return 0;
   }
   console.log(red(`Failed: ${failed.join(', ')}.`));

@@ -2,7 +2,7 @@ name: add reviewers
 
 # Belt and braces alongside .github/CODEOWNERS: whoever is listed in
 # setup/reviewers.json is asked to review every pull request, even one opened
-# from the web UI rather than `npm run ship`.
+# from the web UI rather than `npm run publish`.
 
 on:
   pull_request_target:

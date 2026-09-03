@@ -38,7 +38,9 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 
 **What happens:**
 
-- An interview, one question at a time — usually 8–15 questions.
+- It reads everything you gave it first, and plays back what it learned.
+- Then an interview about the gaps only, one question at a time — and you steer it ("focus on
+  the trigger", "skip that").
 - Answer from real examples; say "I don't know" rather than guessing.
 - Generates two skill folders (doer + interpreter) into `skills/`, tests included.
 - Comes back with follow-ups while it turns placeholders into your real rules.
@@ -83,26 +85,18 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 
 **Done when:** all checks passed.
 
-### Step 6 — save
+### Step 6 — publish
 
-> Prompt: "Save my work."
-
-**What happens:**
-
-- Checks run again first; a failure means nothing is saved.
-- Work is saved and uploaded on its own branch, never the shared one.
-
-**Done when:** it confirms "saved and uploaded".
-
-### Step 7 — review and ship
-
-> Prompt: "Ask for a review." — then, once approved: "Ship ___ to our team's repo."
+> Prompt: "Publish ___ to our team's repo."
 
 **What happens:**
 
-- A review request opens on GitHub so a person approves before merge.
-- Shipping asks for the receiving repo's address the first time, then remembers it.
-- The pair is re-verified, copied over, and a review request opens there too.
+- The checks run one more time; nothing goes out unless they confirm.
+- If they don't confirm, it's still your call: say "publish anyway — because ___" and your
+  reason goes on the record.
+- Your work is quietly saved and uploaded first, so nothing is ever lost.
+- The pair is copied to the receiving repo (it asks for the address once, then remembers), and a
+  review request opens there.
 
 **Done when:** you have the receiving repo's review link.
 
@@ -118,15 +112,14 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 | "Waive C3 on that report — because ___" | Accepts just that one failing check (each row on the report card has a short ID); everything else still counts |
 | "It should have done X instead" | Fixes the skill AND adds a test so that mistake can never come back |
 | "Check my work" | Runs every check and explains anything that fails, in plain words |
-| "Save my work" | Checks first, then saves and uploads it on its own branch |
-| "Ask for a review" | Opens the review request with the right reviewers |
-| "Ship ___ to our team's repo" | Copies the finished pair to the repo that will use it |
+| "Publish ___ to our team's repo" | Confirms the checks, saves your work, delivers the pair with a review request — one ask |
+| "Publish anyway — because ___" | Your right to override failing checks; your reason goes on the record |
 | "How is the library doing?" | Shows the health report: anything untested, stale, or half a pair |
 
 Two things worth knowing:
 
-- **Nothing is saved without passing its checks.** The assistant literally cannot save work that
-  fails them, and the same checks run again on GitHub — nothing slips through.
+- **Nothing is published without its checks confirming.** The assistant cannot deliver failing
+  work on its own — only you can say "publish anyway", and your reason is recorded.
 - **You develop in one chat, but testing happens in a fresh one.** The assistant that wrote a
   skill already knows what it *meant* to say, so it would paper over the gaps. Testing always
   uses a separate agent that has never seen your conversation.

@@ -1,65 +1,76 @@
 # The interview
 
 Goal: extract a procedure precise enough that a stranger could follow it, and a trigger precise
-enough that it fires on the right prompts and no others. One question at a time, in this order.
-Skip a question only when the raw material already answers it — then confirm your reading instead
-of asking cold.
+enough that it fires on the right prompts and no others — **without asking a single question the
+author's material already answers.**
 
-## A. Trigger (do this first — it is the hardest part to get right)
+## 0. The material comes first
 
-1. "Describe the last three times you did this. What were you actually doing right before?"
-2. "What would someone type that should make this fire?" — collect **verbatim phrasings**, not paraphrases.
-3. "What is a request that looks like this but should *not* fire it?" — push until you get two.
-4. "Is there a neighbouring skill that overlaps? Where is the line?"
+Before any question:
 
-## B. Procedure
+1. **Read everything the author gave you, completely.** Notes, transcripts, runbooks, prompts,
+   examples — all of it.
+2. **Play back what you learned**, in a short summary: what the use case does, how it seems to be
+   done today, what a good output looks like. Ask what you got wrong.
+3. **Collect the name.** If the material does not name it, ask now: "What should this use case be
+   called?" (it becomes `<name>-doer` and `<name>-interpreter`). Never generate under an invented
+   name.
 
-5. "Walk me through it start to finish, as if I'm doing it for the first time." Do not interrupt.
-   Then replay it back as numbered steps and ask what you got wrong.
-6. For each step: "What do you look at to do this? What do you produce?"
-7. "Which step do people get wrong most often?" — that step needs the most words and a regression case.
-8. "Where do you branch?" Get the condition and the default. If there is no default, ask what they
-   do when they cannot tell — that is the default.
+Everything after this is gap work. A question about something the material already covers is a
+wasted question and tells the author you did not read.
 
-## B2. What must be exact, and what it produces
+## 1. Build the gap map, and let the author steer
 
-These four questions decide how much of the skill is code rather than prose. Ask them before you
-generate anything.
+Compare the material against what a finished pair needs to know:
 
-9. "Which parts must come out identical every single time?" — every yes becomes a Python function
-   (`references/python-determinism.md`). Push: "if this number were 2% off, would you notice?"
-10. "What files should exist when it's finished?" — each becomes a declared artifact with an id, a
-    path, and its own accuracy, edge-case and performance tests.
-11. "Would you ever want one of those without the others?" — a yes means separate skills in a
-    sequence, not one skill with two outputs.
-12. "How big does the input get, on a bad day?" — that number becomes the largest size in the
-    performance test, and the budget it must stay under.
+| Area | The pair needs |
+| --- | --- |
+| Name | what the use case is called |
+| Trigger | verbatim phrasings that should fire it; two near-misses that must not |
+| Procedure | the steps in order; where it branches; the step people get wrong |
+| Exactness | which values must be identical every run (those become doer code) |
+| Artifact | the fields each record carries; what downstream reads |
+| Judgment | the interpreter's lens: what counts as notable, concerning, actionable |
+| Scope | what it deliberately does not cover; what it needs available; input size on a bad day |
 
-## C. Quality bar
+Mark each area **answered by the material**, **partly answered**, or **a gap**. Then show the
+author the gap list and ask where they want to start:
 
-13. "How do you know the output is good? What makes you reject one?" — this becomes the rubric and
-   the assertions in the regression suite.
-14. "Show me a good output and a bad one." Keep both; the good one becomes a template, the bad one
-    becomes a `not_contains` case.
-15. "What must never happen?" — hard constraints. Each becomes its own case.
+> "The material covers A, B, C well. The gaps I see are X and Y. Where do you want to dig in
+> first — or is there an area you want me to focus on?"
 
-## D. Scope and inputs
+**The author steers.** If they say "focus on the trigger" or "just ask me about the judgment
+part", follow that lead and stay there until they move on. If they say an area does not matter
+for this use case, record that decision in the interview notes and skip it — do not relitigate.
+Only when they have no preference do you work the gaps in the table's order.
 
-12. "What does this deliberately not cover?"
-17. "What does it need available to work — files, credentials, tools, a running service?"
-18. "Who is the reader of the output, and what do they do with it next?"
+## 2. Digging into a gap
 
-## E. Close
+Use these techniques inside whatever area is open:
 
-19. Play back: does / fires when / produces which artifacts / must not fire when / leaves out. Get an explicit yes.
-
-## Interviewing rules
-
-- **Concrete over general.** "The last three times" outperforms "in general, how do you...".
+- **Concrete over general.** "Describe the last three times you did this" outperforms "in
+  general, how do you...". For triggers: collect what someone would *actually type*, verbatim,
+  and push for two requests that look similar but must NOT fire it.
+- **Walk-through, then replay.** For procedure gaps: "walk me through it start to finish" —
+  do not interrupt — then replay it as numbered steps and ask what you got wrong.
+- **Wrong guesses extract more than open questions.** "So you'd always start by X?" gets
+  corrected in detail; "how do you start?" gets a shrug.
+- **Probe exactness concretely.** "If this number were 2% off, would you notice?" A yes means
+  doer code (`references/python-determinism.md`), never prose.
+- **Ask for artifacts of judgment.** For the interpreter's lens: "show me an output you accepted
+  and one you rejected — what's the difference?" The difference IS the lens; the rejected one
+  becomes a never-again test.
 - **Silence is a tool.** After an answer, wait. The second half of the answer is the useful half.
-- **Wrong guesses extract more than open questions.** "So you'd always start by X?" gets corrected
-  in detail; "how do you start?" gets a shrug.
-- **Never invent an answer.** An unanswered question is a note in the interview record, not a
+- **One question at a time.** Batched questions get batched, shallow answers.
+
+## 3. Close
+
+Play back the whole picture in one breath: called / does / fires when / must not fire when /
+produces (fields) / judged by / leaves out. Get an explicit yes before generating anything.
+
+## Rules
+
+- **Never invent an answer.** An unanswered gap is a note in the interview record, not a
   confident sentence in `SKILL.md`.
-- **Stop when answers stop changing the draft.** Typically 10-19 questions; the exactness and
-  artifact questions (B2) are never the ones to skip.
+- **Record the author's skips.** "We decided not to cover X" is provenance, same as an answer.
+- **Stop when answers stop changing the draft** — or when the author says they are done.

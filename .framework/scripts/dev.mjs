@@ -4,13 +4,11 @@
 //   npm run status     what is going on, in plain words
 //   npm run start      begin a new piece of work on its own branch
 //   npm run check      run every check (same ones the robots run)
-//   npm run save       check, save, and upload your work
-//   npm run ship       open a pull request for review
 //   npm run doctor     make sure this computer is set up properly
 //
-// Every command explains what it is about to do before it does it, and refuses the
-// two things that actually hurt: committing straight to main, and saving work that
-// has not passed its checks.
+// Saving and delivering both live in one verb now: `npm run publish -- <use-case>`
+// confirms the test state (the human may --override with a reason), saves and
+// uploads the work, and delivers the pair to the target repo.
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,16 +37,6 @@ const currentBranch = () => git(['rev-parse', '--abbrev-ref', 'HEAD']);
 const changedFiles = () => git(['status', '--porcelain']).split('\n').filter(Boolean);
 const hooksWired = () => git(['config', 'core.hooksPath'], { allowFail: true }) === '.framework/hooks';
 
-function runChecks({ quiet = false } = {}) {
-  const result = spawnSync('node', ['.framework/scripts/verify-all.mjs'], {
-    cwd: REPO_ROOT,
-    encoding: 'utf8',
-    env: { ...process.env, NO_COLOR: quiet ? '1' : process.env.NO_COLOR ?? '' },
-    stdio: quiet ? 'pipe' : 'inherit',
-  });
-  return { passed: result.status === 0, output: `${result.stdout ?? ''}${result.stderr ?? ''}` };
-}
-
 // --- commands ---------------------------------------------------------------
 
 function status() {
@@ -64,8 +52,7 @@ function status() {
   say('');
   say(bold('What to do next'));
   if (branch === MAIN && changes.length) say('  npm run start "what you are working on"   (moves your work onto its own branch)');
-  else if (changes.length) say('  npm run save     (checks your work, saves it, uploads it)');
-  else if (branch !== MAIN) say('  npm run ship     (asks your reviewers to look at it)');
+  else if (changes.length) say('  npm run check                        (see where the work stands)\n  npm run publish -- <use-case>        (confirms the checks, saves, and delivers)');
   else say('  npm run start "what you want to build"');
   return 0;
 }
@@ -86,55 +73,7 @@ async function start(argv, prompter) {
   step('creating your branch');
   git(['checkout', '-B', branch, `origin/${MAIN}`], { allowFail: true }) || git(['checkout', '-B', branch]);
   say(green(`\nYou are now on ${branch}. Everything you change is separate from ${MAIN} until it is reviewed.`));
-  say(dim('Next: make your changes, then run  npm run save'));
-  return 0;
-}
-
-async function save(argv, prompter) {
-  const branch = currentBranch();
-  if (branch === MAIN) {
-    say(red(`You are on ${MAIN}, the shared branch. Work is never saved straight onto it.`));
-    say(`Run:  npm run start "what you are working on"   then  npm run save`);
-    return 1;
-  }
-  if (!hooksWired()) {
-    say(yellow('Safety checks are not switched on for this copy of the repo. Fixing that first.'));
-    execFileSync('bash', ['.framework/scripts/setup-hooks.sh'], { cwd: REPO_ROOT, stdio: 'inherit' });
-  }
-
-  const changes = changedFiles();
-  if (changes.length === 0) {
-    say('Nothing has changed since your last save.');
-    return 0;
-  }
-
-  say(bold('Checking your work before saving it'));
-  const checks = runChecks();
-  if (!checks.passed) {
-    say(red('\nSomething is not right yet, so nothing was saved.'));
-    say('Read the lines above: each one says which skill and what to run to fix it.');
-    say(dim('Common fix: npm run regression -- <skill-name>   (re-runs that skill\'s tests and records the result)'));
-    return 1;
-  }
-
-  const message = argv.join(' ') || (await prompter.ask('message', 'Describe what you did, in one line', { default: 'update skills' }));
-  const conventional = /^(feat|fix|docs|chore|test|refactor)(\(.+\))?:/.test(message) ? message : `feat: ${message}`;
-
-  say(bold('\nSaving'));
-  step('bundling your changes');
-  git(['add', '-A']);
-  step('recording them with your message');
-  git(['commit', '-m', conventional]);
-  step('uploading to GitHub');
-  const push = spawnSync('git', ['push', '-u', 'origin', branch], { cwd: REPO_ROOT, encoding: 'utf8' });
-  if (push.status !== 0) {
-    say(red('Saved on this computer, but the upload failed:'));
-    say(dim(push.stderr.trim()));
-    say('Try again in a moment with:  npm run save');
-    return 1;
-  }
-  say(green('\nSaved and uploaded.'));
-  say(dim('Next: npm run ship   (asks your reviewers to look at it)'));
+  say(dim('Next: make your changes; when the pair is ready, npm run publish -- <use-case>'));
   return 0;
 }
 
@@ -147,64 +86,6 @@ function reviewers() {
   } catch {
     return [];
   }
-}
-
-async function ship(argv, prompter) {
-  const branch = currentBranch();
-  if (branch === MAIN) {
-    say(red(`You are on ${MAIN}. There is nothing to review — start a branch first.`));
-    return 1;
-  }
-  if (changedFiles().length) {
-    say(yellow('You have unsaved changes. Saving them first.'));
-    const code = await save([], prompter);
-    if (code !== 0) return code;
-  }
-
-  const title = argv.join(' ') || (await prompter.ask('title', 'Title for the review request', { default: branch.replace(/^skill\//, '').replace(/-/g, ' ') }));
-  const people = reviewers();
-
-  if (!has('gh')) {
-    const remote = git(['remote', 'get-url', 'origin'], { allowFail: true }).replace(/\.git$/, '').replace(/^git@github\.com:/, 'https://github.com/');
-    say(yellow('The GitHub command line tool is not installed, so open the request in your browser:'));
-    say(`  ${remote}/compare/${MAIN}...${branch}?expand=1`);
-    say(dim('Or install it and run: bash .framework/setup/configure-gh.sh'));
-    return 0;
-  }
-
-  say(bold('Opening a review request'));
-  step(`asking GitHub to compare ${branch} with ${MAIN}`);
-  const body = [
-    '## What changed',
-    '',
-    title,
-    '',
-    '## Checks',
-    '',
-    'All local checks passed before this was uploaded (`npm run check`): skill format, rubric, regression suites, Python accuracy/edge/performance tests.',
-    '',
-    '_Opened with `npm run ship`._',
-  ].join('\n');
-
-  const args = ['pr', 'create', '--base', MAIN, '--head', branch, '--title', title, '--body', body];
-  if (people.length) args.push('--reviewer', people.join(','));
-  const result = spawnSync('gh', args, { cwd: REPO_ROOT, encoding: 'utf8' });
-  if (result.status !== 0) {
-    const existing = spawnSync('gh', ['pr', 'view', '--json', 'url', '-q', '.url'], { cwd: REPO_ROOT, encoding: 'utf8' });
-    if (existing.status === 0 && existing.stdout.trim()) {
-      say(green(`\nThis branch already has a review request open: ${existing.stdout.trim()}`));
-      say(dim('Your new changes were added to it automatically.'));
-      return 0;
-    }
-    say(red('Could not open the review request:'));
-    say(dim((result.stderr || result.stdout).trim()));
-    say(dim('If it mentions authentication, run: bash .framework/setup/configure-gh.sh'));
-    return 1;
-  }
-  say(green(`\nReview request opened: ${result.stdout.trim()}`));
-  if (people.length) say(dim(`Reviewers asked: ${people.join(', ')}`));
-  else say(yellow('No reviewers are configured yet — run: bash .framework/setup/configure-gh.sh'));
-  return 0;
 }
 
 // What each package manager calls the runtimes this repo needs.
@@ -250,7 +131,7 @@ function doctor() {
   if (!wired) {
     execFileSync('bash', ['.framework/scripts/setup-hooks.sh'], { cwd: REPO_ROOT, stdio: 'ignore' });
   }
-  record('safety checks run before each save', hooksWired(), 'run: bash .framework/scripts/setup-hooks.sh');
+  record('safety checks run before anything is saved', hooksWired(), 'run: bash .framework/scripts/setup-hooks.sh');
   record('the hook script can run', fs.existsSync(path.join(REPO_ROOT, '.framework/hooks/pre-commit')), 'the file .framework/hooks/pre-commit is missing');
   record('reviewers are configured', reviewers().length > 0, 'run: bash .framework/setup/configure-gh.sh');
   record(
@@ -293,13 +174,12 @@ function sync() {
 
 const USAGE = `dev — the friendly commands
 
-  npm run status              what is going on right now
-  npm run start "topic"       begin work on its own branch
-  npm run check               run every check
-  npm run save "what I did"   check, save, upload
-  npm run ship "title"        open a review request
-  npm run sync                bring in the latest main
-  npm run doctor              check this computer is set up
+  npm run status                  what is going on right now
+  npm run start "topic"           begin work on its own branch
+  npm run check                   run every check
+  npm run publish -- <use-case>   confirm checks, save, and deliver the pair
+  npm run sync                    bring in the latest main
+  npm run doctor                  check this computer is set up
 `;
 
 async function main(argv) {
@@ -309,8 +189,6 @@ async function main(argv) {
     switch (command) {
       case 'status': return status();
       case 'start': return await start(rest, prompter);
-      case 'save': return await save(rest, prompter);
-      case 'ship': return await ship(rest, prompter);
       case 'sync': return sync();
       case 'doctor': return doctor();
       default:

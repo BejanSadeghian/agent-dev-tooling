@@ -65,21 +65,22 @@ interview with that — a wrong guess out loud extracts far more than an open qu
 
 ### 2. Interview the author
 
-Work through `references/interview.md`. Rules:
+Work through `references/interview.md`. The shape:
 
-- **One question at a time.** Batched questions get batched, shallow answers.
-- **Ask for the last three real instances**, not the general case. "When did you last do this? What
-  did you actually type?"
-- **Chase the exceptions.** "When does this *not* apply?" is the question that produces a
-  description precise enough to trigger correctly.
-- **Draw the pair boundary.** Which part is mechanical data processing (the doer), and which part is
-  reading meaning out of the result (the interpreter)? "Which values must come out identical every
-  time?" — everything that answers yes is doer Python, per `references/python-determinism.md`.
-- **Pin the artifact schema.** "What fields does each record carry? What does the downstream reader
-  need?" This becomes the doer's `references/schema.md` — see `references/the-pair-contract.md`.
-- **Find the variations.** "Does this differ by domain, team, or region?" Each answer becomes a file
-  in `references/variations/`.
-- **Stop when the answers stop changing your draft.** Usually 8–15 questions.
+- **The material comes first.** Read everything the author gave you, play back what you learned,
+  and ask what you got wrong — never ask a question the material already answers.
+- **Collect the name.** If the material does not name the use case, ask before anything else —
+  never generate under an invented name.
+- **Work the gaps, not a script.** Build the gap map (name, trigger, procedure, exactness,
+  artifact fields, judgment lens, scope), show the author which areas are already covered and
+  which are gaps, and ask where they want to dig in.
+- **The author steers.** "Focus on X" means stay on X; "skip that" is a recorded decision, not a
+  debate. Only with no preference do you work the gaps in order.
+- **One question at a time.** Concrete over general; wrong guesses over open questions; exactness
+  probed with "if this were 2% off, would you notice?" (yes = doer Python, per
+  `references/python-determinism.md`); the lens extracted from an accepted output versus a
+  rejected one.
+- **Stop when the answers stop changing your draft** — or when the author says done.
 
 ### 3. Confirm the boundary before generating
 
@@ -188,9 +189,11 @@ npm run check
 ```
 
 Format and roles → tests (cases, Python, performance budgets) → rubric → library health. Fix until
-clean, then `npm run save`. The refreshed `.framework/state/<skill>.json` files are part of the change:
-they are the evidence the suite ran after the last edit. When the pair is done and reviewed,
-`npm run publish -- <use-case>` ships it to the repo that will use it.
+clean. Then one verb does the rest: `npm run publish -- <use-case>` confirms the test state,
+saves and uploads the work (the refreshed `.framework/state/<skill>.json` files travel with it —
+they are the evidence the suite ran after the last edit), and delivers the pair to the repo that
+will use it. If the checks do not confirm, publishing stops — the author may direct
+`--override "their reason"`; never override on your own judgment.
 
 ## Outputs
 

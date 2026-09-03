@@ -1,12 +1,12 @@
 {
   "id": "gate-commands-in-order",
-  "description": "The gating step runs the single check command and commits the recorded state with the change.",
+  "description": "The gating step runs the single check command and publishes through the confirmed gate.",
   "type": "contains",
   "kind": "accuracy",
   "file": "SKILL.md",
   "patterns": [
     "npm run check",
-    "npm run save",
+    "npm run publish",
     "\\.framework/state/<skill>\\.json"
   ],
   "provenance": "hard rule: the recorded run is the evidence the suite ran after the last edit"

@@ -11,8 +11,6 @@
     "setup": "bash .framework/setup/install.sh",
     "status": "node .framework/scripts/dev.mjs status",
     "start": "node .framework/scripts/dev.mjs start",
-    "save": "node .framework/scripts/dev.mjs save",
-    "ship": "node .framework/scripts/dev.mjs ship",
     "sync": "node .framework/scripts/dev.mjs sync",
     "doctor": "node .framework/scripts/dev.mjs doctor",
     "lint": "node .framework/scripts/lint.mjs",

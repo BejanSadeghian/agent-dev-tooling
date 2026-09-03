@@ -39,16 +39,13 @@ stale.
 **5. Validate** — `npm run check`. Five stages in order (lint, format, tests, rubric, health);
 each failure names the skill and the fixing command. Ends `All checks passed.`
 
-**6. Save** — `npm run start "topic"` once per piece of work (creates branch `skill/topic`), then
-`npm run save "what I did"`. Save re-runs the checks, commits with a conventional message, and
-pushes; ends `Saved and uploaded.` On a failure: `Something is not right yet, so nothing was
-saved.`
-
-**7. Review + ship** — `npm run ship "title"` opens the PR in this repo (ends `Review request
-opened: <url>`). `npm run publish -- <uc>` ships a green pair to the consuming repo: first run
-tells you to create `.framework/targets.json` (it prints the exact shape); after that it
-re-verifies the pair, copies both halves to the target's `.github/skills/` on branch
-`skill/<uc>`, and opens the PR there.
+**6. Publish** — `npm run publish -- <uc>`. One verb: confirms the test state (the full gate
+over the pair), quietly commits and pushes your work on a branch (never `main`), then delivers —
+first run tells you to create `.framework/targets.json` (it prints the exact shape); after that
+it copies both halves to the target's `.github/skills/` on branch `skill/<uc>` and opens the PR
+there. If the gate fails, nothing is published; the human may direct
+`npm run publish -- <uc> --override "reason"` — the reason lands in the delivery commit and PR
+body. (`npm run start "topic"` still exists for starting work on its own branch.)
 
 | Command | What it does |
 | --- | --- |
@@ -62,9 +59,7 @@ re-verifies the pair, copies both halves to the target's `.github/skills/` on br
 | `npm run regression -- <skill>` | Runs one skill's suite and records the result in `.framework/state/` — the "inspection sticker" the gate checks. |
 | `npm run status` | Where you are — branch, changed files, whether the safety checks are on — and the next command to run. |
 | `npm run start "topic"` | Begins a piece of work on its own branch, named after the topic. |
-| `npm run save "what I did"` | Runs every check; only if all pass does it commit and upload your work. |
-| `npm run ship "title"` | Opens a pull request for this repo's changes, with the configured reviewers attached. |
-| `npm run publish -- <uc>` | Verifies the pair is green, then copies it to the target repo (from `.framework/targets.json`) on a branch with a pull request. |
+| `npm run publish -- <uc>` | The one delivery verb: confirms the test state, commits and pushes your work (never on `main`), then copies the pair to the target repo (from `.framework/targets.json`) on a branch with a pull request. `--override "reason"` publishes despite failing checks — human's call only, reason on the record. |
 | `npm run health` | The whole library at a glance: anything untested, stale, thinly covered, colliding triggers, or half a pair. |
 
 The full contract the gate enforces is `.framework/FRAMEWORK.md`, mirrored machine-readably in
