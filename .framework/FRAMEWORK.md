@@ -5,7 +5,7 @@ machine-readable mirror — the pre-commit hook and CI both read that file, so *
 the same commit you change this page**.
 
 Two subjects have their own source-of-truth pages next to this one: **how skills are tested**
-lives in [`TESTING.md`](TESTING.md) and **how test data is made** lives in [`DATA.md`](DATA.md).
+lives in [`framework-testing.md`](framework-testing.md) and **how test data is made** lives in [`framework-data.md`](framework-data.md).
 The testing sections below are the short version; those pages win on detail.
 
 ## 1. The two ideas

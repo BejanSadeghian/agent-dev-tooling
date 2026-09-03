@@ -114,6 +114,7 @@ commands and their output is in [docs/advanced.md](docs/advanced.md).)
 | "I want to build a skill for ___" | Interviews you about it (one question at a time), then generates the whole pair with its tests |
 | "Test it on a real task: ___" | Runs the skill with a **fresh, separate agent** and shows you what it produced |
 | "Make this a repeatable test" | Saves the task as a scenario: three fresh runs, one report card with a pass grid, a verdict you can overrule |
+| "Accept that test result anyway — because ___" | Records your override on the report card, with your reason and name; the machine's verdict stays visible underneath |
 | "It should have done X instead" | Fixes the skill AND adds a test so that mistake can never come back |
 | "Check my work" | Runs every check and explains anything that fails, in plain words |
 | "Save my work" | Checks first, then saves and uploads it on its own branch |
@@ -163,7 +164,7 @@ These are what your assistant reaches for when you ask for things — you never 
 ## How testing works
 
 Three layers, from smallest to most lifelike — full details live in the framework's
-[testing framework](.framework/TESTING.md), which is the source of truth:
+[testing framework](.framework/framework-testing.md), which is the source of truth:
 
 1. **Exact tests on the code.** The doer's mechanical work is checked for being exactly right,
    for surviving weird input, and for staying fast as data grows.
@@ -178,7 +179,7 @@ Three layers, from smallest to most lifelike — full details live in the framew
 
 All practice data is **made up and reproducible** — never real, never random. Your real files can
 be used for one-off runs but are never saved into the repo. That contract is the
-[data generation framework](.framework/DATA.md).
+[data generation framework](.framework/framework-data.md).
 
 ## What keeps it honest
 

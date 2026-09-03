@@ -1,6 +1,6 @@
 # Data generation
 
-> Source of truth: `.framework/DATA.md`. This page is the generator's own reference detail.
+> Source of truth: `.framework/framework-data.md`. This page is the generator's own reference detail.
 
 `scripts/datagen.mjs` is the bundled generator. It is deterministic by construction: a seeded
 mulberry32 PRNG, no clock, no network, no `Math.random`. Same spec + same seed = identical bytes.

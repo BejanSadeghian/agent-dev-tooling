@@ -21,7 +21,7 @@ through these commands — never hand-roll their jobs:
 | Set up this computer | — | `npm run doctor`, then `npm run setup` |
 | Build a new skill / use case | `skill-builder` | interview first, then `npm run skill:new` (writes the pair into `skills/`, creating it if absent) |
 | Test a skill being built | `skill-builder` | `npm run subagent -- <use-case> "<real task>"` (`--role interpreter`, `--discovery`) — NEVER run the skill yourself |
-| Run a repeatable acceptance eval | `skill-builder` | `npm run scenario -- <use-case> [name]` — 3 fresh-sandbox trials, one report; only the human uses `--accept`/`--reject` |
+| Run a repeatable acceptance eval | `skill-builder` | `npm run scenario -- <use-case> [name]` — 3 fresh-sandbox trials, one report; record `--accept`/`--reject` only at the human's explicit direction, with their reason |
 | Fix a skill after feedback | `skill-builder` | edit + a regression case for each item, then `npm run regression -- <skill>` |
 | Add or fill tests, make fixtures | `test-generator` | `npm run test:new -- <skill>`; fixtures via its seeded `scripts/datagen.mjs` |
 | Check everything | — | `npm run check` |

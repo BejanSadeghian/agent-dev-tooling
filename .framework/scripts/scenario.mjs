@@ -246,7 +246,8 @@ export function renderReport(result) {
   lines.push('');
   for (const t of result.matrix) lines.push(`- trial ${t.trial}: \`${t.transcript}\``);
   lines.push('');
-  lines.push('To overrule this verdict: `npm run scenario -- <use-case> <name> --accept "reason"` (or `--reject`).');
+  lines.push('Disagree with this verdict? Tell your assistant to accept or reject it and give your');
+  lines.push('reason — the decision is recorded here with your name on it. (Command form in docs/advanced.md.)');
   lines.push('');
   return lines.join('\n');
 }

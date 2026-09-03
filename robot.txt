@@ -32,7 +32,10 @@ doctor reports the safety hooks were off, run `npm run setup`.
                                                # transcript, 3 trials, one report; run before
                                                # shipping. Turn the first real task into a
                                                # committed scenario (evals/scenarios/<name>/).
-                                               # Only the human may --accept/--reject a verdict.
+                                               # Record an --accept/--reject override ONLY
+                                               # when the human explicitly directs it, with
+                                               # the human's own reason — never on your own
+                                               # judgment.
 
 ## Working rules
 
