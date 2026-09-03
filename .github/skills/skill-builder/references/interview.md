@@ -15,6 +15,10 @@ Before any question:
 3. **Collect the name.** If the material does not name it, ask now: "What should this use case be
    called?" (it becomes `<name>-doer` and `<name>-interpreter`). Never generate under an invented
    name.
+4. **Keep the material.** Once the pair is generated, save what the author gave you into the
+   doer's `references/source-material/` — it is provenance, same as the interview notes. The one
+   exception: anything containing real or personal data stays OUT of the repo
+   (`.framework/framework-data.md`); record in the interview notes where it lives instead.
 
 Everything after this is gap work. A question about something the material already covers is a
 wasted question and tells the author you did not read.

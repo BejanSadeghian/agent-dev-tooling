@@ -68,7 +68,9 @@ interview with that — a wrong guess out loud extracts far more than an open qu
 Work through `references/interview.md`. The shape:
 
 - **The material comes first.** Read everything the author gave you, play back what you learned,
-  and ask what you got wrong — never ask a question the material already answers.
+  and ask what you got wrong — never ask a question the material already answers. After
+  generating, save the material into the doer's `references/source-material/` (provenance, like
+  the interview notes) — unless it holds real or personal data, which never enters the repo.
 - **Collect the name.** If the material does not name the use case, ask before anything else —
   never generate under an invented name.
 - **Work the gaps, not a script.** Build the gap map (name, trigger, procedure, exactness,
