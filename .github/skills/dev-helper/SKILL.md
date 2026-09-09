@@ -54,16 +54,18 @@ command before you know this — the right next step is entirely different on `m
 | Get the latest main | `npm run sync` | Merges `main` into their branch |
 | Fix their setup | `npm run doctor` | Checks tools, switches the hooks back on |
 
-Prefer these over `git` directly. They refuse the two things that actually cause damage — committing
-to `main`, and saving work whose checks have not passed — and they say what they are doing first.
+Prefer these over `git` directly. They refuse the one thing that actually causes damage —
+committing to `main` — surface check failures as loud warnings instead of blocking on them, and
+they say what they are doing first.
 
 ### 3. Never do these
 
 - **Never** `git push --force`, `git reset --hard`, `git rebase`, or delete a branch on their behalf.
 - **Never** commit directly to `main`. If they are on `main` with changes, run `npm run start` first;
   the branch takes the changes with it.
-- **Never** switch the pre-commit checks off. If a check fails, fix the cause. `SKIP_SKILL_GATE=1`
-  exists for emergencies and CI still enforces the same gate, so skipping only moves the failure.
+- **Never** switch the pre-commit checks off. If a check fails, fix the cause — the warnings are
+  the cheapest place to see a problem. `SKIP_SKILL_GATE=1` exists for emergencies; skipping only
+  silences the warnings, it never fixes them.
 - **Never** delete or overwrite their files to make a check pass.
 
 ### 4. When a check fails, translate it

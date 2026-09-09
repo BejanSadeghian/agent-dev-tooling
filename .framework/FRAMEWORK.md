@@ -197,7 +197,10 @@ Copilot CLI process (configurable in `framework.json` `subagent`) that reads the
 disk, captures the transcript under `evals/runs/`, and judges the output deterministically:
 
 - doer runs: the artifact parses and carries `records` + `deviations`;
-- observer runs (`--role observer`): `## Facts` appears before `## Interpretations`;
+- observer runs (`--role observer`): `## Facts` appears before `## Interpretations` — that
+  discipline is the whole of what is machine-checked. The reading itself
+  (`outputs/<use-case>-reading.md`) is the review artifact: its pass criterion is the author's
+  eyes (voice, lens judgment, thresholds), never an assertion;
 - `--discovery` omits the skill path to test that the description alone triggers.
 
 That is the quick loop. The acceptance layer is **scenario evals** — they test the agent USING
@@ -222,20 +225,26 @@ the skill, holistically and repeatably, across multiple steps:
   `.framework/state/scenarios/` and are committed; full transcripts stay in `evals/runs/`
   (gitignored).
 
-Sub-agent runs and scenarios are LLM-in-the-loop and therefore nondeterministic: they never gate
-pre-commit. Run scenarios before shipping. The gate below is purely deterministic.
+Sub-agent runs and scenarios are LLM-in-the-loop and therefore nondeterministic: their verdicts
+are advisory, never blocking. Run scenarios before shipping. The checks below are purely
+deterministic — and they too warn, never block.
 
-## 9. Freshness rule and the gate
+## 9. Freshness rule and the checks
 
 `npm run regression` runs each skill's JSON cases and Python tests, hashes every (non-transient)
 file in the skill directory, and records the result in `.framework/state/<skill>.json` (performance in
-`.framework/state/perf/<skill>.json`). The rubric fails if the current hash differs from the recorded
+`.framework/state/perf/<skill>.json`). The rubric flags it when the current hash differs from the recorded
 one — **you edited the skill and did not re-run its suite**. The state files are committed with
 the change; they are the evidence.
 
-The same gate runs in three places:
+The same checks run in three places — and everywhere they warn, never block:
 
 - `npm run check` — lint → format+roles → tests → rubric → health;
-- `.framework/hooks/pre-commit` — the gate over the staged skills (wired by `npm run setup`;
-  `SKIP_SKILL_GATE=1` is the visible escape hatch, and CI does not skip);
-- `.github/workflows/skills-ci.yml` — the identical gate, plus hook parity, on every push and PR.
+- `.framework/hooks/pre-commit` — the checks over the staged skills (wired by `npm run setup`;
+  `SKIP_SKILL_GATE=1` silences them);
+- `.github/workflows/skills-ci.yml` — the identical checks, plus hook parity, on every push and PR.
+
+A failing check is a loud warning with the fixing command attached, not a refusal. The detectors
+still report pass/fail honestly; nothing downstream treats a failure as a veto. The human decides —
+`npm run publish` ships with warnings printed, and `--override "reason"` is now just a way to put
+the reason on the record in the delivery commit and PR body.

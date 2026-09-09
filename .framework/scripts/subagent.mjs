@@ -13,7 +13,9 @@
 // The run transcript is captured under the skill's evals/runs/ (gitignored), then
 // the deterministic checks judge what came out: the doer's artifact must parse and
 // carry records + deviations; the observer's output must separate Facts from
-// Interpretations.
+// Interpretations. That discipline is the whole of what is machine-checked for the
+// observer — the reading itself is the review artifact, and its pass criterion is
+// the author's eyes, never an assertion.
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -150,6 +152,12 @@ function main(argv) {
     console.log(`  ${mark} ${f.message}`);
   }
   console.log(dim('\nFold what you learned back into the skill AND into a regression case, then re-run.'));
+  if (args.role === 'observer') {
+    console.log(dim('\nThe checks above cover only the Facts/Interpretations discipline.'));
+    console.log(dim(`The reading itself — outputs/${args.useCase}-reading.md — is the review artifact:`));
+    console.log(dim("its pass criterion is the author's eyes: does it sound like them, does the lens fire"));
+    console.log(dim('where they would fire it, do the thresholds match? No machine check substitutes for that review.'));
+  }
   return result.status !== 0 || findings.some((f) => f.level === 'error') ? 1 : 0;
 }
 

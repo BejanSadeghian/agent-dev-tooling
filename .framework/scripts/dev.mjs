@@ -7,8 +7,9 @@
 //   npm run doctor     make sure this computer is set up properly
 //
 // Saving and delivering both live in one verb now: `npm run publish -- <use-case>`
-// confirms the test state (the human may --override with a reason), saves and
-// uploads the work, and delivers the pair to the target repo.
+// confirms the test state (failing checks print as warnings, never blockers;
+// --override "reason" puts the reason on the record), saves and uploads the work,
+// and delivers the pair to the target repo.
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';

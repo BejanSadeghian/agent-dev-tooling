@@ -1,6 +1,6 @@
 {
   "id": "gate-commands-in-order",
-  "description": "The gating step runs the single check command and publishes through the confirmed gate.",
+  "description": "The check step runs the single check command and publishes with the checks confirmed.",
   "type": "contains",
   "kind": "accuracy",
   "file": "SKILL.md",

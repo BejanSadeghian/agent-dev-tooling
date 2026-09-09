@@ -67,12 +67,13 @@ doctor reports the safety hooks were off, run `npm run setup`.
 - New pairs are generated into skills/ with `npm run skill:new` — do not hand-scaffold.
   The folder does not exist until the first pair is generated; the generator creates it.
 - After ANY edit to a skill, re-run its suite (`npm run regression -- <skill>`) and commit the
-  refreshed .framework/state/<skill>.json with the change; the gate rejects stale suites.
+  refreshed .framework/state/<skill>.json with the change; the checks flag stale suites.
 - Never edit .framework/state/ by hand — it is machine-written evidence, and a forged sticker
   fails anyway because the content fingerprint will not match.
-- Never weaken or skip the gate to get a commit through (SKIP_SKILL_GATE is for the human's
-  explicit emergency use; CI does not skip).
+- The checks warn, never block — treat their warnings as work to do, not noise: fix what they
+  name before moving on. SKIP_SKILL_GATE=1 silences the hook only on the human's explicit ask.
 - Author feedback lands twice: as a skill edit AND as a regression test, so the mistake cannot
   return.
-- Ship only green pairs: `npm run publish -- <use-case>` (targets in .framework/targets.json).
-- The gate in full: `npm run check` = lint -> format+roles -> tests -> rubric -> health.
+- Ship with `npm run publish -- <use-case>` (targets in .framework/targets.json); failing checks
+  print as warnings and the human decides whether to fix or ship.
+- The checks in full: `npm run check` = lint -> format+roles -> tests -> rubric -> health.

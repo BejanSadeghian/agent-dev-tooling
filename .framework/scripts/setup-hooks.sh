@@ -5,4 +5,4 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 git config core.hooksPath .framework/hooks
 chmod +x .framework/hooks/* .framework/scripts/*.sh 2>/dev/null || true
-echo "git hooks path -> .framework/hooks (pre-commit skill gate active)"
+echo "git hooks path -> .framework/hooks (pre-commit skill checks active: they warn, never block)"

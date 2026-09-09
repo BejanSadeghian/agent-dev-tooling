@@ -85,49 +85,50 @@ test('the hook passes for a skill edited and re-recorded together', (t) => {
   assert.equal(staged.code, 0, staged.out);
 });
 
-test('the hook FAILS when a skill is edited without re-running its suite', (t) => {
+test('the hook WARNS (but does not block) when a skill is edited without re-running its suite', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.appendFileSync(skillMd, '\n2. An unverified edit.\n');
   const result = sh('git add .github/skills/hook-demo && .framework/hooks/pre-commit', dir);
-  assert.equal(result.code, 1);
+  assert.equal(result.code, 0, result.out);
   assert.match(result.out, /R5 stale: skill edited after its last regression run/);
+  assert.match(result.out, /warn, never block/);
 });
 
-test('the hook FAILS when the skill no longer matches the format spec', (t) => {
+test('the hook WARNS (but does not block) when the skill no longer matches the format spec', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.writeFileSync(skillMd, fs.readFileSync(skillMd, 'utf8').replace('## Workflow', '## Steps'));
   sh('node .framework/scripts/run-regression.mjs hook-demo', dir);
   const result = sh('git add .github/skills/hook-demo .framework/state && .framework/hooks/pre-commit', dir);
-  assert.equal(result.code, 1);
+  assert.equal(result.code, 0, result.out);
   assert.match(result.out, /missing required heading "## Workflow"/);
 });
 
-test('the hook FAILS when a regression case goes red', (t) => {
+test('the hook WARNS (but does not block) when a regression case goes red', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.writeFileSync(skillMd, fs.readFileSync(skillMd, 'utf8').replace('Copy this directory', 'Duplicate this folder'));
   sh('node .framework/scripts/run-regression.mjs hook-demo', dir);
   const result = sh('git add .github/skills/hook-demo .framework/state && .framework/hooks/pre-commit', dir);
-  assert.equal(result.code, 1);
+  assert.equal(result.code, 0, result.out);
   assert.match(result.out, /stays-minimal/);
 });
 
-test('the hook FAILS when the refreshed state file is left unstaged', (t) => {
+test('the hook WARNS (but does not block) when the refreshed state file is left unstaged', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.appendFileSync(skillMd, '\n2. Another line.\n');
   sh('git add .github/skills/hook-demo', dir);
   sh('node .framework/scripts/run-regression.mjs hook-demo', dir); // refreshes .framework/state, leaves it unstaged
   const result = sh('.framework/hooks/pre-commit', dir);
-  assert.equal(result.code, 1);
+  assert.equal(result.code, 0, result.out);
   assert.match(result.out, /has unstaged changes/);
 });
 
-test('SKILL_GATE_FILES drives the gate the same way a staged list does', (t) => {
+test('SKILL_GATE_FILES drives the checks the same way a staged list does', (t) => {
   const { dir, skillMd } = makeGitRepo(t);
   fs.appendFileSync(skillMd, '\n2. Unverified.\n');
   const result = sh('.framework/hooks/pre-commit', dir, {
     SKILL_GATE_FILES: '.github/skills/hook-demo/SKILL.md',
   });
-  assert.equal(result.code, 1);
+  assert.equal(result.code, 0, result.out);
   assert.match(result.out, /R5 stale/);
 });
 

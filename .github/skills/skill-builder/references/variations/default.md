@@ -1,7 +1,7 @@
 # Variation: default
 
 The baseline behaviour of `skill-builder`: interview, generate the pair, refine through clean
-sub-agent runs, gate, ship. Add one file per variation — each states when it applies and what
+sub-agent runs, check, ship. Add one file per variation — each states when it applies and what
 changes relative to this default.
 
 | Aspect | Default |

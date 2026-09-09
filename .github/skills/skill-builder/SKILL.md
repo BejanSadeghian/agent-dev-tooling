@@ -3,7 +3,8 @@ name: skill-builder
 description: >-
   Builds a production use case as a doer/observer skill pair: interviews the author, generates
   both skills (documents, artifact schema, deterministic Python, accuracy/edge/performance tests),
-  refines them by running clean sub-agents against real work, and gates everything. Use when
+  refines them by running clean sub-agents against real work, and runs the full check suite
+  over everything (checks warn, never block). Use when
   someone wants to create a new skill or use case, rewrite or refine an existing one, or add
   regression coverage to a skill that has none.
 allowed-tools:
@@ -180,7 +181,11 @@ npm run subagent -- <use-case> "<the real task>" --discovery       # does the de
 
 Each run launches a fresh agent process that reads the latest skill from disk, captures the
 transcript under the skill's `evals/runs/`, and judges the output deterministically (doer: artifact
-parses and conforms; observer: Facts before Interpretations). Because every run re-reads disk,
+parses and conforms; observer: Facts before Interpretations). For the observer that deterministic
+check is only the discipline — the reading itself (`outputs/<use-case>-reading.md`) is the review
+artifact, and its pass criterion is the author's eyes: does it sound like them, does the lens fire
+where they would fire it, are the thresholds right? Present the reading for review and do not call
+the observer green until the author signs off. Because every run re-reads disk,
 edit-and-re-run is the whole loop — the author never has to switch contexts.
 
 Read the transcript like a reviewer: every place the sub-agent improvised, re-read, or produced

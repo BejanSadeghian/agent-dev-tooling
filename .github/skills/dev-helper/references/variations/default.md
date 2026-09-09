@@ -1,8 +1,8 @@
 # Variation: default
 
-The baseline behaviour of `dev-helper`: friendly git and GitHub verbs with the safety gate always
-on. Add one file per variation — each states when it applies and what changes relative to this
-default.
+The baseline behaviour of `dev-helper`: friendly git and GitHub verbs with the safety checks
+always on. Add one file per variation — each states when it applies and what changes relative to
+this default.
 
 | Aspect | Default |
 |---|---|

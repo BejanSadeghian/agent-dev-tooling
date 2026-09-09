@@ -29,24 +29,25 @@ what it wrote. Then replace the scaffolded parts: the real schema fields in
 CLI installed (`copilot`); the run transcript is saved under the skill's `evals/runs/` and the
 output ends with deterministic checks, e.g. `ok outputs/<uc>.json parses and carries records +
 deviations`. Variants: `--role observer` (checks `## Facts` comes before
-`## Interpretations`), `--discovery` (does not name the skill — tests that the description
+`## Interpretations` — that discipline is the whole of what is machine-checked; the reading
+itself is the review artifact and its pass criterion is the author's eyes), `--discovery` (does not name the skill — tests that the description
 triggers).
 
 **4. Edit + lock in feedback** — make the fix, add a regression test (JSON in `evals/tests/` or a
 Python test), then `npm run regression -- <skill>`. Expect `PASS <skill> (n/n)` and `recorded 1
-run(s) in .framework/state/` — commit that state file with your change or the gate rejects it as
-stale.
+run(s) in .framework/state/` — commit that state file with your change; the checks flag it as
+stale if you don't (a warning, never a block).
 
 **5. Validate** — `npm run check`. Five stages in order (lint, format, tests, rubric, health);
 each failure names the skill and the fixing command. Ends `All checks passed.`
 
-**6. Publish** — `npm run publish -- <uc>`. One verb: confirms the test state (the full gate
-over the pair), quietly commits and pushes your work on a branch (never `main`), then delivers —
+**6. Publish** — `npm run publish -- <uc>`. One verb: confirms the test state (the full check
+suite over the pair), quietly commits and pushes your work on a branch (never `main`), then delivers —
 first run tells you to create `.framework/targets.json` (it prints the exact shape); after that
 it copies both halves to the target's `.github/skills/` on branch `skill/<uc>` and opens the PR
-there. If the gate fails, nothing is published; the human may direct
-`npm run publish -- <uc> --override "reason"` — the reason lands in the delivery commit and PR
-body. (`npm run start "topic"` still exists for starting work on its own branch.)
+there. Failing checks print as warnings and publishing continues — the human decides.
+`npm run publish -- <uc> --override "reason"` puts the reason on the record in the delivery
+commit and PR body. (`npm run start "topic"` still exists for starting work on its own branch.)
 
 | Command | What it does |
 | --- | --- |
@@ -56,12 +57,12 @@ body. (`npm run start "topic"` still exists for starting work on its own branch.
 | `npm run subagent -- <uc> "task"` | Runs the skill with a fresh agent process that has none of your conversation context, saves the transcript under the skill's `evals/runs/`, and checks the output (artifact matches the schema; Facts before Interpretations). `--role observer` runs the other half; `--discovery` hides the skill's name to test that its description alone triggers it. |
 | `npm run test:new -- <skill>` | Lists every missing accuracy/edge/performance test for a doer's artifact and modules, and writes the file that closes each gap — a working scaffold whose expectations you make real. |
 | `npm run scenario -- <uc> [name]` | Agent-level acceptance eval: stages the scenario's fixtures into a fresh sandbox, walks the steps with a clean sub-agent (3 trials), evaluates checkpoints over artifacts and transcript (plus an LLM judge), and writes one report per scenario to `.framework/state/scenarios/`. Report rows carry short IDs (`C1`, `C2`, …). Human decisions: `--waive C3 "reason"` (accept one failing check), `--accept "reason"` / `--reject "reason"` (overrule the whole verdict). `--list` shows every scenario's effective verdict and failing IDs. Spec: `.framework/framework-testing.md`. |
-| `npm run check` | The whole gate in order: lint → format + pair rules → every regression test and Python test → rubric (nothing stale or uncovered) → library health. |
-| `npm run regression -- <skill>` | Runs one skill's suite and records the result in `.framework/state/` — the "inspection sticker" the gate checks. |
+| `npm run check` | The whole check suite in order: lint → format + pair rules → every regression test and Python test → rubric (nothing stale or uncovered) → library health. Checks warn, never block. |
+| `npm run regression -- <skill>` | Runs one skill's suite and records the result in `.framework/state/` — the "inspection sticker" the checks read. |
 | `npm run status` | Where you are — branch, changed files, whether the safety checks are on — and the next command to run. |
 | `npm run start "topic"` | Begins a piece of work on its own branch, named after the topic. |
-| `npm run publish -- <uc>` | The one delivery verb: confirms the test state, commits and pushes your work (never on `main`), then copies the pair to the target repo (from `.framework/targets.json`) on a branch with a pull request. `--override "reason"` publishes despite failing checks — human's call only, reason on the record. |
+| `npm run publish -- <uc>` | The one delivery verb: confirms the test state, commits and pushes your work (never on `main`), then copies the pair to the target repo (from `.framework/targets.json`) on a branch with a pull request. Failing checks print as warnings; shipping continues. `--override "reason"` puts the reason on the record. |
 | `npm run health` | The whole library at a glance: anything untested, stale, thinly covered, colliding triggers, or half a pair. |
 
-The full contract the gate enforces is `.framework/FRAMEWORK.md`, mirrored machine-readably in
+The full contract the checks verify is `.framework/FRAMEWORK.md`, mirrored machine-readably in
 `.framework/framework.json` — change both in the same commit.

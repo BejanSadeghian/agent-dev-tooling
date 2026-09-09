@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Ship a finished pair to a target repo. Skills are DEVELOPED here and USED
-// elsewhere: when a pair is green, this copies it out of skills/ into the
-// target's skills folder (default: .github/skills/, where Copilot discovers it),
-// on a branch, with a pull request when the target is a remote repo.
+// elsewhere: this copies the pair out of skills/ into the target's skills folder
+// (default: .github/skills/, where Copilot discovers it), on a branch, with a
+// pull request when the target is a remote repo. The pre-ship checks warn, never
+// block — failures print loudly and shipping continues; the human decides.
 //
 //   npm run publish -- <use-case>                    # to the default target
 //   npm run publish -- <use-case> --target staging   # to a named target
@@ -111,18 +112,20 @@ function main(argv) {
   let overridden = false;
   const overrideBy = process.env.USER || process.env.USERNAME || 'unknown';
   if (gate.status !== 0) {
-    if (!overrideReason) {
-      console.error(red('\nNot published: the checks above did not confirm.'));
-      console.error('Either fix what they name (the usual fix: npm run regression -- <skill>), or — your call —');
-      console.error('publish anyway with your reason on the record:  npm run publish -- ' + useCase + ' --override "why"');
-      return 1;
+    // Checks warn, never block: the failures print above, publishing continues,
+    // and the human decides. --override "reason" is optional — when given, the
+    // reason goes on the record in the delivery commit and PR body.
+    console.log(yellow('\nChecks did not confirm — publishing anyway (checks warn, never block).'));
+    console.log(yellow('Fix what they name when you can (the usual fix: npm run regression -- <skill>).'));
+    if (overrideReason) {
+      overridden = true;
+      console.log(yellow(`Reason on the record: "${overrideReason}" (by ${overrideBy})`));
     }
-    overridden = true;
-    console.log(yellow(`\nPublishing DESPITE failing checks — override on record: "${overrideReason}"`));
   }
 
   // Absorb "save": nothing ships that is not also safely on GitHub. Commit any
-  // pending work on a branch (never main) and push it, quietly.
+  // pending work on a branch (never main) and push it, quietly. The pre-commit
+  // hook only warns, so no skip is needed here.
   const dirty = spawnSync('git', ['status', '--porcelain'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
   if (dirty) {
     const branchNow = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout.trim();
@@ -131,7 +134,6 @@ function main(argv) {
     execFileSync('git', ['commit', '-m', `feat: ${useCase} — published${overridden ? ` (checks overridden by ${overrideBy}: ${overrideReason})` : ''}`], {
       cwd: REPO_ROOT,
       stdio: 'inherit',
-      env: overridden ? { ...process.env, SKIP_SKILL_GATE: '1' } : process.env,
     });
     const pushed = spawnSync('git', ['push', '-u', 'origin', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
     if (pushed.status !== 0) console.log(yellow('saved locally; the upload to GitHub failed — publish continues, push again later'));

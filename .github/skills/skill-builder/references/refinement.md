@@ -45,5 +45,5 @@ it was meant to say, so you would silently compensate for its gaps. The clean su
   Feedback about judgment belongs in the observer; feedback about processing belongs in the doer.
 - **Edits shrink as often as they grow.** Most refinement is deletion — options nobody uses,
   background nobody reads.
-- **Re-run the suite after every edit** (`npm run regression -- <skill>`); the rubric gate fails a
+- **Re-run the suite after every edit** (`npm run regression -- <skill>`); the rubric flags a
   skill edited after its last recorded run.

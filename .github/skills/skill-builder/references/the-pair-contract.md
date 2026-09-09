@@ -76,6 +76,6 @@ check.
 
 When the source material holds cross-analysis content — comparing across artifacts or runs, what
 no single reading can see — init stubs a third skill, `skills/<use-case>-investigator/`: a folder
-with a `SKILL.md` marked to be developed further, plus one seed test so it passes the gate. It is
+with a `SKILL.md` marked to be developed further, plus one seed test so the checks pass on it. It is
 not part of the pair contract: no pair warning fires for it, and it owes no coverage until its
 contract is defined.
