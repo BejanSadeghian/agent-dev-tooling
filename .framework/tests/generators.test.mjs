@@ -117,6 +117,55 @@ test('the old single lens answers key still seeds all three lens sections', (t) 
   assert.match(observer, /Flag anything odd/);
 });
 
+test('no investigator stub without cross-analysis content', (t) => {
+  const { root, result } = generate(t, ANSWERS);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.ok(!fs.existsSync(path.join(root, 'skills', 'unit-economics-investigator')));
+});
+
+test('cross-analysis content stubs an investigator skill', (t) => {
+  const withInvestigator = {
+    ...ANSWERS,
+    investigator: 'Compare this month’s artifact against the previous three; flag trend breaks.',
+    investigatorTrigger: 'Use when someone wants margin trends compared across months.',
+  };
+  const { root, result } = generate(t, withInvestigator);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const dir = path.join(root, 'skills', 'unit-economics-investigator');
+  const skillMd = fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8');
+  assert.match(skillMd, /to be developed further/i);
+  assert.match(skillMd, /trend breaks/);
+  assert.match(skillMd, /compared across months/);
+  assert.match(skillMd, /## When to use/);
+  assert.match(skillMd, /## Workflow/);
+
+  // The stub passes the gate: its seed test runs green against what was generated.
+  const seed = JSON.parse(fs.readFileSync(path.join(dir, 'evals/tests/stub-names-its-use-case.json'), 'utf8'));
+  const outcome = runTest(seed, dir);
+  assert.equal(outcome.passed, true, outcome.message);
+
+  // And the pair is untouched.
+  assert.ok(fs.existsSync(path.join(root, 'skills', 'unit-economics-doer', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills', 'unit-economics-observer', 'SKILL.md')));
+});
+
+test('--source files the reviewed source into the doer’s source-material', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-gen-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const answersFile = path.join(root, 'answers.json');
+  fs.writeFileSync(answersFile, JSON.stringify(ANSWERS));
+  const sourceFile = path.join(root, 'process-flow.md');
+  fs.writeFileSync(sourceFile, '# Process flow\n\nThe overall flow.\n');
+  const result = node([
+    '.framework/scripts/new-skill.mjs', '--answers', answersFile, '--source', sourceFile,
+    '--yes', '--root', path.join(root, 'skills'), '--no-verify',
+  ]);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const copied = path.join(root, 'skills', 'unit-economics-doer', 'references/source-material/process-flow.md');
+  assert.ok(fs.existsSync(copied), 'source file was not filed');
+  assert.match(fs.readFileSync(copied, 'utf8'), /The overall flow/);
+});
+
 test('multiple steps generate one module per step plus an orchestrator', (t) => {
   const { doerDir, result } = generate(t, ANSWERS);
   assert.equal(result.status, 0, result.stdout + result.stderr);

@@ -17,9 +17,19 @@ The testing sections below are the short version; those pages win on detail.
   `references/schema.md`. Easy to verify exactly, three ways: accuracy, edge cases, performance.
 - `<use-case>-observer` — reads that artifact, identifies **Facts** (each traceable to the
   artifact), then applies **Interpretations** (its own lens) — always in that order, always
-  separated. The observer's init interview captures that lens as three concrete judgments — what
+  separated. The single init interview captures that lens as three concrete judgments — what
   is notable, what is concerning, what is actionable — and the generator seeds each as a
   structural test.
+- `<use-case>-investigator` — optional, not part of the pair contract. When the source material
+  holds cross-analysis content (comparing across artifacts or runs), init stubs this third skill:
+  a folder with a `SKILL.md` marked to be developed further.
+
+**Init is one interview.** It starts from a source file (`.md` or `.docx`) describing the
+overall process flow — read completely and played back before any question is asked. Then a
+single interview with the builder makes the whole set: doer, observer, and investigator if there
+is cross-analysis content. The builder can end or redirect the interview at any point; when they
+do, the remaining gaps are noted on the record and generation proceeds. Everything the source
+file and the interview contain populates the generated skills.
 
 The role is detected from the directory-name suffix; there is no manifest. A skill under
 `skills/` with neither suffix fails the format check. A pair missing one half is a

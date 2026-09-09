@@ -6,6 +6,9 @@
 //   <use-case>-doer         deterministic scripts/ code -> one structured artifact,
 //                           shape fixed by references/schema.md, deviations reported
 //   <use-case>-observer  reads that artifact, separates Facts from Interpretations
+// plus, when the source material holds cross-analysis content:
+//   <use-case>-investigator  compares across artifacts or runs — stubbed at init,
+//                           to be developed further
 
 const pyName = (s) => s.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').toLowerCase();
 
@@ -605,6 +608,64 @@ export function observerSeedTests({ useCase }) {
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));
 }
 
+
+export function investigatorSkillMd({ useCase, investigator, investigatorTrigger }) {
+  const name = `${useCase}-investigator`;
+  const trigger = (investigatorTrigger || '').trim() || `Use when someone wants ${useCase} artifacts compared across runs or time periods.`;
+  return `---
+name: ${name}
+description: >-
+  Cross-analysis across ${useCase} artifacts — what a single reading cannot see. ${trigger}
+allowed-tools:
+  - Read
+---
+
+# ${title(name)}
+
+Cross-analysis for \`${useCase}\`: comparing artifacts across runs or time periods to find
+what no single reading shows.
+
+> **To be developed further.** This skill was stubbed at init because the source material and
+> the interview contained cross-analysis content. Its input contract, output shape, and tests
+> are not yet defined — define them here before using it for real.
+
+## When to use
+
+${trigger}
+
+Do **not** use for: single-artifact readings — that is \`${useCase}-observer\`'s job.
+
+## What was captured at init
+
+${investigator.trim()}
+
+## Workflow
+
+TBD — define the cross-analysis contract: what it reads (which artifacts, how many), what it
+compares, and what it produces. Keep the observer's discipline: facts first, each traceable to
+the artifacts they came from, then interpretations.
+`;
+}
+
+export function investigatorSeedTest({ useCase }) {
+  const id = 'stub-names-its-use-case';
+  return {
+    file: `${id}.json`,
+    text:
+      JSON.stringify(
+        {
+          id,
+          description: 'The stub still names the use case it will investigate.',
+          type: 'contains',
+          file: 'SKILL.md',
+          patterns: [useCase, 'investigat'],
+          provenance: 'stub: cross-analysis skill, to be developed further',
+        },
+        null,
+        2,
+      ) + '\n',
+  };
+}
 
 export function artifactSeedTest({ useCase, entry, input, expected }) {
   const id = 'artifact-matches-seed-input';

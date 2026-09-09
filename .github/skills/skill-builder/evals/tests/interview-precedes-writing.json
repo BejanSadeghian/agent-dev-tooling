@@ -1,12 +1,13 @@
 {
   "id": "interview-precedes-writing",
-  "description": "The workflow interviews the author before anything is generated, one question at a time.",
+  "description": "The workflow runs one interview from the source file before anything is generated, one question at a time, and the builder can end it.",
   "type": "contains",
   "kind": "accuracy",
   "file": "SKILL.md",
   "patterns": [
-    "### 2\\. Interview the author",
+    "### 2\\. One interview to make the set",
     "One question at a time",
+    "can end it",
     "### 4\\. Generate the pair"
   ],
   "provenance": "hard rule: a skill written from raw material alone encodes the writer's guesses, not the author's procedure"

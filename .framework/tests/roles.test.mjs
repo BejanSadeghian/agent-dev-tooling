@@ -56,7 +56,7 @@ test('a lone doer draws a pair warning; a complete pair draws none', (t) => {
 test('a product skill without a role suffix fails the format check', (t) => {
   const repo = makeRepo({ name: 'sales-summary', skillsRoot: 'skills' });
   t.after(repo.cleanup);
-  assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /must be one half of a pair/);
+  assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /must carry a role suffix/);
 });
 
 test('a doer without references/schema.md fails the format check', (t) => {

@@ -39,7 +39,7 @@ export function validateSkill(config, skill) {
   const role = roleOf(config, skill);
   if (role === null) {
     const suffixes = Object.values(config.roles.suffixes).join(' or ');
-    err(`product skills must be one half of a pair — name it <use-case>${suffixes}`);
+    err(`product skills must carry a role suffix — name it <use-case>${suffixes}`);
   }
   if (role === 'doer') {
     const schema = schemaPath(config, skill.dir);

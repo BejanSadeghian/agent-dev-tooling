@@ -38,6 +38,7 @@ function parseArgs(argv) {
     if (a === '--answers') args.answersFile = argv[++i];
     else if (a === '--only') args.only = argv[++i];
     else if (a === '--root') args.root = argv[++i];
+    else if (a === '--source') args.sourceFile = argv[++i];
     else if (a === '--yes' || a === '-y') args.yes = true;
     else if (a === '--no-verify') args.noVerify = true;
     else if (!a.startsWith('-')) args.useCase = a;
@@ -135,7 +136,21 @@ async function collect(prompter, args) {
     default: lensLegacy || 'What the reader should do next for each kind of finding above.',
   });
 
-  return { useCase, what, trigger, nonTrigger, fields, steps, modules, interprets, observerTrigger, observerNonTrigger, notable, concerning, actionable };
+  // Cross-analysis content gets its own stub skill — a folder with a SKILL.md,
+  // to be developed further. Blank means there is none and nothing is generated.
+  const investigator = await prompter.ask('investigator', 'Any cross-analysis content for an investigator skill — comparing across artifacts or runs?', {
+    hint: 'Blank to skip. If there is some, it gets its own stub skill to develop further.',
+    default: '',
+  });
+  let investigatorTrigger = '';
+  if (investigator.trim()) {
+    investigatorTrigger = await prompter.ask('investigatorTrigger', 'When should the investigator fire? Finish: "Use when ..."', {
+      default: `Use when someone wants ${useCase} artifacts compared across runs or time periods.`,
+      validate: (v) => (v.toLowerCase().startsWith('use when') ? null : 'start with "Use when"'),
+    });
+  }
+
+  return { useCase, what, trigger, nonTrigger, fields, steps, modules, interprets, observerTrigger, observerNonTrigger, notable, concerning, actionable, investigator, investigatorTrigger };
 }
 
 function write(file, contents) {
@@ -189,17 +204,20 @@ async function main(argv) {
     console.error('  npm run skill:new -- --answers answers.json --yes          # full control');
     console.error(dim('  answers.json keys: useCase, what, trigger, nonTrigger, fields[], steps[],'));
     console.error(dim('                     interprets, observerTrigger, observerNonTrigger,'));
-    console.error(dim('                     notable, concerning, actionable, moduleNames'));
+    console.error(dim('                     notable, concerning, actionable, moduleNames,'));
+    console.error(dim('                     investigator, investigatorTrigger, [--source file]'));
     return 1;
   }
 
   const baseDir = args.root ? path.resolve(args.root) : path.resolve(REPO_ROOT, config.productSkillsDir);
   const doerDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.doer}`);
   const observerDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.observer}`);
+  const investigatorDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.investigator}`);
   const wantDoer = args.only !== 'observer';
   const wantObserver = args.only !== 'doer';
+  const wantInvestigator = !!spec.investigator.trim();
 
-  for (const [want, dir] of [[wantDoer, doerDir], [wantObserver, observerDir]]) {
+  for (const [want, dir] of [[wantDoer, doerDir], [wantObserver, observerDir], [wantInvestigator, investigatorDir]]) {
     if (want && fs.existsSync(dir)) {
       console.error(red(`\n${path.relative(REPO_ROOT, dir)} already exists. Pick another name, edit the existing skill, or use --only for the missing half.`));
       return 1;
@@ -260,6 +278,26 @@ async function main(argv) {
     for (const seed of T.observerSeedTests(spec)) {
       written.push(write(path.join(observerDir, config.evals.dir, seed.file), seed.text));
     }
+  }
+
+  if (wantInvestigator) {
+    generated.push(`${spec.useCase}${config.roles.suffixes.investigator}`);
+    written.push(write(path.join(investigatorDir, 'SKILL.md'), T.investigatorSkillMd(spec)));
+    const seed = T.investigatorSeedTest(spec);
+    written.push(write(path.join(investigatorDir, config.evals.dir, seed.file), seed.text));
+  }
+
+  // The reviewed source file is provenance: it lives with the doer.
+  if (wantDoer && args.sourceFile) {
+    const src = path.resolve(args.sourceFile);
+    if (!fs.existsSync(src)) {
+      console.error(red(`\n--source file not found: ${args.sourceFile}`));
+      return 1;
+    }
+    const dest = path.join(doerDir, 'references/source-material', path.basename(src));
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(src, dest);
+    written.push(dest);
   }
 
   console.log(green(`\nGenerated ${written.length} files across ${generated.length} skill(s): ${generated.join(', ')}`));

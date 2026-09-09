@@ -63,3 +63,11 @@ until the other half exists (`npm run skill:new -- --only <role>` scaffolds it).
 `skills/<use-case>-doer/` and `skills/<use-case>-observer/`. The suffix is how the
 tooling detects roles — there is no manifest. A product skill with neither suffix fails the format
 check.
+
+## The optional investigator
+
+When the source material holds cross-analysis content — comparing across artifacts or runs, what
+no single reading can see — init stubs a third skill, `skills/<use-case>-investigator/`: a folder
+with a `SKILL.md` marked to be developed further, plus one seed test so it passes the gate. It is
+not part of the pair contract: no pair warning fires for it, and it owes no coverage until its
+contract is defined.

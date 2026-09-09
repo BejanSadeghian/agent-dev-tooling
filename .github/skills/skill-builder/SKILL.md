@@ -63,38 +63,47 @@ Read everything the author gave you, plus any skill it resembles (`npm run healt
 write, in three sentences, what you believe the use case does and when it should fire. Open the
 interview with that — a wrong guess out loud extracts far more than an open question.
 
-### 2. Interview the author
+### 2. One interview to make the set
 
+There is one interview per use case — it makes the doer, the observer, and the investigator if
+there is cross-analysis content. Never split it into a doer interview and an observer interview.
 Work through `references/interview.md`. The shape:
 
-- **The material comes first.** Read everything the author gave you, play back what you learned,
-  and ask what you got wrong — never ask a question the material already answers. After
-  generating, save the material into the doer's `references/source-material/` (provenance, like
-  the interview notes) — unless it holds real or personal data, which never enters the repo.
-- **Collect the name.** If the material does not name the use case, ask before anything else —
+- **The source file comes first.** The author gives you a `.md` or `.docx` describing the
+  overall process flow. Read it completely (extract `.docx` text first), play back what you
+  learned, and ask what you got wrong — never ask a question the file already answers. Pass it
+  to the generator with `--source` and it is filed into the doer's
+  `references/source-material/` (provenance, like the interview notes) — unless it holds real or
+  personal data, which never enters the repo.
+- **Collect the name.** If the file does not name the use case, ask before anything else —
   never generate under an invented name.
 - **Work the gaps, not a script.** Build the gap map (name, trigger, procedure, exactness,
-  artifact fields, judgment lens, scope), show the author which areas are already covered and
-  which are gaps, and ask where they want to dig in.
-- **The author steers.** "Focus on X" means stay on X; "skip that" is a recorded decision, not a
-  debate. Only with no preference do you work the gaps in order.
+  artifact fields, observer trigger, reading, Facts contract, lens, investigator, scope), show
+  the builder which areas are already covered and which are gaps, and ask where they want to
+  dig in.
+- **The builder steers — and can end it.** "Focus on X" means stay on X; "skip that" is a
+  recorded decision, not a debate; "I'm done" ends the interview immediately — no "just one more
+  question". Only with no preference do you work the gaps in order.
 - **One question at a time.** Concrete over general; wrong guesses over open questions; exactness
   probed with "if this were 2% off, would you notice?" (yes = doer Python, per
   `references/python-determinism.md`); the lens extracted from an accepted output versus a
-  rejected one, per `references/interview-observer.md`.
-- **Give the observer its own interview.** Once the doer's half is mapped, run the observer's
-  four gaps (trigger, reading, Facts contract, lens) from `references/interview-observer.md` —
-  never re-asking what the doer interview already decided. The lens must come out as three
-  concrete judgments: what is notable, what is concerning, what is actionable.
+  rejected one — it must come out as three concrete judgments: what is notable, what is
+  concerning, what is actionable.
+- **Cross-analysis goes to the investigator.** If the file or the builder offers content that
+  compares across artifacts or runs, capture it for the investigator stub — a folder with a
+  `SKILL.md`, to be developed further.
 - **Persist as you go.** Every few answers, save progress to gitignored `tmp/interview-<use-case>.json`;
   on session start, check `tmp/` for a partial interview and offer to resume — a closed laptop
   never loses an answer.
-- **Stop when the answers stop changing your draft** — or when the author says done.
+- **When they end it, note the gaps.** Every area still open goes into the interview notes as an
+  explicit open question — recorded, never re-litigated, never silently filled.
+- **Stop when the answers stop changing your draft** — or when the builder says done.
 
 ### 3. Confirm the boundary before generating
 
 Play back, one line each: what the doer does, what the observer reads out of the artifact, when
-each fires, when each must not fire, the artifact's record fields, and the observer's lens. Get
+each fires, when each must not fire, the artifact's record fields, the observer's lens (notable,
+concerning, actionable), any cross-analysis for the investigator, and the gaps still open. Get
 an explicit yes. If the doer's "does" needs an "and", it is two use cases — say so now.
 
 ### 4. Generate the pair
@@ -102,13 +111,16 @@ an explicit yes. If the doer's "does" needs an "and", it is two use cases — sa
 Write the interview's outcome into an answers file, then generate non-interactively:
 
 ```bash
-npm run skill:new -- --answers /tmp/answers.json --yes
+npm run skill:new -- --answers /tmp/answers.json --source /path/to/process-flow.docx --yes
 ```
 
 The answers file carries what the interview produced — keys: `useCase`, `what`, `trigger`,
 `nonTrigger`, `fields[]` (each `"name: type — meaning"`), `steps[]`, `moduleNames` (comma-separated,
 when `steps[]` has more than one), `interprets`,
-`observerTrigger`, `observerNonTrigger`, `notable`, `concerning`, `actionable`. (Run without flags only in a real
+`observerTrigger`, `observerNonTrigger`, `notable`, `concerning`, `actionable`,
+`investigator`, `investigatorTrigger` (the last two only when the file or interview offered
+cross-analysis content). `--source` files the reviewed file into the doer's
+`references/source-material/`; omit it if there is no file. (Run without flags only in a real
 terminal; a non-interactive bare run refuses rather than generating an unnamed skill.)
 
 It writes both skills into `skills/` (creating the folder if
@@ -140,6 +152,9 @@ The generator writes the structure and working scaffolds. You write the substanc
 - observer `SKILL.md` — the real lens: what counts as notable, concerning, actionable. Keep the
   two-part output contract exactly: `## Facts` (each fact citing the artifact field or record it
   came from, deviations carried in), then `## Interpretations`.
+- investigator `SKILL.md` — only when the source file or interview offered cross-analysis
+  content: keep the generated stub as-is (marked to be developed further). Do not invent a
+  contract for it.
 - both `references/variations/` — one file per domain/use-case/regional variation from the
   interview, each stating when it applies and what changes.
 
@@ -234,8 +249,7 @@ determinism, and a clean facts/interpretation boundary.
 
 - `.framework/framework-testing.md` — the testing framework (source of truth): layers, scenarios, verdicts.
 - `.framework/framework-data.md` — the data generation framework (source of truth): fixtures, seeds, rules.
-- `references/interview.md` — the question set, in order, with follow-ups.
-- `references/interview-observer.md` — the observer's own interview: trigger, reading, Facts contract, and the lens as notable / concerning / actionable.
+- `references/interview.md` — the one interview: source file, gap map, techniques, close.
 - `references/the-pair-contract.md` — the pair contract: schema, deviations, handoff.
 - `references/python-determinism.md` — what becomes doer Python, and how it must behave.
 - `references/refinement.md` — the sub-agent feedback loop and how feedback maps to changes.

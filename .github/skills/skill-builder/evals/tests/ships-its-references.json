@@ -5,7 +5,6 @@
   "kind": "performance",
   "paths": [
     "references/interview.md",
-    "references/interview-observer.md",
     "references/refinement.md",
     "references/regression-tests.md",
     "references/the-pair-contract.md",
