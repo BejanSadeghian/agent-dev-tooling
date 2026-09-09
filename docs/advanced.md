@@ -18,7 +18,8 @@ the day-to-day command list. If a runtime is missing, `npm run doctor` prints on
 for your package manager (brew/apt/winget) — run it, then re-run the doctor.
 
 **2. Build a pair** — `npm run skill:new`. One interview in the terminal (it starts from your
-source file: `--source flow.docx`); blank line finishes list questions. Ends with `Generated N
+source file: `--source flow.docx`, converted to Markdown and filed with the interview
+transcript into every skill's `assets/source/`); blank line finishes list questions. Ends with `Generated N
 files across 2 skill(s): <uc>-doer, <uc>-observer`, the file list, and a validation run over
 what it wrote. Then replace the scaffolded parts: the real schema fields in
 `references/schema.md`, the real logic in `scripts/<module>.py`, real expectations in

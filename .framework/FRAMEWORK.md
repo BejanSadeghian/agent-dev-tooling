@@ -58,12 +58,12 @@ Skills live one directory deep under a configured root (`skillsDirs`: `skills/` 
 <skills-root>/<skill-name>/
   SKILL.md            # required — the only file the agent always reads
   assets/             # static fixtures, sample data, images, file templates
-    source/           # development-only — the interview script and notes frozen at init
+    source/           # development-only — the reviewed source (as Markdown), the interview
+                      #   script, and the interview notes, frozen at init
   references/         # deep-dive docs loaded on demand
     variations/       # optional — domain / use-case / regional adaptations, one file each
     schema.md         # any required input/output schemas; a doer MUST commit its
                       #   artifact schema here, and it must define "deviations"
-    source-material/  # provenance — what the author gave to build this use case
   scripts/            # executable code the skill runs; deterministic Python and its tests
     <module>.py
     tests/test_{accuracy,edge,performance}_<module>.py
@@ -78,15 +78,14 @@ No other top-level directories are allowed inside a skill (`allowUnknownDirs: fa
 dirs (`outputs/`, `__pycache__/`, `.pytest_cache/`, `evals/runs/`, `evals/tests/*/results/`) are
 invisible to both the layout check and the freshness hash.
 
-**Provenance is pair-level and lives in the doer** — `references/source-material/` and
-`assets/source/` belong to the use case, and the doer is their one canonical home
-(never duplicated into the observer). `assets/source/` holds the interview provenance frozen at
-init time: `interview.md` (the exact questions the generator asked) and `interview-notes.md`
-(the answers given). Provenance and scenario evals are development-only: `npm run publish`
-strips `assets/source/`, `references/source-material/`, `evals/scenarios/`, and `evals/runs/`
-from the shipped copy — the consuming repo receives only what an agent needs to use the skill.
-Real or personal data never enters the repo at all (`framework-data.md`); the interview notes
-record where it lives instead.
+**Provenance is saved into every skill of the set** — each generated skill (doer, observer,
+and investigator when one exists) carries its own `assets/source/` with the reviewed source
+file converted to Markdown, `interview.md` (the exact questions the generator asked), and
+`interview-notes.md` (the answers given), all frozen at init time. Provenance and scenario
+evals are development-only: `npm run publish` strips `assets/source/`, `evals/scenarios/`, and
+`evals/runs/` from the shipped copy — the consuming repo receives only what an agent needs to
+use the skill. Real or personal data never enters the repo at all (`framework-data.md`); the
+interview notes record where it lives instead.
 
 ## 3. `SKILL.md`
 

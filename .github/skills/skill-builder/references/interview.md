@@ -21,8 +21,10 @@ Before any question:
 3. **Collect the name.** If the material does not name it, ask now: "What should this use case
    be called?" (it becomes `<name>-doer`, `<name>-observer`, and `<name>-investigator` if there
    is cross-analysis content). Never generate under an invented name.
-4. **Keep the material.** Once the set is generated, save what the author gave you into the
-   doer's `references/source-material/` — it is provenance, same as the interview notes. The one
+4. **Keep the material.** Once the set is generated, the reviewed source file (converted to
+   Markdown when it arrives as `.docx`) and the interview transcript are saved into
+   `assets/source/` inside EVERY generated skill — doer, observer, and investigator when one
+   exists. It is provenance, same as the interview notes. The one
    exception: anything containing real or personal data stays OUT of the repo
    (`.framework/framework-data.md`); record in the interview notes where it lives instead.
 

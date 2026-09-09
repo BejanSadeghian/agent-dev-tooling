@@ -73,8 +73,9 @@ Work through `references/interview.md`. The shape:
 - **The source file comes first.** The author gives you a `.md` or `.docx` describing the
   overall process flow. Read it completely (extract `.docx` text first), play back what you
   learned, and ask what you got wrong — never ask a question the file already answers. Pass it
-  to the generator with `--source` and it is filed into the doer's
-  `references/source-material/` (provenance, like the interview notes) — unless it holds real or
+  to the generator with `--source`: it is converted to Markdown when needed and filed, together
+  with the interview transcript, into `assets/source/` inside EVERY generated skill
+  (provenance, dev-only, never shipped) — unless it holds real or
   personal data, which never enters the repo.
 - **Collect the name.** If the file does not name the use case, ask before anything else —
   never generate under an invented name.
@@ -120,8 +121,9 @@ The answers file carries what the interview produced — keys: `useCase`, `what`
 when `steps[]` has more than one), `interprets`,
 `observerTrigger`, `observerNonTrigger`, `notable`, `concerning`, `actionable`,
 `investigator`, `investigatorTrigger` (the last two only when the file or interview offered
-cross-analysis content). `--source` files the reviewed file into the doer's
-`references/source-material/`; omit it if there is no file. (Run without flags only in a real
+cross-analysis content). `--source` files the reviewed file, converted to Markdown when it is
+a `.docx`, into `assets/source/` inside every generated skill together with the interview
+transcript; omit it if there is no file. (Run without flags only in a real
 terminal; a non-interactive bare run refuses rather than generating an unnamed skill.)
 
 It writes both skills into `skills/` (creating the folder if

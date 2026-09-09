@@ -143,7 +143,9 @@
     "requireArtifactCoverage": true,
     "requirePythonCoverage": true,
     "requirePerfMeasurements": true,
-    "perfMeasurementRoles": ["doer"],
+    "perfMeasurementRoles": [
+      "doer"
+    ],
     "stateDir": ".framework/state"
   },
   "health": {
@@ -169,7 +171,6 @@
     "defaultDest": ".github/skills",
     "devOnlyNames": [
       "runs",
-      "source-material",
       "interview-notes.md",
       "scenarios"
     ],

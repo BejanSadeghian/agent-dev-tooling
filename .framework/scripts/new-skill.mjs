@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Prompter } from './lib/prompt.mjs';
 import * as T from './lib/templates.mjs';
+import { docxToMarkdown } from './lib/docx-to-md.mjs';
 import { REPO_ROOT, loadConfig } from './lib/skills.mjs';
 import { bold, dim, green, red } from './lib/report.mjs';
 
@@ -233,8 +234,6 @@ async function main(argv) {
     written.push(write(path.join(doerDir, 'SKILL.md'), T.doerSkillMd({ ...spec, steps })));
     written.push(write(path.join(doerDir, config.roles.doer.schemaFile), T.schemaMd(spec)));
     written.push(write(path.join(doerDir, 'references/variations/default.md'), T.variationMd({ name: `${spec.useCase}-doer`, useCase: spec.useCase })));
-    written.push(write(path.join(doerDir, 'assets/source/interview.md'), T.interviewScript({ name: spec.useCase, questions: prompter.transcript.map((t) => t.question) })));
-    written.push(write(path.join(doerDir, 'assets/source/interview-notes.md'), T.interviewNotes({ name: spec.useCase, answers: prompter.transcript })));
     const entryModule = T.moduleNameFor(spec.useCase);
     const entryFn = T.functionNameFor(spec.useCase);
     const testTargets = [{ module: entryModule, fn: entryFn, isEntry: true }];
@@ -294,17 +293,47 @@ async function main(argv) {
     written.push(write(path.join(investigatorDir, config.evals.dir, seed.file), seed.text));
   }
 
-  // The reviewed source file is provenance: it lives with the doer.
-  if (wantDoer && args.sourceFile) {
+  // Provenance: the interview transcript and the reviewed source material are
+  // saved into EVERY generated skill's assets/source/ — they are dev-only
+  // (the ship config strips assets/source/) and never reach the product repo.
+  const provenanceDirs = [];
+  if (wantDoer) provenanceDirs.push(doerDir);
+  if (wantObserver) provenanceDirs.push(observerDir);
+  if (wantInvestigator) provenanceDirs.push(investigatorDir);
+  const questions = prompter.transcript.map((t) => t.question);
+  for (const dir of provenanceDirs) {
+    written.push(write(path.join(dir, 'assets/source/interview.md'), T.interviewScript({ name: spec.useCase, questions })));
+    written.push(write(path.join(dir, 'assets/source/interview-notes.md'), T.interviewNotes({ name: spec.useCase, answers: prompter.transcript })));
+  }
+  if (args.sourceFile) {
     const src = path.resolve(args.sourceFile);
     if (!fs.existsSync(src)) {
       console.error(red(`\n--source file not found: ${args.sourceFile}`));
       return 1;
     }
-    const dest = path.join(doerDir, 'references/source-material', path.basename(src));
-    fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.copyFileSync(src, dest);
-    written.push(dest);
+    const ext = path.extname(src).toLowerCase();
+    const base = path.basename(src, path.extname(src));
+    let fileName;
+    let content;
+    if (ext === '.docx') {
+      content = docxToMarkdown(fs.readFileSync(src));
+      fileName = `${base}.md`;
+      console.log(dim(`  (converted ${path.basename(src)} from .docx to Markdown)`));
+    } else if (ext === '.md') {
+      content = fs.readFileSync(src, 'utf8');
+      fileName = path.basename(src);
+    } else {
+      console.error(dim(`  (warning: --source is not .md or .docx; filing ${path.basename(src)} as-is)`));
+      content = null;
+      fileName = path.basename(src);
+    }
+    for (const dir of provenanceDirs) {
+      const dest = path.join(dir, 'assets/source', fileName);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      if (content === null) fs.copyFileSync(src, dest);
+      else fs.writeFileSync(dest, content);
+      written.push(dest);
+    }
   }
 
   console.log(green(`\nGenerated ${written.length} files across ${generated.length} skill(s): ${generated.join(', ')}`));

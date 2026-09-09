@@ -161,7 +161,50 @@ test('cross-analysis content stubs an investigator skill', (t) => {
   assert.ok(fs.existsSync(path.join(root, 'skills', 'unit-economics-observer', 'SKILL.md')));
 });
 
-test('--source files the reviewed source into the doer’s source-material', (t) => {
+// Minimal stored-entry zip builder: just enough to hand the generator a real .docx.
+function makeZip(files) {
+  const chunks = [];
+  const central = [];
+  let offset = 0;
+  const crcTable = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      t[n] = c;
+    }
+    return t;
+  })();
+  const crc = (buf) => {
+    let c = 0xffffffff;
+    for (const b of buf) c = crcTable[(c ^ b) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const names = Object.keys(files);
+  for (const name of names) {
+    const data = files[name];
+    const nb = Buffer.from(name, 'utf8');
+    const lh = Buffer.alloc(30);
+    lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4);
+    lh.writeUInt32LE(crc(data), 14); lh.writeUInt32LE(data.length, 18); lh.writeUInt32LE(data.length, 22);
+    lh.writeUInt16LE(nb.length, 26);
+    chunks.push(lh, nb, data);
+    const cd = Buffer.alloc(46);
+    cd.writeUInt32LE(0x02014b50, 0); cd.writeUInt16LE(20, 4); cd.writeUInt16LE(20, 6);
+    cd.writeUInt32LE(crc(data), 16); cd.writeUInt32LE(data.length, 20); cd.writeUInt32LE(data.length, 24);
+    cd.writeUInt16LE(nb.length, 28); cd.writeUInt32LE(offset, 42);
+    central.push(cd, nb);
+    offset += lh.length + nb.length + data.length;
+  }
+  const cdBuf = Buffer.concat(central);
+  const eocd = Buffer.alloc(22);
+  eocd.writeUInt32LE(0x06054b50, 0);
+  eocd.writeUInt16LE(names.length, 8); eocd.writeUInt16LE(names.length, 10);
+  eocd.writeUInt32LE(cdBuf.length, 12); eocd.writeUInt32LE(offset, 16);
+  return Buffer.concat([...chunks, cdBuf, eocd]);
+}
+
+test('--source files the reviewed source (as Markdown) into every skill’s assets/source', (t) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-gen-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const answersFile = path.join(root, 'answers.json');
@@ -173,9 +216,42 @@ test('--source files the reviewed source into the doer’s source-material', (t)
     '--yes', '--root', path.join(root, 'skills'), '--no-verify',
   ]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  const copied = path.join(root, 'skills', 'unit-economics-doer', 'references/source-material/process-flow.md');
-  assert.ok(fs.existsSync(copied), 'source file was not filed');
-  assert.match(fs.readFileSync(copied, 'utf8'), /The overall flow/);
+  for (const skill of ['unit-economics-doer', 'unit-economics-observer']) {
+    const filed = path.join(root, 'skills', skill, 'assets/source/process-flow.md');
+    assert.ok(fs.existsSync(filed), `source file was not filed into ${skill}`);
+    assert.match(fs.readFileSync(filed, 'utf8'), /The overall flow/);
+    // The interview transcript travels with the source in every skill too.
+    assert.ok(fs.existsSync(path.join(root, 'skills', skill, 'assets/source/interview.md')));
+    assert.ok(fs.existsSync(path.join(root, 'skills', skill, 'assets/source/interview-notes.md')));
+  }
+  assert.ok(!fs.existsSync(path.join(root, 'skills', 'unit-economics-doer', 'references/source-material')),
+    'old doer-only source-material location must be gone');
+});
+
+test('--source converts a .docx source to Markdown in every skill', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-gen-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const answersFile = path.join(root, 'answers.json');
+  fs.writeFileSync(answersFile, JSON.stringify(ANSWERS));
+  const documentXml = `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>` +
+    `<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Flow</w:t></w:r></w:p>` +
+    `<w:p><w:r><w:t>The overall flow.</w:t></w:r></w:p>` +
+    `</w:body></w:document>`;
+  const docxFile = path.join(root, 'process-flow.docx');
+  fs.writeFileSync(docxFile, makeZip({ 'word/document.xml': Buffer.from(documentXml, 'utf8') }));
+  const result = node([
+    '.framework/scripts/new-skill.mjs', '--answers', answersFile, '--source', docxFile,
+    '--yes', '--root', path.join(root, 'skills'), '--no-verify',
+  ]);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  for (const skill of ['unit-economics-doer', 'unit-economics-observer']) {
+    const filed = path.join(root, 'skills', skill, 'assets/source/process-flow.md');
+    assert.ok(fs.existsSync(filed), `converted source was not filed into ${skill}`);
+    const md = fs.readFileSync(filed, 'utf8');
+    assert.match(md, /^# Flow$/m);
+    assert.match(md, /The overall flow/);
+  }
 });
 
 test('multiple steps generate one module per step plus an orchestrator', (t) => {
