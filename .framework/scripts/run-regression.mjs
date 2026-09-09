@@ -5,13 +5,13 @@
 // report in .framework/state/perf/<skill>.json.
 //
 // Usage: node scripts/run-regression.mjs [skill-name ...] [--no-record] [--json] [--skip-python]
-import { runCase } from './lib/cases.mjs';
+import { runTest } from './lib/tests.mjs';
 import { comparePerf, hasPythonCode, perfTable, readPerf, runPythonTests, writePerf } from './lib/python.mjs';
-import { REPO_ROOT, discoverSkills, hashSkill, loadCases, loadConfig, writeState } from './lib/skills.mjs';
+import { REPO_ROOT, discoverSkills, hashSkill, loadTests, loadConfig, writeState } from './lib/skills.mjs';
 import { bold, dim, green, red, yellow } from './lib/report.mjs';
 
 export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = false } = {}) {
-  const { cases, problems } = loadCases(config, skill.dir);
+  const { cases, problems } = loadTests(config, skill.dir);
   const results = problems.map((p) => ({
     id: p.file,
     description: 'case file could not be loaded',
@@ -20,7 +20,7 @@ export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = fa
   }));
 
   for (const c of cases) {
-    const outcome = runCase(c, skill.dir);
+    const outcome = runTest(c, skill.dir);
     results.push({
       id: c.id,
       description: c.description,

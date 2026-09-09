@@ -6,9 +6,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readFrontmatter } from './lib/frontmatter.mjs';
-import { validateCaseShape } from './lib/cases.mjs';
+import { validateTestShape } from './lib/tests.mjs';
 import { roleOf, schemaPath } from './lib/roles.mjs';
-import { TRANSIENT_DIRS, discoverSkills, loadCases, loadConfig } from './lib/skills.mjs';
+import { TRANSIENT_DIRS, discoverSkills, loadTests, loadConfig } from './lib/skills.mjs';
 import { bold, printFindings } from './lib/report.mjs';
 
 export function validateSkill(config, skill) {
@@ -143,13 +143,13 @@ export function validateSkill(config, skill) {
   }
 
   // --- regression cases -----------------------------------------------------
-  const { cases, problems } = loadCases(config, skill.dir);
+  const { cases, problems } = loadTests(config, skill.dir);
   for (const p of problems) err(p.message, `${config.evals.dir}/${p.file}`);
   if (cases.length < config.evals.minCases) {
     err(`${cases.length} regression case(s), min ${config.evals.minCases}`, config.evals.dir);
   }
   for (const c of cases) {
-    for (const problem of validateCaseShape(c)) err(problem, `${config.evals.dir}/${c.__file}`);
+    for (const problem of validateTestShape(c)) err(problem, `${config.evals.dir}/${c.__file}`);
     if (c[config.coverage.caseKindField] && !config.coverage.kinds.includes(c[config.coverage.caseKindField])) {
       err(
         `case "${c.id}" has unknown kind "${c[config.coverage.caseKindField]}" (${config.coverage.kinds.join(', ')})`,

@@ -11,7 +11,7 @@ import {
   useCaseOf,
 } from '../scripts/lib/roles.mjs';
 import { validateSkill } from '../scripts/validate-skill.mjs';
-import { loadCases, loadConfig } from '../scripts/lib/skills.mjs';
+import { loadTests, loadConfig } from '../scripts/lib/skills.mjs';
 import { VALID_SCHEMA_MD, addSkill, doerSkillMd, interpreterSkillMd, makeRepo, messages } from './helpers.mjs';
 
 const PY_TEST = (kind) => `KIND = "${kind}"\nCOVERS = ["sales-summary", "sales_summary.build"]\n`;
@@ -105,7 +105,7 @@ test('a doer owes all three kinds for its artifact and each module; tests close 
   const repo = makeDoerRepo();
   t.after(repo.cleanup);
   const config = loadConfig(repo.root);
-  const { cases } = loadCases(config, repo.skillDir);
+  const { cases } = loadTests(config, repo.skillDir);
   const gaps = coverageGaps(config, repo.skill, cases);
   // artifact + one module, three kinds each
   assert.equal(gaps.length, 6);
@@ -122,7 +122,7 @@ test('python test files declaring KIND and COVERS close doer gaps', (t) => {
   });
   t.after(repo.cleanup);
   const config = loadConfig(repo.root);
-  const { cases } = loadCases(config, repo.skillDir);
+  const { cases } = loadTests(config, repo.skillDir);
   assert.deepEqual(coverageGaps(config, repo.skill, cases), []);
 });
 
@@ -134,6 +134,6 @@ test('interpreters and tools owe no three-kind coverage', (t) => {
   });
   t.after(repo.cleanup);
   const config = loadConfig(repo.root);
-  const { cases } = loadCases(config, repo.skillDir);
+  const { cases } = loadTests(config, repo.skillDir);
   assert.deepEqual(coverageGaps(config, repo.skill, cases), []);
 });

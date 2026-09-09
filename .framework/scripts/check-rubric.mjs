@@ -5,7 +5,7 @@
 import { validateSkill } from './validate-skill.mjs';
 import { coverageGaps } from './lib/roles.mjs';
 import { hasPythonCode, pythonModules, readPerf } from './lib/python.mjs';
-import { REPO_ROOT, discoverSkills, hashSkill, loadCases, loadConfig, readState } from './lib/skills.mjs';
+import { REPO_ROOT, discoverSkills, hashSkill, loadTests, loadConfig, readState } from './lib/skills.mjs';
 import { bold, dim, printFindings } from './lib/report.mjs';
 
 export function checkRubric(config, skill, root = REPO_ROOT) {
@@ -13,7 +13,7 @@ export function checkRubric(config, skill, root = REPO_ROOT) {
   const err = (message, where) => findings.push({ level: 'error', message, where });
   const { rubric } = config;
 
-  const { cases } = loadCases(config, skill.dir);
+  const { cases } = loadTests(config, skill.dir);
   if (cases.length < config.evals.minCases) {
     err(`R2 no regression cases (need >= ${config.evals.minCases})`, config.evals.dir);
     return findings; // R3-R5 are meaningless without a suite

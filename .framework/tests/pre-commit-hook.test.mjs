@@ -51,12 +51,12 @@ function makeGitRepo(t) {
 
   // A synthetic skill this test owns, so scenarios never depend on the real dev skills.
   const skillDir = path.join(dir, '.github/skills/hook-demo');
-  fs.mkdirSync(path.join(skillDir, 'evals/cases'), { recursive: true });
+  fs.mkdirSync(path.join(skillDir, 'evals/tests'), { recursive: true });
   fs.mkdirSync(path.join(skillDir, 'references/variations'), { recursive: true });
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), DEMO_MD);
   fs.writeFileSync(path.join(skillDir, 'references/variations/default.md'), '# Variation: default\n\nBaseline.\n');
   fs.writeFileSync(
-    path.join(skillDir, 'evals/cases/stays-minimal.json'),
+    path.join(skillDir, 'evals/tests/stays-minimal.json'),
     JSON.stringify({ id: 'stays-minimal', description: 'keeps its copy line', type: 'contains', file: 'SKILL.md', patterns: ['Copy this directory'] }, null, 2) + '\n',
   );
 

@@ -62,15 +62,15 @@ test('the generator writes a complete pair', (t) => {
     'scripts/tests/test_accuracy_unit_economics.py',
     'scripts/tests/test_edge_unit_economics.py',
     'scripts/tests/test_performance_unit_economics.py',
-    'evals/cases/schema-reports-deviations.json',
+    'evals/tests/schema-reports-deviations.json',
   ]) {
     assert.ok(fs.existsSync(path.join(doerDir, file)), `doer missing ${file}`);
   }
   for (const file of [
     'SKILL.md',
     'references/variations/default.md',
-    'evals/cases/output-separates-facts-from-interpretation.json',
-    'evals/cases/reads-the-doers-schema.json',
+    'evals/tests/output-separates-facts-from-interpretation.json',
+    'evals/tests/reads-the-doers-schema.json',
   ]) {
     assert.ok(fs.existsSync(path.join(interpreterDir, file)), `interpreter missing ${file}`);
   }

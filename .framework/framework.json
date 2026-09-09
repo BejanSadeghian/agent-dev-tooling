@@ -1,17 +1,36 @@
 {
   "_comment": "Machine-readable contract for the skill framework: agentskills.io layout, the doer/interpreter pair, schema conformance, test coverage, and the freshness rubric. .framework/FRAMEWORK.md is the human-readable spec; keep the two in sync. Edit THIS file to change what the pre-commit hook and CI enforce.",
-  "skillsDirs": ["skills", ".github/skills"],
+  "skillsDirs": [
+    "skills",
+    ".github/skills"
+  ],
   "productSkillsDir": "skills",
   "layout": {
-    "requiredFiles": ["SKILL.md"],
-    "allowedDirs": ["assets", "references", "scripts", "evals"],
+    "requiredFiles": [
+      "SKILL.md"
+    ],
+    "allowedDirs": [
+      "assets",
+      "references",
+      "scripts",
+      "evals"
+    ],
     "allowUnknownDirs": false,
     "requiredDirs": [],
     "maxSkillMdBytes": 40000
   },
   "frontmatter": {
-    "required": ["name", "description"],
-    "allowed": ["name", "description", "license", "allowed-tools", "metadata"],
+    "required": [
+      "name",
+      "description"
+    ],
+    "allowed": [
+      "name",
+      "description",
+      "license",
+      "allowed-tools",
+      "metadata"
+    ],
     "name": {
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
       "maxLength": 64,
@@ -20,33 +39,72 @@
     "description": {
       "minLength": 40,
       "maxLength": 1024,
-      "mustMatchOneOf": ["Use when", "Use this", "Use for", "Use whenever"]
+      "mustMatchOneOf": [
+        "Use when",
+        "Use this",
+        "Use for",
+        "Use whenever"
+      ]
     }
   },
   "body": {
-    "requiredHeadings": ["## When to use", "## Workflow"],
-    "forbiddenPatterns": ["\\bTODO\\b", "\\bFIXME\\b", "<placeholder>", "Lorem ipsum"],
+    "requiredHeadings": [
+      "## When to use",
+      "## Workflow"
+    ],
+    "forbiddenPatterns": [
+      "\\bTODO\\b",
+      "\\bFIXME\\b",
+      "<placeholder>",
+      "Lorem ipsum"
+    ],
     "maxWords": 5000
   },
   "roles": {
-    "suffixes": { "doer": "-doer", "interpreter": "-interpreter" },
-    "requireRoleIn": ["skills"],
+    "suffixes": {
+      "doer": "-doer",
+      "interpreter": "-interpreter"
+    },
+    "requireRoleIn": [
+      "skills"
+    ],
     "doer": {
       "schemaFile": "references/schema.md",
-      "schemaMustContain": ["deviations"],
+      "schemaMustContain": [
+        "deviations"
+      ],
       "requireScripts": true
     },
     "interpreter": {
-      "requiredBodyPatterns": ["## Facts", "## Interpretations", "schema\\.md"]
+      "requiredBodyPatterns": [
+        "## Facts",
+        "## Interpretations",
+        "schema\\.md"
+      ]
     }
   },
   "coverage": {
-    "kinds": ["accuracy", "edge", "performance"],
+    "kinds": [
+      "accuracy",
+      "edge",
+      "performance"
+    ],
     "caseKindField": "kind",
     "caseCoversField": "covers",
-    "pythonMarkers": { "covers": "COVERS", "kind": "KIND" },
-    "requireKindsForArtifacts": ["accuracy", "edge", "performance"],
-    "requireKindsForPython": ["accuracy", "edge", "performance"]
+    "pythonMarkers": {
+      "covers": "COVERS",
+      "kind": "KIND"
+    },
+    "requireKindsForArtifacts": [
+      "accuracy",
+      "edge",
+      "performance"
+    ],
+    "requireKindsForPython": [
+      "accuracy",
+      "edge",
+      "performance"
+    ]
   },
   "python": {
     "dir": "scripts",
@@ -64,11 +122,16 @@
     "exponentTolerance": 0.35
   },
   "evals": {
-    "dir": "evals/cases",
+    "dir": "evals/tests",
     "runsDir": "evals/runs",
     "extension": ".json",
     "minCases": 1,
-    "requiredCaseFields": ["id", "description", "type"]
+    "requiredCaseFields": [
+      "id",
+      "description",
+      "type"
+    ],
+    "resultsDirName": "results"
   },
   "rubric": {
     "requireEvalsGreen": true,
@@ -87,7 +150,9 @@
     "bin": "copilot",
     "preArgs": [],
     "promptFlag": "-p",
-    "extraArgs": ["--no-ask-user"]
+    "extraArgs": [
+      "--no-ask-user"
+    ]
   },
   "scenarios": {
     "dir": "evals/scenarios",
@@ -96,6 +161,15 @@
   },
   "ship": {
     "targetsFile": ".framework/targets.json",
-    "defaultDest": ".github/skills"
+    "defaultDest": ".github/skills",
+    "devOnlyNames": [
+      "runs",
+      "source-material",
+      "interview-notes.md",
+      "scenarios"
+    ],
+    "devOnlyPaths": [
+      "assets/source"
+    ]
   }
 }

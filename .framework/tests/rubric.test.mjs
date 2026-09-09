@@ -56,7 +56,7 @@ test('R5: adding or editing a case also makes the suite stale', (t) => {
   t.after(repo.cleanup);
   record(repo);
   fs.writeFileSync(
-    path.join(repo.skillDir, 'evals/cases/extra.json'),
+    path.join(repo.skillDir, 'evals/tests/extra.json'),
     JSON.stringify({ id: 'extra', description: 'another rule', type: 'contains', file: 'SKILL.md', patterns: ['Workflow'] }),
   );
   assert.match(messages(check(repo)), /R5 stale/);

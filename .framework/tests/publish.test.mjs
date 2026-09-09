@@ -21,7 +21,7 @@ test('publish ships the skill without its development-only provenance', (t) => {
     'references/interview-notes.md': 'answers',
     'scripts/margin.py': 'x = 1',
     'scripts/tests/test_accuracy_margin.py': 'KIND = "accuracy"',
-    'evals/cases/rule.json': '{}',
+    'evals/tests/rule.json': '{}',
     'evals/scenarios/first-run/scenario.json': '{}',
     'evals/runs/transcript.md': 'log',
     '.pytest_cache/CACHEDIR.TAG': 'cache',
@@ -37,7 +37,7 @@ test('publish ships the skill without its development-only provenance', (t) => {
   copySkill(src, dest);
 
   // What an agent needs to USE the skill ships...
-  for (const rel of ['SKILL.md', 'references/schema.md', 'references/variations/default.md', 'scripts/margin.py', 'scripts/tests/test_accuracy_margin.py', 'evals/cases/rule.json']) {
+  for (const rel of ['SKILL.md', 'references/schema.md', 'references/variations/default.md', 'scripts/margin.py', 'scripts/tests/test_accuracy_margin.py', 'evals/tests/rule.json']) {
     assert.ok(fs.existsSync(path.join(dest, rel)), `should ship: ${rel}`);
   }
   // ...the workshop's provenance and eval machinery does not.

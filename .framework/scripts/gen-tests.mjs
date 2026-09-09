@@ -16,7 +16,7 @@ import { Prompter } from './lib/prompt.mjs';
 import { coverageGaps, useCaseOf } from './lib/roles.mjs';
 import { pythonModules } from './lib/python.mjs';
 import * as T from './lib/templates.mjs';
-import { REPO_ROOT, discoverSkills, loadCases, loadConfig } from './lib/skills.mjs';
+import { REPO_ROOT, discoverSkills, loadTests, loadConfig } from './lib/skills.mjs';
 import { bold, dim, green, yellow } from './lib/report.mjs';
 
 /** One Python test file per missing kind. */
@@ -60,7 +60,7 @@ async function main(argv) {
   let outstanding = 0;
 
   for (const skill of skills) {
-    const { cases } = loadCases(config, skill.dir);
+    const { cases } = loadTests(config, skill.dir);
     const gaps = coverageGaps(config, skill, cases);
     if (gaps.length === 0) {
       console.log(`${green('PASS')} ${skill.name} ${dim('every artifact and module is covered')}`);

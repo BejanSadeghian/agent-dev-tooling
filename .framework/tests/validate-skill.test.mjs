@@ -100,15 +100,15 @@ test('duplicate case ids are reported', (t) => {
   assert.match(messages(validate(repo)), /duplicate case id "dup"/);
 });
 
-test('an unknown case type is reported', (t) => {
+test('an unknown test type is reported', (t) => {
   const repo = makeRepo({ cases: [{ id: 'x', description: 'y', type: 'vibes' }] });
   t.after(repo.cleanup);
-  assert.match(messages(validate(repo)), /unknown case type "vibes"/);
+  assert.match(messages(validate(repo)), /unknown test type "vibes"/);
 });
 
 test('invalid JSON in a case file is reported, not thrown', (t) => {
   const repo = makeRepo();
   t.after(repo.cleanup);
-  fs.writeFileSync(path.join(repo.skillDir, 'evals/cases/broken.json'), '{ not json');
+  fs.writeFileSync(path.join(repo.skillDir, 'evals/tests/broken.json'), '{ not json');
   assert.match(messages(validate(repo)), /invalid JSON/);
 });

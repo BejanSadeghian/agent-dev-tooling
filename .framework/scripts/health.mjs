@@ -13,7 +13,7 @@ import { validateSkill } from './validate-skill.mjs';
 import { coverageGaps, pairFindings, roleOf } from './lib/roles.mjs';
 import { hasPythonCode, readPerf } from './lib/python.mjs';
 import { readFrontmatter } from './lib/frontmatter.mjs';
-import { REPO_ROOT, discoverSkills, hashSkill, loadCases, loadConfig, readState } from './lib/skills.mjs';
+import { REPO_ROOT, discoverSkills, hashSkill, loadTests, loadConfig, readState } from './lib/skills.mjs';
 import { bold, dim, green, red, yellow } from './lib/report.mjs';
 
 const DAY_MS = 86_400_000;
@@ -48,7 +48,7 @@ export function inspect(config, root = REPO_ROOT, now = Date.now()) {
   const descriptions = [];
 
   for (const skill of skills) {
-    const { cases } = loadCases(config, skill.dir);
+    const { cases } = loadTests(config, skill.dir);
     const state = readState(config, skill.name, root);
     const formatErrors = validateSkill(config, skill).filter((f) => f.level !== 'warn');
     const rubricErrors = checkRubric(config, skill, root).filter((f) => f.level !== 'warn');

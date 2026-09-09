@@ -25,7 +25,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runCase } from './lib/cases.mjs';
+import { runTest } from './lib/tests.mjs';
 import { REPO_ROOT, loadConfig } from './lib/skills.mjs';
 import { bold, dim, green, red, yellow } from './lib/report.mjs';
 
@@ -77,7 +77,7 @@ export function evalCheckpoint(checkpoint, { sandbox, transcript, runAgent }) {
     if (/\bPASS\b/.test(firstLine)) return { passed: true, message: result.output.trim() };
     return { passed: false, message: `judge said: ${result.output?.trim().slice(0, 600) || '(no output)'}` };
   }
-  return runCase(checkpoint, sandbox);
+  return runTest(checkpoint, sandbox);
 }
 
 // --- scenario discovery -------------------------------------------------------

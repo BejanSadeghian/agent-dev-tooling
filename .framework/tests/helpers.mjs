@@ -90,7 +90,7 @@ The deviations field is always present, possibly empty.
 /**
  * Create a temp repo containing .framework/framework.json and one skill.
  * The default skill lives under .github/skills (role-exempt "tool"), fully
- * conformant: SKILL.md, references/variations/, evals/cases/.
+ * conformant: SKILL.md, references/variations/, evals/tests/.
  * @returns {{root: string, skillDir: string, skill: object, cleanup: () => void}}
  */
 export function makeRepo({
@@ -111,10 +111,10 @@ export function makeRepo({
   fs.writeFileSync(path.join(root, '.framework/framework.json'), JSON.stringify(merged, null, 2));
 
   const skillDir = path.join(root, skillsRoot, name);
-  fs.mkdirSync(path.join(skillDir, 'evals/cases'), { recursive: true });
+  fs.mkdirSync(path.join(skillDir, 'evals/tests'), { recursive: true });
   if (skillMd !== null) fs.writeFileSync(path.join(skillDir, 'SKILL.md'), skillMd);
   cases.forEach((c, i) =>
-    fs.writeFileSync(path.join(skillDir, 'evals/cases', `case-${i}.json`), JSON.stringify(c, null, 2)),
+    fs.writeFileSync(path.join(skillDir, 'evals/tests', `test-${i}.json`), JSON.stringify(c, null, 2)),
   );
   if (variations) {
     fs.mkdirSync(path.join(skillDir, 'references/variations'), { recursive: true });
@@ -156,10 +156,10 @@ export function addSkill(repo, {
   scripts = {},
 } = {}) {
   const skillDir = path.join(repo.root, skillsRoot, name);
-  fs.mkdirSync(path.join(skillDir, 'evals/cases'), { recursive: true });
+  fs.mkdirSync(path.join(skillDir, 'evals/tests'), { recursive: true });
   if (skillMd) fs.writeFileSync(path.join(skillDir, 'SKILL.md'), skillMd);
   cases.forEach((c, i) =>
-    fs.writeFileSync(path.join(skillDir, 'evals/cases', `case-${i}.json`), JSON.stringify(c, null, 2)),
+    fs.writeFileSync(path.join(skillDir, 'evals/tests', `test-${i}.json`), JSON.stringify(c, null, 2)),
   );
   if (variations) {
     fs.mkdirSync(path.join(skillDir, 'references/variations'), { recursive: true });

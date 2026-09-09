@@ -48,7 +48,13 @@ export function skillForPath(config, relPath) {
 // Transient directories that appear inside a skill while running it: never part
 // of its content, so neither the layout check nor the content hash may see them.
 export const TRANSIENT_DIRS = new Set(['__pycache__', '.pytest_cache', 'outputs', 'node_modules']);
-const isTransient = (name, rel) => TRANSIENT_DIRS.has(name) || name.startsWith('.') || rel === 'evals/runs';
+const isTransient = (name, rel) =>
+  TRANSIENT_DIRS.has(name) ||
+  name.startsWith('.') ||
+  rel === 'evals/runs' ||
+  // Per-test trial results live beside the test but are evidence, not definition:
+  // they never affect the freshness hash.
+  (rel.startsWith('evals/tests/') && rel.split('/').includes('results'));
 
 /** All files under dir, relative to dir, sorted. Transient dirs are excluded. */
 export function listSkillFiles(dir) {
@@ -104,7 +110,7 @@ export function writeState(config, skillName, state, root = REPO_ROOT) {
 }
 
 /** Load every eval case for a skill, with parse errors surfaced as problems. */
-export function loadCases(config, skillDir) {
+export function loadTests(config, skillDir) {
   const casesDir = path.join(skillDir, config.evals.dir);
   const problems = [];
   const cases = [];
