@@ -102,7 +102,7 @@ async function collect(prompter, args) {
     });
   }
 
-  const interprets = await prompter.ask('interprets', 'In one sentence, what does the INTERPRETER read out of the artifact?', {
+  const interprets = await prompter.ask('interprets', 'In one sentence, what does the observer read out of the artifact?', {
     hint: 'Third person: "Reads the sales summary and assesses category health and momentum."',
     default: `Reads the ${useCase} artifact, states the facts it shows, and interprets them.`,
     validate: (v) => (v.length >= 20 ? null : 'a little more detail — this becomes the trigger description'),
@@ -117,12 +117,25 @@ async function collect(prompter, args) {
     default: 'producing or reprocessing the data itself',
   });
 
-  const lens = await prompter.ask('lens', 'What lens does the observer apply to the facts?', {
-    hint: 'The judgment rules: what counts as good/bad/urgent, thresholds in words, what a reader should do with it.',
-    default: 'Apply the judgment rules this skill documents: what counts as notable, concerning, or actionable in these facts.',
+  // The observer's lens, as three concrete judgments. The old single `lens`
+  // answers-file key still works: it becomes the default for all three.
+  const lensLegacy = prompter.answers.lens;
+  const notable = await prompter.ask('notable', 'What counts as NOTABLE in a reading — worth surfacing to the reader?', {
+    hint: 'The interesting-but-fine: patterns, outliers, records that deserve attention without alarm.',
+    default: lensLegacy || `Patterns, outliers, and records in the ${useCase} artifact that deserve the reader's attention.`,
   });
 
-  return { useCase, what, trigger, nonTrigger, fields, steps, modules, interprets, observerTrigger, observerNonTrigger, lens };
+  const concerning = await prompter.ask('concerning', 'What counts as CONCERNING — what must the observer never miss?', {
+    hint: 'The must-never-miss: breaches, anomalies, deviations the doer flagged. Word thresholds plainly ("below X", "more than N").',
+    default: lensLegacy || `Breaches, anomalies, and deviations in the ${useCase} artifact that need a response.`,
+  });
+
+  const actionable = await prompter.ask('actionable', 'What counts as ACTIONABLE — what should the reader do with the reading?', {
+    hint: 'The so-what: the decision or next step each kind of finding points to.',
+    default: lensLegacy || 'What the reader should do next for each kind of finding above.',
+  });
+
+  return { useCase, what, trigger, nonTrigger, fields, steps, modules, interprets, observerTrigger, observerNonTrigger, notable, concerning, actionable };
 }
 
 function write(file, contents) {
@@ -175,7 +188,8 @@ async function main(argv) {
     console.error('  npm run skill:new -- <use-case-name>                       # name only, defaults for the rest');
     console.error('  npm run skill:new -- --answers answers.json --yes          # full control');
     console.error(dim('  answers.json keys: useCase, what, trigger, nonTrigger, fields[], steps[],'));
-    console.error(dim('                     interprets, observerTrigger, observerNonTrigger, lens, moduleNames'));
+    console.error(dim('                     interprets, observerTrigger, observerNonTrigger,'));
+    console.error(dim('                     notable, concerning, actionable, moduleNames'));
     return 1;
   }
 

@@ -17,7 +17,9 @@ The testing sections below are the short version; those pages win on detail.
   `references/schema.md`. Easy to verify exactly, three ways: accuracy, edge cases, performance.
 - `<use-case>-observer` — reads that artifact, identifies **Facts** (each traceable to the
   artifact), then applies **Interpretations** (its own lens) — always in that order, always
-  separated.
+  separated. The observer's init interview captures that lens as three concrete judgments — what
+  is notable, what is concerning, what is actionable — and the generator seeds each as a
+  structural test.
 
 The role is detected from the directory-name suffix; there is no manifest. A skill under
 `skills/` with neither suffix fails the format check. A pair missing one half is a
@@ -141,7 +143,8 @@ Coverage owed, by role:
 - **doer** — all three kinds for its artifact (target: the use-case name) and for every `*.py`
   module in `scripts/`. A JSON case declares `{ "kind": "accuracy", "covers": ["<use-case>"] }`;
   a Python test declares `KIND = "..."` and `COVERS = [...]` at the top of the file.
-- **observer** — structural evals: the two-part output contract and the schema reference
+- **observer** — structural evals: the two-part output contract, the schema reference, the
+  stated lens (notable / concerning / actionable), and the never-recompute rule
   (seeded by the generator).
 - **tools** (`.github/skills/`) — role-exempt: evals required, three-kind regime only if they own
   Python.

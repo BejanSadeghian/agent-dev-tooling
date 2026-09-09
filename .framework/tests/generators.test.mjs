@@ -37,7 +37,9 @@ const ANSWERS = {
   interprets: 'Reads the unit economics artifact and assesses which orders need attention.',
   observerTrigger: 'Use when someone wants the margin numbers explained or prioritised.',
   observerNonTrigger: 'recomputing the margins themselves',
-  lens: 'An order is concerning when its margin is below the floor; several in one category is a pattern.',
+  notable: 'A category whose margin moved more than two points since last month.',
+  concerning: 'An order is concerning when its margin is below the floor; several in one category is a pattern.',
+  actionable: 'Reprice or renegotiate the concerning orders; watch the notable categories next month.',
 };
 
 test('parseFieldLine reads name, type and notes', () => {
@@ -80,6 +82,8 @@ test('the generator writes a complete pair', (t) => {
     'references/variations/default.md',
     'evals/tests/output-separates-facts-from-interpretation.json',
     'evals/tests/reads-the-doers-schema.json',
+    'evals/tests/lens-states-notable-concerning-actionable.json',
+    'evals/tests/observer-never-recomputes.json',
   ]) {
     assert.ok(fs.existsSync(path.join(observerDir, file)), `observer missing ${file}`);
   }
@@ -91,6 +95,26 @@ test('the generator writes a complete pair', (t) => {
   assert.match(observer, /## Facts/);
   assert.match(observer, /## Interpretations/);
   assert.match(observer, /schema\.md/);
+  assert.match(observer, /#### Notable/);
+  assert.match(observer, /#### Concerning/);
+  assert.match(observer, /#### Actionable/);
+  assert.match(observer, /never recompute/);
+  assert.match(observer, /below the floor/);
+});
+
+test('the old single lens answers key still seeds all three lens sections', (t) => {
+  const legacy = { ...ANSWERS };
+  delete legacy.notable;
+  delete legacy.concerning;
+  delete legacy.actionable;
+  legacy.lens = 'Flag anything odd; margins below the floor need a response.';
+  const { observerDir, result } = generate(t, legacy);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const observer = fs.readFileSync(path.join(observerDir, 'SKILL.md'), 'utf8');
+  for (const heading of ['#### Notable', '#### Concerning', '#### Actionable']) {
+    assert.match(observer, new RegExp(heading.replace(/ /g, ' ')));
+  }
+  assert.match(observer, /Flag anything odd/);
 });
 
 test('multiple steps generate one module per step plus an orchestrator', (t) => {

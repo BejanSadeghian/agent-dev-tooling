@@ -38,7 +38,7 @@ Compare the material against what a finished pair needs to know:
 | Procedure | the steps in order; where it branches; the step people get wrong |
 | Exactness | which values must be identical every run (those become doer code) |
 | Artifact | the fields each record carries; what downstream reads |
-| Judgment | the observer's lens: what counts as notable, concerning, actionable |
+| Judgment | the observer's lens: what counts as notable, concerning, actionable — worked as its own interview in `interview-observer.md` |
 | Scope | what it deliberately does not cover; what it needs available; input size on a bad day |
 
 Mark each area **answered by the material**, **partly answered**, or **a gap**. Then show the

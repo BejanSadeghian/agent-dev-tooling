@@ -40,7 +40,7 @@ echo "pre-commit: gating ${#SKILLS[@]} skill(s): ${SKILLS[*]}"
 
 FAILED=0
 
-# 1. Format — layout, frontmatter, body, and the doer/interpreter role rules.
+# 1. Format — layout, frontmatter, body, and the doer/observer role rules.
 node .framework/scripts/validate-skill.mjs "${SKILLS[@]}" || FAILED=1
 
 # 2. Suite actually green right now (verify only — recording here would defeat the freshness rule).

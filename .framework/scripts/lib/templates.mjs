@@ -96,7 +96,7 @@ output to fit unusual input.
 `;
 }
 
-export function observerSkillMd({ useCase, whatItInterprets, trigger, nonTrigger, lens }) {
+export function observerSkillMd({ useCase, whatItInterprets, trigger, nonTrigger, notable, concerning, actionable }) {
   const name = `${useCase}-observer`;
   return `---
 name: ${name}
@@ -142,11 +142,29 @@ what the data could not say.
 ### 2. Identify the facts
 
 State only what the artifact shows. Every fact cites the field or record it came
-from. No judgment yet.
+from, in the form \`(from: <field or record>)\`. No judgment words here — no
+"good", "bad", "worrying", "healthy", "urgent". Those belong under
+Interpretations, never in Facts.
 
 ### 3. Apply the lens
 
-${lens}
+#### Notable
+
+Worth surfacing to the reader — interesting, not alarming:
+
+${notable}
+
+#### Concerning
+
+Must never be missed:
+
+${concerning}
+
+#### Actionable
+
+What the reader should do with the reading:
+
+${actionable}
 
 Check \`references/variations/\` for the domain, use-case, or regional variation
 that matches this request and apply its adjustments.
@@ -560,6 +578,28 @@ export function observerSeedTests({ useCase }) {
         file: 'SKILL.md',
         patterns: [`${useCase}-doer`, 'schema\\.md', 'deviations'],
         provenance: 'the pair contract: the observer consumes exactly what the schema declares',
+      },
+    },
+    {
+      file: 'lens-states-notable-concerning-actionable.json',
+      body: {
+        id: 'lens-states-notable-concerning-actionable',
+        description: 'The lens is concrete: it states what is notable, what is concerning, and what is actionable.',
+        type: 'contains',
+        file: 'SKILL.md',
+        patterns: ['#### Notable', '#### Concerning', '#### Actionable'],
+        provenance: 'the observer init: a lens the reader cannot see is a lens the reader cannot check',
+      },
+    },
+    {
+      file: 'observer-never-recomputes.json',
+      body: {
+        id: 'observer-never-recomputes',
+        description: "The skill states the observer never recomputes the doer's numbers.",
+        type: 'contains',
+        file: 'SKILL.md',
+        patterns: ['never recompute'],
+        provenance: 'the pair contract: exactness lives in the doer, judgment lives here',
       },
     },
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));

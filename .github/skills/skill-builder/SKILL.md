@@ -81,7 +81,11 @@ Work through `references/interview.md`. The shape:
 - **One question at a time.** Concrete over general; wrong guesses over open questions; exactness
   probed with "if this were 2% off, would you notice?" (yes = doer Python, per
   `references/python-determinism.md`); the lens extracted from an accepted output versus a
-  rejected one.
+  rejected one, per `references/interview-observer.md`.
+- **Give the observer its own interview.** Once the doer's half is mapped, run the observer's
+  four gaps (trigger, reading, Facts contract, lens) from `references/interview-observer.md` —
+  never re-asking what the doer interview already decided. The lens must come out as three
+  concrete judgments: what is notable, what is concerning, what is actionable.
 - **Persist as you go.** Every few answers, save progress to gitignored `tmp/interview-<use-case>.json`;
   on session start, check `tmp/` for a partial interview and offer to resume — a closed laptop
   never loses an answer.
@@ -104,7 +108,7 @@ npm run skill:new -- --answers /tmp/answers.json --yes
 The answers file carries what the interview produced — keys: `useCase`, `what`, `trigger`,
 `nonTrigger`, `fields[]` (each `"name: type — meaning"`), `steps[]`, `moduleNames` (comma-separated,
 when `steps[]` has more than one), `interprets`,
-`observerTrigger`, `observerNonTrigger`, `lens`. (Run without flags only in a real
+`observerTrigger`, `observerNonTrigger`, `notable`, `concerning`, `actionable`. (Run without flags only in a real
 terminal; a non-interactive bare run refuses rather than generating an unnamed skill.)
 
 It writes both skills into `skills/` (creating the folder if
@@ -231,6 +235,7 @@ determinism, and a clean facts/interpretation boundary.
 - `.framework/framework-testing.md` — the testing framework (source of truth): layers, scenarios, verdicts.
 - `.framework/framework-data.md` — the data generation framework (source of truth): fixtures, seeds, rules.
 - `references/interview.md` — the question set, in order, with follow-ups.
+- `references/interview-observer.md` — the observer's own interview: trigger, reading, Facts contract, and the lens as notable / concerning / actionable.
 - `references/the-pair-contract.md` — the pair contract: schema, deviations, handoff.
 - `references/python-determinism.md` — what becomes doer Python, and how it must behave.
 - `references/refinement.md` — the sub-agent feedback loop and how feedback maps to changes.

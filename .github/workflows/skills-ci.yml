@@ -35,7 +35,7 @@ jobs:
         run: npm run lint
 
       # 2. Same check as the pre-commit hook: layout, frontmatter, body, and the
-      #    doer/interpreter role rules from .framework/framework.json.
+      #    doer/observer role rules from .framework/framework.json.
       - name: Validate skill format
         run: node .framework/scripts/validate-skill.mjs
 

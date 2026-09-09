@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Skill development environment: every use case is a doer/interpreter pair built to the agentskills.io layout, tested with accuracy/edge/performance suites, executed only by clean sub-agents, and shipped to the repos that use it.",
+  "description": "Skill development environment: every use case is a doer/observer pair built to the agentskills.io layout, tested with accuracy/edge/performance suites, executed only by clean sub-agents, and shipped to the repos that use it.",
   "engines": {
     "node": ">=22"
   },
