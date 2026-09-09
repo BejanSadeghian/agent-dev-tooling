@@ -7,7 +7,7 @@ first (macOS: `brew install node`), then run the doctor. If the safety hooks wer
 `npm run setup`.
 
 Then read `robot.txt` (every rule that applies specifically to you) and `README.md` (the
-concepts). The short version: every use case is a doer/interpreter pair, you never execute a
+concepts). The short version: every use case is a doer/observer pair, you never execute a
 skill you are developing in your own context (`npm run subagent` does that), and nothing is saved
 without passing `npm run check`.
 
@@ -20,7 +20,7 @@ through these commands — never hand-roll their jobs:
 | --- | --- | --- |
 | Set up this computer | — | `npm run doctor`, then `npm run setup` |
 | Build a new skill / use case | `skill-builder` | interview first, then `npm run skill:new -- --answers <file> --yes` — write the answers file OUTSIDE the repo or under gitignored `tmp/` (publish commits the whole tree); it writes the pair into `skills/` |
-| Test a skill being built | `skill-builder` | `npm run subagent -- <use-case> "<real task>"` (`--role interpreter`, `--discovery`) — NEVER run the skill yourself |
+| Test a skill being built | `skill-builder` | `npm run subagent -- <use-case> "<real task>"` (`--role observer`, `--discovery`) — NEVER run the skill yourself |
 | Run a repeatable acceptance eval | `skill-builder` | `npm run scenario -- <use-case> [name]` — 3 fresh-sandbox trials, one report. To CREATE one: author `evals/scenarios/<name>/scenario.json` + `fixtures/` per `.framework/framework-testing.md` (Layer 3) — fixtures are always synthetic, never the human's real file. Human decisions: `--waive <id> "reason"` (one failing check), `--accept`/`--reject "reason"` (whole verdict) — record any of them only at the human's explicit direction |
 | Fix a skill after feedback | `skill-builder` | edit + a regression case for each item, then `npm run regression -- <skill>` |
 | Add or fill tests, make fixtures | `test-generator` | `npm run test:new -- <skill>`; fixtures via its seeded `scripts/datagen.mjs` |

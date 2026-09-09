@@ -50,11 +50,11 @@ Skills shipped from the skill development environment. Each use case is a pair:
 - \`<use-case>${config.roles.suffixes.doer}\` — deterministic, procedural: turns input data into one
   structured artifact whose shape is fixed by its \`references/schema.md\`. Deviations from the
   ideal input are reported in the artifact's \`deviations\` field, never absorbed into a new shape.
-- \`<use-case>${config.roles.suffixes.interpreter}\` — reads that artifact and produces a two-part output:
+- \`<use-case>${config.roles.suffixes.observer}\` — reads that artifact and produces a two-part output:
   **Facts** (each traceable to the artifact), then **Interpretations** (judgment applying the
   skill's lens). Check its \`references/variations/\` for domain/regional adaptations.
 
-Run the doer before the interpreter. Do not edit these skills here — changes are made in the
+Run the doer before the observer. Do not edit these skills here — changes are made in the
 development environment and shipped as a new version.
 `;
 
@@ -194,7 +194,7 @@ function main(argv) {
   }
   const pr = spawnSync(
     'gh',
-    ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Publishes the \`${useCase}\` doer/interpreter pair from the skill development environment. ${overridden ? `**Checks were overridden by ${overrideBy}:** ${overrideReason}` : 'All checks were green at publish time.'}`],
+    ['pr', 'create', '--fill', '--title', `Ship skills: ${useCase}`, '--body', `Publishes the \`${useCase}\` doer/observer pair from the skill development environment. ${overridden ? `**Checks were overridden by ${overrideBy}:** ${overrideReason}` : 'All checks were green at publish time.'}`],
     { cwd: workdir, encoding: 'utf8' },
   );
   if (pr.status === 0) console.log(green(`\nPull request opened: ${pr.stdout.trim()}`));

@@ -10,7 +10,7 @@ Every performance test answers one question: **what does this cost as the data g
 | Column | Meaning |
 |---|---|
 | `seconds` | Best of N repeats. Best, not mean — machine noise is one-sided. |
-| `peak KiB` | `tracemalloc` peak *inside* the call, so it measures the code, not the interpreter. |
+| `peak KiB` | `tracemalloc` peak *inside* the call, so it measures the code, not the observer. |
 | `items/s` | Throughput, the number people actually feel. |
 
 and across sizes, the **growth rate**: the slope of log(time) against log(n), plus its R². Slope

@@ -8,7 +8,7 @@ it was meant to say, so you would silently compensate for its gaps. The clean su
 
 1. **Pick a real task** the skill claims to cover — from the author's actual queue, not invented.
 2. **Run the clean sub-agent:** `npm run subagent -- <use-case> "<task>"` (add
-   `--role interpreter` for the second half, `--discovery` to test that the description alone
+   `--role observer` for the second half, `--discovery` to test that the description alone
    triggers). It launches a fresh process that reads the latest skill from disk and captures the
    transcript under the skill's `evals/runs/`.
 3. **Read the transcript like a reviewer:**
@@ -32,7 +32,7 @@ it was meant to say, so you would silently compensate for its gaps. The clean su
 | "It missed a step I always do" | insert the step in `## Workflow` | `contains` on the step's key phrase |
 | "The artifact shape was wrong" | fix `references/schema.md`; the doer conforms, never invents | `contains` on the schema field |
 | "It absorbed bad input silently" | report it in the artifact's `deviations` field | `contains`: the deviation rule |
-| "It mixed opinion into the facts" | sharpen the interpreter's Facts rule | `contains` on the Facts/Interpretations contract |
+| "It mixed opinion into the facts" | sharpen the observer's Facts rule | `contains` on the Facts/Interpretations contract |
 | "I stopped reading halfway" | move depth to `references/`, leave a one-line link | `contains` on the link; word-count shrinks |
 | "It was right but slow" | reorder so the common path is first; make the rare path a branch | none (advisory) |
 | "It hallucinated a value" | name the source of truth in the step | `contains` on the source-of-truth path |
@@ -42,7 +42,7 @@ it was meant to say, so you would silently compensate for its gaps. The clean su
 - **One feedback item, one case.** If you cannot write a case, the feedback is not concrete enough —
   go back and ask what the observable difference would be.
 - **Never widen scope to absorb feedback.** Feedback about a neighbouring job is a new skill; say so.
-  Feedback about judgment belongs in the interpreter; feedback about processing belongs in the doer.
+  Feedback about judgment belongs in the observer; feedback about processing belongs in the doer.
 - **Edits shrink as often as they grow.** Most refinement is deletion — options nobody uses,
   background nobody reads.
 - **Re-run the suite after every edit** (`npm run regression -- <skill>`); the rubric gate fails a

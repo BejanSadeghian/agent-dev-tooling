@@ -19,15 +19,15 @@ for your package manager (brew/apt/winget) — run it, then re-run the doctor.
 
 **2. Build a pair** — `npm run skill:new`. Interactive interview in the terminal; blank line
 finishes list questions. Ends with `Generated N files across 2 skill(s): <uc>-doer,
-<uc>-interpreter`, the file list, and a validation run over what it wrote. Then replace the
+<uc>-observer`, the file list, and a validation run over what it wrote. Then replace the
 scaffolded parts: the real schema fields in `references/schema.md`, the real logic in
-`scripts/<module>.py`, real expectations in `scripts/tests/`, the real lens in the interpreter's
+`scripts/<module>.py`, real expectations in `scripts/tests/`, the real lens in the observer's
 SKILL.md.
 
 **3. Test with a clean sub-agent** — `npm run subagent -- <uc> "a real task"`. Needs the Copilot
 CLI installed (`copilot`); the run transcript is saved under the skill's `evals/runs/` and the
 output ends with deterministic checks, e.g. `ok outputs/<uc>.json parses and carries records +
-deviations`. Variants: `--role interpreter` (checks `## Facts` comes before
+deviations`. Variants: `--role observer` (checks `## Facts` comes before
 `## Interpretations`), `--discovery` (does not name the skill — tests that the description
 triggers).
 
@@ -52,7 +52,7 @@ body. (`npm run start "topic"` still exists for starting work on its own branch.
 | `npm run setup` | One-time: checks the runtimes, switches on the pre-commit safety checks, runs every check once to prove the clone works. |
 | `npm run doctor` | Checks this computer — runtimes, hooks, reviewers, harness — and prints the one install command for anything missing. |
 | `npm run skill:new` | Interviews you (name, trigger, artifact fields, steps, lens), then generates the complete pair into `skills/` — both SKILL.md files, the artifact schema, variations, deterministic Python, all three kinds of test, seed regression cases — and validates what it wrote. The folder appears with your first pair. |
-| `npm run subagent -- <uc> "task"` | Runs the skill with a fresh agent process that has none of your conversation context, saves the transcript under the skill's `evals/runs/`, and checks the output (artifact matches the schema; Facts before Interpretations). `--role interpreter` runs the other half; `--discovery` hides the skill's name to test that its description alone triggers it. |
+| `npm run subagent -- <uc> "task"` | Runs the skill with a fresh agent process that has none of your conversation context, saves the transcript under the skill's `evals/runs/`, and checks the output (artifact matches the schema; Facts before Interpretations). `--role observer` runs the other half; `--discovery` hides the skill's name to test that its description alone triggers it. |
 | `npm run test:new -- <skill>` | Lists every missing accuracy/edge/performance test for a doer's artifact and modules, and writes the file that closes each gap — a working scaffold whose expectations you make real. |
 | `npm run scenario -- <uc> [name]` | Agent-level acceptance eval: stages the scenario's fixtures into a fresh sandbox, walks the steps with a clean sub-agent (3 trials), evaluates checkpoints over artifacts and transcript (plus an LLM judge), and writes one report per scenario to `.framework/state/scenarios/`. Report rows carry short IDs (`C1`, `C2`, …). Human decisions: `--waive C3 "reason"` (accept one failing check), `--accept "reason"` / `--reject "reason"` (overrule the whole verdict). `--list` shows every scenario's effective verdict and failing IDs. Spec: `.framework/framework-testing.md`. |
 | `npm run check` | The whole gate in order: lint → format + pair rules → every regression case and Python test → rubric (nothing stale or uncovered) → library health. |

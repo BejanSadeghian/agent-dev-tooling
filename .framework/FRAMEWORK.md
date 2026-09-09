@@ -15,7 +15,7 @@ The testing sections below are the short version; those pages win on detail.
 - `<use-case>-doer` — as low-level and procedural as the task allows. Deterministic code in
   `scripts/` turns input data into ONE structured artifact whose shape is committed in
   `references/schema.md`. Easy to verify exactly, three ways: accuracy, edge cases, performance.
-- `<use-case>-interpreter` — reads that artifact, identifies **Facts** (each traceable to the
+- `<use-case>-observer` — reads that artifact, identifies **Facts** (each traceable to the
   artifact), then applies **Interpretations** (its own lens) — always in that order, always
   separated.
 
@@ -65,7 +65,7 @@ layout check and the freshness hash.
 
 **Provenance is pair-level and lives in the doer** — `references/source-material/` and
 `references/interview-notes.md` belong to the use case, and the doer is their one canonical home
-(never duplicated into the interpreter). Provenance and scenario evals are development-only:
+(never duplicated into the observer). Provenance and scenario evals are development-only:
 `npm run publish` strips `references/source-material/`, `references/interview-notes.md`,
 `evals/scenarios/`, and `evals/runs/` from the shipped copy — the consuming repo receives only
 what an agent needs to use the skill. Real or personal data never enters the repo at all
@@ -87,7 +87,7 @@ anywhere: `TODO`, `FIXME`, `<placeholder>`, `Lorem ipsum`. Ship it finished or d
 Role rules on top of that:
 
 - **doer** — `references/schema.md` exists and defines `deviations`; `scripts/` is non-empty.
-- **interpreter** — the body must contain `## Facts`, `## Interpretations`, and name `schema.md`
+- **observer** — the body must contain `## Facts`, `## Interpretations`, and name `schema.md`
   (the output-structure contract and the input contract).
 
 ## 4. The schema contract
@@ -100,8 +100,8 @@ The doer ALWAYS conforms to its committed `references/schema.md`:
 
 It never invents a new shape at run time. When the input forces a departure — a missing field, an
 unparseable value, an unexpected variant — the artifact still conforms structurally and the
-departure is reported in `deviations`, so the human and the downstream interpreter both see it.
-The interpreter reads `deviations` first and carries every entry into its Facts section.
+departure is reported in `deviations`, so the human and the downstream observer both see it.
+The observer reads `deviations` first and carries every entry into its Facts section.
 
 ## 5. Deterministic Python (`scripts/`)
 
@@ -128,7 +128,7 @@ Coverage owed, by role:
 - **doer** — all three kinds for its artifact (target: the use-case name) and for every `*.py`
   module in `scripts/`. A JSON case declares `{ "kind": "accuracy", "covers": ["<use-case>"] }`;
   a Python test declares `KIND = "..."` and `COVERS = [...]` at the top of the file.
-- **interpreter** — structural evals: the two-part output contract and the schema reference
+- **observer** — structural evals: the two-part output contract and the schema reference
   (seeded by the generator).
 - **tools** (`.github/skills/`) — role-exempt: evals required, three-kind regime only if they own
   Python.
@@ -158,7 +158,7 @@ Copilot CLI process (configurable in `framework.json` `subagent`) that reads the
 disk, captures the transcript under `evals/runs/`, and judges the output deterministically:
 
 - doer runs: the artifact parses and carries `records` + `deviations`;
-- interpreter runs (`--role interpreter`): `## Facts` appears before `## Interpretations`;
+- observer runs (`--role observer`): `## Facts` appears before `## Interpretations`;
 - `--discovery` omits the skill path to test that the description alone triggers.
 
 That is the quick loop. The acceptance layer is **scenario evals** — they test the agent USING
@@ -167,7 +167,7 @@ the skill, holistically and repeatably, across multiple steps:
 - A scenario is committed inside the skill: `evals/scenarios/<name>/scenario.json` (steps,
   prompts, checkpoints) plus `fixtures/` (the starting workspace).
 - Each trial stages the fixtures into a **fresh sandbox** and walks the steps in order — the
-  interpreter step consumes whatever the doer step actually produced, so intermediate artifacts
+  observer step consumes whatever the doer step actually produced, so intermediate artifacts
   are part of what is tested.
 - Checkpoints run after each step, over artifacts (`files_exist`, `contains`, `json_shape`,
   `command`) AND over the transcript (`transcript_contains`, `transcript_not_contains`,

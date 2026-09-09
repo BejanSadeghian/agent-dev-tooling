@@ -6,13 +6,13 @@
 // for unclear instructions. A fresh process is the real test.
 //
 //   npm run subagent -- <use-case> "a realistic task"            # run the doer
-//   npm run subagent -- <use-case> "..." --role interpreter      # run the interpreter
+//   npm run subagent -- <use-case> "..." --role observer      # run the observer
 //   npm run subagent -- <use-case> "..." --discovery             # do not name the skill:
 //                                                                # does the description trigger?
 //
 // The run transcript is captured under the skill's evals/runs/ (gitignored), then
 // the deterministic checks judge what came out: the doer's artifact must parse and
-// carry records + deviations; the interpreter's output must separate Facts from
+// carry records + deviations; the observer's output must separate Facts from
 // Interpretations.
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -95,11 +95,11 @@ function main(argv) {
   const config = loadConfig();
 
   if (!args.useCase || !args.task) {
-    console.log('usage: npm run subagent -- <use-case> "a realistic task" [--role doer|interpreter] [--discovery]');
+    console.log('usage: npm run subagent -- <use-case> "a realistic task" [--role doer|observer] [--discovery]');
     return 1;
   }
-  if (!['doer', 'interpreter'].includes(args.role)) {
-    console.error(red(`unknown role "${args.role}" — doer or interpreter`));
+  if (!['doer', 'observer'].includes(args.role)) {
+    console.error(red(`unknown role "${args.role}" — doer or observer`));
     return 1;
   }
 

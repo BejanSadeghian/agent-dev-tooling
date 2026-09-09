@@ -21,7 +21,7 @@ function generate(t, answers, extraArgs = []) {
   return {
     root,
     doerDir: path.join(root, 'skills', `${answers.useCase}-doer`),
-    interpreterDir: path.join(root, 'skills', `${answers.useCase}-interpreter`),
+    observerDir: path.join(root, 'skills', `${answers.useCase}-observer`),
     result,
   };
 }
@@ -34,8 +34,8 @@ const ANSWERS = {
   fields: ['order_id: string — the order this line belongs to', 'margin: number — contribution margin in USD'],
   steps: ['Check the input columns', 'Run the margin calculation', 'Report the breaches'],
   interprets: 'Reads the unit economics artifact and assesses which orders need attention.',
-  interpreterTrigger: 'Use when someone wants the margin numbers explained or prioritised.',
-  interpreterNonTrigger: 'recomputing the margins themselves',
+  observerTrigger: 'Use when someone wants the margin numbers explained or prioritised.',
+  observerNonTrigger: 'recomputing the margins themselves',
   lens: 'An order is concerning when its margin is below the floor; several in one category is a pattern.',
 };
 
@@ -50,7 +50,7 @@ test('parseFieldLine reads name, type and notes', () => {
 });
 
 test('the generator writes a complete pair', (t) => {
-  const { doerDir, interpreterDir, result } = generate(t, ANSWERS);
+  const { doerDir, observerDir, result } = generate(t, ANSWERS);
   assert.equal(result.status, 0, result.stdout + result.stderr);
 
   for (const file of [
@@ -72,16 +72,16 @@ test('the generator writes a complete pair', (t) => {
     'evals/tests/output-separates-facts-from-interpretation.json',
     'evals/tests/reads-the-doers-schema.json',
   ]) {
-    assert.ok(fs.existsSync(path.join(interpreterDir, file)), `interpreter missing ${file}`);
+    assert.ok(fs.existsSync(path.join(observerDir, file)), `observer missing ${file}`);
   }
 
   const schema = fs.readFileSync(path.join(doerDir, 'references/schema.md'), 'utf8');
   assert.match(schema, /deviations/);
   assert.match(schema, /`unit_price`|`order_id`/);
-  const interpreter = fs.readFileSync(path.join(interpreterDir, 'SKILL.md'), 'utf8');
-  assert.match(interpreter, /## Facts/);
-  assert.match(interpreter, /## Interpretations/);
-  assert.match(interpreter, /schema\.md/);
+  const observer = fs.readFileSync(path.join(observerDir, 'SKILL.md'), 'utf8');
+  assert.match(observer, /## Facts/);
+  assert.match(observer, /## Interpretations/);
+  assert.match(observer, /schema\.md/);
 });
 
 test('generated Python tests declare their kind and what they cover', (t) => {
@@ -94,7 +94,7 @@ test('generated Python tests declare their kind and what they cover', (t) => {
 });
 
 test('everything generated passes format, tests and rubric with no hand-editing', (t) => {
-  const { doerDir, interpreterDir } = generate(t, ANSWERS);
+  const { doerDir, observerDir } = generate(t, ANSWERS);
   // Point a scratch repo at the generated pair so the real tooling runs over it.
   const config = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.framework/framework.json'), 'utf8'));
   const scratch = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'skill-gen-repo-')));
@@ -102,7 +102,7 @@ test('everything generated passes format, tests and rubric with no hand-editing'
   fs.cpSync(path.join(REPO_ROOT, '.framework/scripts'), path.join(scratch, '.framework/scripts'), { recursive: true });
   fs.cpSync(path.join(REPO_ROOT, '.framework/harness'), path.join(scratch, '.framework/harness'), { recursive: true });
   fs.cpSync(doerDir, path.join(scratch, 'skills/unit-economics-doer'), { recursive: true });
-  fs.cpSync(interpreterDir, path.join(scratch, 'skills/unit-economics-interpreter'), { recursive: true });
+  fs.cpSync(observerDir, path.join(scratch, 'skills/unit-economics-observer'), { recursive: true });
   fs.writeFileSync(path.join(scratch, '.framework/framework.json'), JSON.stringify({ ...config, skillsDirs: ['skills'] }, null, 2));
 
   const run = (script) =>
@@ -119,10 +119,10 @@ test('everything generated passes format, tests and rubric with no hand-editing'
 });
 
 test('--only doer generates just the missing half', (t) => {
-  const { doerDir, interpreterDir, result } = generate(t, ANSWERS, ['--only', 'doer']);
+  const { doerDir, observerDir, result } = generate(t, ANSWERS, ['--only', 'doer']);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.ok(fs.existsSync(doerDir));
-  assert.ok(!fs.existsSync(interpreterDir));
+  assert.ok(!fs.existsSync(observerDir));
 });
 
 test('gen-tests reports gaps across the repo and exits zero when there are none', () => {

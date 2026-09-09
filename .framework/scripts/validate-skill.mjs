@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Format validator: does every skill match the framework spec (.framework/FRAMEWORK.md,
 // as encoded in .framework/framework.json)? Layout, frontmatter, body, eval cases,
-// and the doer/interpreter role rules.
+// and the doer/observer role rules.
 // Usage: node .framework/scripts/validate-skill.mjs [skill-name ...] [--json]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -35,7 +35,7 @@ export function validateSkill(config, skill) {
     }
   }
 
-  // --- role rules (the doer/interpreter pair) --------------------------------
+  // --- role rules (the doer/observer pair) --------------------------------
   const role = roleOf(config, skill);
   if (role === null) {
     const suffixes = Object.values(config.roles.suffixes).join(' or ');
@@ -131,11 +131,11 @@ export function validateSkill(config, skill) {
     warn(`SKILL.md body is ${words} words — approaching the ${config.body.maxWords} cap`, 'SKILL.md');
   }
 
-  if (role === 'interpreter') {
-    for (const pattern of config.roles.interpreter.requiredBodyPatterns) {
+  if (role === 'observer') {
+    for (const pattern of config.roles.observer.requiredBodyPatterns) {
       if (!new RegExp(pattern).test(body)) {
         err(
-          `interpreter SKILL.md must match /${pattern}/ — its output separates facts from interpretation and names the doer's schema`,
+          `observer SKILL.md must match /${pattern}/ — its output separates facts from interpretation and names the doer's schema`,
           'SKILL.md',
         );
       }

@@ -48,19 +48,19 @@ Use when a test needs a valid doer.
 1. Run the deterministic code in scripts/.
 `;
 
-/** A minimal interpreter SKILL.md satisfying the two-part output rules. */
-export const interpreterSkillMd = (name) => `---
+/** A minimal observer SKILL.md satisfying the two-part output rules. */
+export const observerSkillMd = (name) => `---
 name: ${name}
 description: >-
-  A demo interpreter used by the tooling tests, long enough to clear the minimum length.
-  Use when a test needs an interpreter that satisfies the format spec.
+  A demo observer used by the tooling tests, long enough to clear the minimum length.
+  Use when a test needs an observer that satisfies the format spec.
 ---
 
 # ${name}
 
 ## When to use
 
-Use when a test needs a valid interpreter.
+Use when a test needs a valid observer.
 
 ## Workflow
 

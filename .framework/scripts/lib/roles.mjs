@@ -1,4 +1,4 @@
-// The doer/interpreter pair: role detection by name suffix, pairing, and the
+// The doer/observer pair: role detection by name suffix, pairing, and the
 // coverage each role owes. Replaces the old skill.json manifest — everything a
 // skill "declares" now comes from its name, its files, and its schema.
 import fs from 'node:fs';
@@ -6,7 +6,7 @@ import path from 'node:path';
 import { pythonModules } from './python.mjs';
 
 /**
- * Role of a skill: 'doer' | 'interpreter' | 'tool' | null.
+ * Role of a skill: 'doer' | 'observer' | 'tool' | null.
  * Skills under a root listed in roles.requireRoleIn MUST carry a role suffix
  * (null means: product skill with no recognisable role — a format error).
  * Skills elsewhere (the dev tools in .github/skills) are role-exempt: 'tool'.
@@ -31,8 +31,8 @@ export function useCaseOf(config, name) {
 export function counterpartName(config, skill) {
   const role = roleOf(config, skill);
   const { suffixes } = config.roles;
-  if (role === 'doer') return useCaseOf(config, skill.name) + suffixes.interpreter;
-  if (role === 'interpreter') return useCaseOf(config, skill.name) + suffixes.doer;
+  if (role === 'doer') return useCaseOf(config, skill.name) + suffixes.observer;
+  if (role === 'observer') return useCaseOf(config, skill.name) + suffixes.doer;
   return null;
 }
 
@@ -47,7 +47,7 @@ export function pairFindings(config, skills) {
       findings.push({
         level: 'warn',
         skill: skill.name,
-        message: `has no ${role === 'doer' ? 'interpreter' : 'doer'} — every use case ships as a pair (expected ${other})`,
+        message: `has no ${role === 'doer' ? 'observer' : 'doer'} — every use case ships as a pair (expected ${other})`,
       });
     }
   }

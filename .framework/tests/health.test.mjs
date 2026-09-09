@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { inspect, jaccard } from '../scripts/health.mjs';
 import { hashSkill, loadConfig, writeState } from '../scripts/lib/skills.mjs';
-import { VALID_SCHEMA_MD, VALID_SKILL_MD, addSkill, doerSkillMd, interpreterSkillMd, makeRepo } from './helpers.mjs';
+import { VALID_SCHEMA_MD, VALID_SKILL_MD, addSkill, doerSkillMd, observerSkillMd, makeRepo } from './helpers.mjs';
 
 const messages = (issues) => issues.map((i) => `${i.level}: ${i.skill}: ${i.message}`).join('\n');
 
@@ -47,16 +47,16 @@ test('a lone doer is warned about as an incomplete pair, and completing it clear
   t.after(repo.cleanup);
   addSkill(repo, { name: 'margin-doer', skillMd: doerSkillMd('margin-doer'), schemaMd: VALID_SCHEMA_MD, scripts: { 'a.py': 'x = 1\n' } });
   const config = loadConfig(repo.root);
-  assert.match(messages(inspect(config, repo.root).issues), /warn: margin-doer: has no interpreter.*expected margin-interpreter/);
+  assert.match(messages(inspect(config, repo.root).issues), /warn: margin-doer: has no observer.*expected margin-observer/);
 
-  addSkill(repo, { name: 'margin-interpreter', skillMd: interpreterSkillMd('margin-interpreter') });
-  assert.doesNotMatch(messages(inspect(config, repo.root).issues), /has no interpreter/);
+  addSkill(repo, { name: 'margin-observer', skillMd: observerSkillMd('margin-observer') });
+  assert.doesNotMatch(messages(inspect(config, repo.root).issues), /has no observer/);
 });
 
 test('the pair warning never escalates to an error', (t) => {
   const repo = makeRepo();
   t.after(repo.cleanup);
-  addSkill(repo, { name: 'margin-interpreter', skillMd: interpreterSkillMd('margin-interpreter') });
+  addSkill(repo, { name: 'margin-observer', skillMd: observerSkillMd('margin-observer') });
   const config = loadConfig(repo.root);
   const pairIssues = inspect(config, repo.root).issues.filter((i) => /has no doer/.test(i.message));
   assert.equal(pairIssues.length, 1);

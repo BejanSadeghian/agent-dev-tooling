@@ -84,7 +84,7 @@ the folder, not the conversation, so the assistant picks up where things stand.
   talk about when this should be used", "skip that part"). Answer from real examples; say
   "I don't know" rather than guessing.
 - It builds the skill — two matching halves: the **doer** (does the mechanical work exactly)
-  and the **interpreter** (says what the result means — facts first, then opinion) — with its
+  and the **observer** (says what the result means — facts first, then opinion) — with its
   tests included.
 - Then, still on its own, it runs the skill once against a real task using a **fresh,
   separate agent** — one that never saw your conversation, so it can't paper over gaps — and
@@ -175,7 +175,7 @@ Two things worth knowing:
 | Half | What it is |
 | --- | --- |
 | The **doer** | Does the mechanical work: turns input data into one structured result whose exact shape is agreed in advance. It never bends that shape — anything odd about the input is listed in a "deviations" note instead. Because it is mechanical, it can be tested for being exactly right. |
-| The **interpreter** | Reads the doer's result and writes two clearly separated sections: **Facts** (only what the data shows, each pointing back to it) and **Interpretations** (what it means). A reader can always tell data from opinion. |
+| The **observer** | Reads the doer's result and writes two clearly separated sections: **Facts** (only what the data shows, each pointing back to it) and **Interpretations** (what it means). A reader can always tell data from opinion. |
 
 Why two halves? So the mechanical part can be tested for being *exactly* right, and the
 judgment part can never quietly invent numbers — each half is checkable in its own way. A pair

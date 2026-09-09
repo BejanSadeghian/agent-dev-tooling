@@ -121,7 +121,7 @@ export function inspect(config, root = REPO_ROOT, now = Date.now()) {
     }
   }
 
-  // Every use case ships as a pair: a doer without its interpreter (or the
+  // Every use case ships as a pair: a doer without its observer (or the
   // reverse) is the framework's one deliberate warning-not-blocker.
   for (const finding of pairFindings(config, skills)) {
     note(finding.level, finding.skill, finding.message, 'npm run skill:new — it scaffolds the missing half');

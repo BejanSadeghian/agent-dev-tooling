@@ -45,7 +45,7 @@ running an existing suite unchanged (just run `npm run check`), or load/soak tes
 
 | Input | Required | Notes |
 |---|---|---|
-| The skill's role and layout | yes | A doer's artifact and every module in its `scripts/` must be covered; an interpreter owes structural evals. |
+| The skill's role and layout | yes | A doer's artifact and every module in its `scripts/` must be covered; an observer owes structural evals. |
 | The code under test | yes | Read the doer's `scripts/` before deciding what to assert. |
 | The bug report or requirement | when applicable | The failing behaviour is the first assertion. |
 | Real input sizes | for performance | The largest test size should be the biggest input the author actually has. |

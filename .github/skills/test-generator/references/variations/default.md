@@ -10,5 +10,5 @@ changes relative to this default.
 | Adjustments | none — follow SKILL.md as written |
 
 Known variation worth a file when it first occurs: generating **structural evals for an
-interpreter** (two-part output, schema reference) versus the three-kind regime a doer's code and
+observer** (two-part output, schema reference) versus the three-kind regime a doer's code and
 artifact get.

@@ -13,7 +13,7 @@ Before any question:
 2. **Play back what you learned**, in a short summary: what the use case does, how it seems to be
    done today, what a good output looks like. Ask what you got wrong.
 3. **Collect the name.** If the material does not name it, ask now: "What should this use case be
-   called?" (it becomes `<name>-doer` and `<name>-interpreter`). Never generate under an invented
+   called?" (it becomes `<name>-doer` and `<name>-observer`). Never generate under an invented
    name.
 4. **Keep the material.** Once the pair is generated, save what the author gave you into the
    doer's `references/source-material/` — it is provenance, same as the interview notes. The one
@@ -38,7 +38,7 @@ Compare the material against what a finished pair needs to know:
 | Procedure | the steps in order; where it branches; the step people get wrong |
 | Exactness | which values must be identical every run (those become doer code) |
 | Artifact | the fields each record carries; what downstream reads |
-| Judgment | the interpreter's lens: what counts as notable, concerning, actionable |
+| Judgment | the observer's lens: what counts as notable, concerning, actionable |
 | Scope | what it deliberately does not cover; what it needs available; input size on a bad day |
 
 Mark each area **answered by the material**, **partly answered**, or **a gap**. Then show the
@@ -65,7 +65,7 @@ Use these techniques inside whatever area is open:
   corrected in detail; "how do you start?" gets a shrug.
 - **Probe exactness concretely.** "If this number were 2% off, would you notice?" A yes means
   doer code (`references/python-determinism.md`), never prose.
-- **Ask for artifacts of judgment.** For the interpreter's lens: "show me an output you accepted
+- **Ask for artifacts of judgment.** For the observer's lens: "show me an output you accepted
   and one you rejected — what's the difference?" The difference IS the lens; the rejected one
   becomes a never-again test.
 - **Silence is a tool.** After an answer, wait. The second half of the answer is the useful half.

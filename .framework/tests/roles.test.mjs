@@ -1,4 +1,4 @@
-// The doer/interpreter pair is the framework's core idea: role detection,
+// The doer/observer pair is the framework's core idea: role detection,
 // pairing, the schema contract, and the coverage each role owes.
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -12,7 +12,7 @@ import {
 } from '../scripts/lib/roles.mjs';
 import { validateSkill } from '../scripts/validate-skill.mjs';
 import { loadTests, loadConfig } from '../scripts/lib/skills.mjs';
-import { VALID_SCHEMA_MD, addSkill, doerSkillMd, interpreterSkillMd, makeRepo, messages } from './helpers.mjs';
+import { VALID_SCHEMA_MD, addSkill, doerSkillMd, observerSkillMd, makeRepo, messages } from './helpers.mjs';
 
 const PY_TEST = (kind) => `KIND = "${kind}"\nCOVERS = ["sales-summary", "sales_summary.build"]\n`;
 
@@ -32,11 +32,11 @@ test('roles are detected from the name suffix; tools are role-exempt', (t) => {
   t.after(repo.cleanup);
   const config = loadConfig(repo.root);
   assert.equal(roleOf(config, repo.skill), 'doer');
-  assert.equal(roleOf(config, { name: 'sales-summary-interpreter', root: 'skills' }), 'interpreter');
+  assert.equal(roleOf(config, { name: 'sales-summary-observer', root: 'skills' }), 'observer');
   assert.equal(roleOf(config, { name: 'sales-summary', root: 'skills' }), null);
   assert.equal(roleOf(config, { name: 'dev-helper', root: '.github/skills' }), 'tool');
   assert.equal(useCaseOf(config, 'sales-summary-doer'), 'sales-summary');
-  assert.equal(counterpartName(config, repo.skill), 'sales-summary-interpreter');
+  assert.equal(counterpartName(config, repo.skill), 'sales-summary-observer');
   assert.equal(artifactTarget(config, repo.skill), 'sales-summary');
 });
 
@@ -47,9 +47,9 @@ test('a lone doer draws a pair warning; a complete pair draws none', (t) => {
   const lone = pairFindings(config, [repo.skill]);
   assert.equal(lone.length, 1);
   assert.equal(lone[0].level, 'warn');
-  assert.match(lone[0].message, /expected sales-summary-interpreter/);
+  assert.match(lone[0].message, /expected sales-summary-observer/);
 
-  const other = addSkill(repo, { name: 'sales-summary-interpreter', skillMd: interpreterSkillMd('sales-summary-interpreter') });
+  const other = addSkill(repo, { name: 'sales-summary-observer', skillMd: observerSkillMd('sales-summary-observer') });
   assert.deepEqual(pairFindings(config, [repo.skill, other]), []);
 });
 
@@ -77,19 +77,19 @@ test('a doer with no scripts/ fails the format check', (t) => {
   assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /doer has no scripts\//);
 });
 
-test('an interpreter must instruct the two-part output and name the schema', (t) => {
+test('an observer must instruct the two-part output and name the schema', (t) => {
   const good = makeRepo({
-    name: 'sales-summary-interpreter',
+    name: 'sales-summary-observer',
     skillsRoot: 'skills',
-    skillMd: interpreterSkillMd('sales-summary-interpreter'),
+    skillMd: observerSkillMd('sales-summary-observer'),
   });
   t.after(good.cleanup);
   assert.deepEqual(validateSkill(loadConfig(good.root), good.skill).filter((f) => f.level !== 'warn'), []);
 
   const bad = makeRepo({
-    name: 'sales-summary-interpreter',
+    name: 'sales-summary-observer',
     skillsRoot: 'skills',
-    skillMd: interpreterSkillMd('sales-summary-interpreter').replace('## Interpretations', '## Opinions'),
+    skillMd: observerSkillMd('sales-summary-observer').replace('## Interpretations', '## Opinions'),
   });
   t.after(bad.cleanup);
   assert.match(messages(validateSkill(loadConfig(bad.root), bad.skill)), /## Interpretations/);
@@ -126,11 +126,11 @@ test('python test files declaring KIND and COVERS close doer gaps', (t) => {
   assert.deepEqual(coverageGaps(config, repo.skill, cases), []);
 });
 
-test('interpreters and tools owe no three-kind coverage', (t) => {
+test('observers and tools owe no three-kind coverage', (t) => {
   const repo = makeRepo({
-    name: 'sales-summary-interpreter',
+    name: 'sales-summary-observer',
     skillsRoot: 'skills',
-    skillMd: interpreterSkillMd('sales-summary-interpreter'),
+    skillMd: observerSkillMd('sales-summary-observer'),
   });
   t.after(repo.cleanup);
   const config = loadConfig(repo.root);

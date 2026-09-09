@@ -1,5 +1,5 @@
 {
-  "_comment": "Machine-readable contract for the skill framework: agentskills.io layout, the doer/interpreter pair, schema conformance, test coverage, and the freshness rubric. .framework/FRAMEWORK.md is the human-readable spec; keep the two in sync. Edit THIS file to change what the pre-commit hook and CI enforce.",
+  "_comment": "Machine-readable contract for the skill framework: agentskills.io layout, the doer/observer pair, schema conformance, test coverage, and the freshness rubric. .framework/FRAMEWORK.md is the human-readable spec; keep the two in sync. Edit THIS file to change what the pre-commit hook and CI enforce.",
   "skillsDirs": [
     "skills",
     ".github/skills"
@@ -63,7 +63,7 @@
   "roles": {
     "suffixes": {
       "doer": "-doer",
-      "interpreter": "-interpreter"
+      "observer": "-observer"
     },
     "requireRoleIn": [
       "skills"
@@ -75,7 +75,7 @@
       ],
       "requireScripts": true
     },
-    "interpreter": {
+    "observer": {
       "requiredBodyPatterns": [
         "## Facts",
         "## Interpretations",

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Fills the test gaps a skill has: for every doer artifact and every deterministic
 // module that is missing an accuracy, edge-case, or performance test, generate one.
-// (Interpreters owe structural evals, not the three-kind regime — they never gap here.)
+// (Observers owe structural evals, not the three-kind regime — they never gap here.)
 //
 //   npm run test:new -- <skill>          # interactive: confirms each gap, then writes
 //   npm run test:new -- <skill> --yes    # write everything missing, no questions

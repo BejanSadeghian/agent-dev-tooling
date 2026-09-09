@@ -3,13 +3,13 @@
 //   skills/<use-case>-doer/         SKILL.md, references/schema.md, variations,
 //                                        deterministic scripts/, three kinds of test,
 //                                        seed regression cases
-//   skills/<use-case>-interpreter/  SKILL.md (Facts/Interpretations contract),
+//   skills/<use-case>-observer/  SKILL.md (Facts/Interpretations contract),
 //                                        variations, structural regression cases
 // Then validates and runs both.
 //
 //   npm run skill:new
 //   npm run skill:new -- --answers answers.json --yes      # non-interactive
-//   npm run skill:new -- --only doer|interpreter           # scaffold one missing half
+//   npm run skill:new -- --only doer|observer           # scaffold one missing half
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -50,7 +50,7 @@ async function collect(prompter, args) {
 
   const useCase = await prompter.ask('useCase', 'What is the use case called? (lower-case-with-dashes)', {
     default: args.useCase ?? '',
-    hint: 'Becomes the pair: <use-case>-doer and <use-case>-interpreter. Say what it does: "sales-summary", not "helper".',
+    hint: 'Becomes the pair: <use-case>-doer and <use-case>-observer. Say what it does: "sales-summary", not "helper".',
     validate: (v) => (kebab(v) ? null : 'lower case letters, numbers and dashes only'),
   });
 
@@ -86,21 +86,21 @@ async function collect(prompter, args) {
     validate: (v) => (v.length >= 20 ? null : 'a little more detail — this becomes the trigger description'),
   });
 
-  const interpreterTrigger = await prompter.ask('interpreterTrigger', 'When should the interpreter fire? Finish: "Use when ..."', {
+  const observerTrigger = await prompter.ask('observerTrigger', 'When should the observer fire? Finish: "Use when ..."', {
     default: `Use when someone wants the ${useCase} artifact explained, assessed, or turned into a recommendation.`,
     validate: (v) => (v.toLowerCase().startsWith('use when') ? null : 'start with "Use when"'),
   });
 
-  const interpreterNonTrigger = await prompter.ask('interpreterNonTrigger', 'When must the interpreter NOT fire?', {
+  const observerNonTrigger = await prompter.ask('observerNonTrigger', 'When must the observer NOT fire?', {
     default: 'producing or reprocessing the data itself',
   });
 
-  const lens = await prompter.ask('lens', 'What lens does the interpreter apply to the facts?', {
+  const lens = await prompter.ask('lens', 'What lens does the observer apply to the facts?', {
     hint: 'The judgment rules: what counts as good/bad/urgent, thresholds in words, what a reader should do with it.',
     default: 'Apply the judgment rules this skill documents: what counts as notable, concerning, or actionable in these facts.',
   });
 
-  return { useCase, what, trigger, nonTrigger, fields, steps, interprets, interpreterTrigger, interpreterNonTrigger, lens };
+  return { useCase, what, trigger, nonTrigger, fields, steps, interprets, observerTrigger, observerNonTrigger, lens };
 }
 
 function write(file, contents) {
@@ -115,7 +115,7 @@ async function main(argv) {
   const answers = args.answersFile ? JSON.parse(fs.readFileSync(args.answersFile, 'utf8')) : {};
   const prompter = new Prompter({ answers, assumeYes: args.yes });
 
-  console.log(bold('\nNew use case — a doer/interpreter pair\n'));
+  console.log(bold('\nNew use case — a doer/observer pair\n'));
   console.log(dim('Answer as much as you can. Everything gets generated: both skills, the schema, the code, and all three kinds of test.\n'));
 
   const spec = await collect(prompter, args);
@@ -126,17 +126,17 @@ async function main(argv) {
     console.error('  npm run skill:new -- <use-case-name>                       # name only, defaults for the rest');
     console.error('  npm run skill:new -- --answers answers.json --yes          # full control');
     console.error(dim('  answers.json keys: useCase, what, trigger, nonTrigger, fields[], steps[],'));
-    console.error(dim('                     interprets, interpreterTrigger, interpreterNonTrigger, lens'));
+    console.error(dim('                     interprets, observerTrigger, observerNonTrigger, lens'));
     return 1;
   }
 
   const baseDir = args.root ? path.resolve(args.root) : path.resolve(REPO_ROOT, config.productSkillsDir);
   const doerDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.doer}`);
-  const interpreterDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.interpreter}`);
-  const wantDoer = args.only !== 'interpreter';
-  const wantInterpreter = args.only !== 'doer';
+  const observerDir = path.join(baseDir, `${spec.useCase}${config.roles.suffixes.observer}`);
+  const wantDoer = args.only !== 'observer';
+  const wantObserver = args.only !== 'doer';
 
-  for (const [want, dir] of [[wantDoer, doerDir], [wantInterpreter, interpreterDir]]) {
+  for (const [want, dir] of [[wantDoer, doerDir], [wantObserver, observerDir]]) {
     if (want && fs.existsSync(dir)) {
       console.error(red(`\n${path.relative(REPO_ROOT, dir)} already exists. Pick another name, edit the existing skill, or use --only for the missing half.`));
       return 1;
@@ -162,12 +162,12 @@ async function main(argv) {
     }
   }
 
-  if (wantInterpreter) {
-    generated.push(`${spec.useCase}${config.roles.suffixes.interpreter}`);
-    written.push(write(path.join(interpreterDir, 'SKILL.md'), T.interpreterSkillMd({ ...spec, whatItInterprets: spec.interprets, trigger: spec.interpreterTrigger, nonTrigger: spec.interpreterNonTrigger })));
-    written.push(write(path.join(interpreterDir, 'references/variations/default.md'), T.variationMd({ name: `${spec.useCase}-interpreter`, useCase: spec.useCase })));
-    for (const seed of T.interpreterSeedCases(spec)) {
-      written.push(write(path.join(interpreterDir, config.evals.dir, seed.file), seed.text));
+  if (wantObserver) {
+    generated.push(`${spec.useCase}${config.roles.suffixes.observer}`);
+    written.push(write(path.join(observerDir, 'SKILL.md'), T.observerSkillMd({ ...spec, whatItInterprets: spec.interprets, trigger: spec.observerTrigger, nonTrigger: spec.observerNonTrigger })));
+    written.push(write(path.join(observerDir, 'references/variations/default.md'), T.variationMd({ name: `${spec.useCase}-observer`, useCase: spec.useCase })));
+    for (const seed of T.observerSeedCases(spec)) {
+      written.push(write(path.join(observerDir, config.evals.dir, seed.file), seed.text));
     }
   }
 

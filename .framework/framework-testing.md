@@ -54,7 +54,7 @@ evals/scenarios/<name>/
 ```
 
 **How a run works.** Each *trial* copies `fixtures/` into a fresh sandbox and walks the steps in
-order with a clean sub-agent — the interpreter step consumes whatever the doer step actually
+order with a clean sub-agent — the observer step consumes whatever the doer step actually
 produced, so intermediate artifacts are part of what is tested. After each step, checkpoints run:
 
 - artifact checkpoints — the layer-2 types, evaluated against the sandbox (`files_exist`,

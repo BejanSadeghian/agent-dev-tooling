@@ -5,7 +5,7 @@
 // A use case is generated as a PAIR:
 //   <use-case>-doer         deterministic scripts/ code -> one structured artifact,
 //                           shape fixed by references/schema.md, deviations reported
-//   <use-case>-interpreter  reads that artifact, separates Facts from Interpretations
+//   <use-case>-observer  reads that artifact, separates Facts from Interpretations
 
 const pyName = (s) => s.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').toLowerCase();
 
@@ -41,7 +41,7 @@ This is the **doer** half of the \`${useCase}\` pair: low-level, procedural, det
 It turns input data into ONE structured artifact whose shape is fixed by
 \`references/schema.md\`. It never invents a new shape — when the input forces a
 deviation, the artifact still conforms and the deviation is reported in the
-schema's \`deviations\` field so the human and \`${useCase}-interpreter\` both see it.
+schema's \`deviations\` field so the human and \`${useCase}-observer\` both see it.
 
 ## When to use
 
@@ -50,7 +50,7 @@ Use when:
 - ${trigger.replace(/^Use when\s*/i, '')}
 
 Do **not** use for: ${nonTrigger}. Interpreting the artifact — identifying facts and
-applying judgment — is \`${useCase}-interpreter\`'s job, never this skill's.
+applying judgment — is \`${useCase}-observer\`'s job, never this skill's.
 
 ## Inputs
 
@@ -96,8 +96,8 @@ output to fit unusual input.
 `;
 }
 
-export function interpreterSkillMd({ useCase, whatItInterprets, trigger, nonTrigger, lens }) {
-  const name = `${useCase}-interpreter`;
+export function observerSkillMd({ useCase, whatItInterprets, trigger, nonTrigger, lens }) {
+  const name = `${useCase}-observer`;
   return `---
 name: ${name}
 description: >-
@@ -111,7 +111,7 @@ allowed-tools:
 
 ${whatItInterprets}
 
-This is the **interpreter** half of the \`${useCase}\` pair. It reads the artifact
+This is the **observer** half of the \`${useCase}\` pair. It reads the artifact
 \`${useCase}-doer\` produced (shape: the doer's \`references/schema.md\`), identifies
 facts from it, and applies interpretations of those facts using this skill's own
 lens. It never recomputes the doer's numbers and never mixes opinion into facts.
@@ -210,7 +210,7 @@ ${rows}
 
 Always present, possibly empty. One entry per departure from the ideal input:
 a missing field, an unparseable value that was skipped, an unexpected variant.
-Downstream (\`${useCase}-interpreter\`) must read this before interpreting anything.
+Downstream (\`${useCase}-observer\`) must read this before interpreting anything.
 `;
 }
 
@@ -434,7 +434,7 @@ export function doerSeedCases({ useCase, nonTrigger }) {
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));
 }
 
-export function interpreterSeedCases({ useCase }) {
+export function observerSeedCases({ useCase }) {
   return [
     {
       file: 'output-separates-facts-from-interpretation.json',
@@ -455,7 +455,7 @@ export function interpreterSeedCases({ useCase }) {
         type: 'contains',
         file: 'SKILL.md',
         patterns: [`${useCase}-doer`, 'schema\\.md', 'deviations'],
-        provenance: 'the pair contract: the interpreter consumes exactly what the schema declares',
+        provenance: 'the pair contract: the observer consumes exactly what the schema declares',
       },
     },
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));

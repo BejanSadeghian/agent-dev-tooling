@@ -1,13 +1,13 @@
-# The pair contract: doer, schema, interpreter
+# The pair contract: doer, schema, observer
 
 ## Why every use case is two skills
 
-Splitting a use case into a **doer** and an **interpreter** is what makes it testable:
+Splitting a use case into a **doer** and an **observer** is what makes it testable:
 
 - The doer is as low-level and procedural as the task allows. Deterministic code turns input data
   into ONE structured artifact — so "is it exactly right?" has a machine-checkable answer, three
   ways (accuracy, edge cases, performance).
-- The interpreter reads that artifact and applies judgment. Judgment cannot be exactly verified,
+- The observer reads that artifact and applies judgment. Judgment cannot be exactly verified,
   but its *discipline* can: facts first, each traceable to the artifact; interpretations second,
   clearly separated. The structural evals pin that discipline.
 
@@ -32,34 +32,34 @@ The doer ships `references/schema.md`: the exact shape of its artifact.
   does not define it.
 
 Changing the schema is an interface change: update `schema.md`, the code, the tests, and the
-interpreter's Facts rules in the same edit.
+observer's Facts rules in the same edit.
 
 ## The handoff
 
-The interpreter's input contract IS the doer's `references/schema.md`:
+The observer's input contract IS the doer's `references/schema.md`:
 
 - Its `SKILL.md` names the doer, the schema file, and the `deviations` field (the format validator
   checks this).
 - Step one of its workflow is reading `deviations` and carrying every entry into the Facts section
   — the reader must know what the data could not say.
-- It never recomputes the doer's values. A number the interpreter produced is a number nobody can
+- It never recomputes the doer's values. A number the observer produced is a number nobody can
   reproduce.
 
 ## Coverage each half owes
 
-| Requirement | doer | interpreter |
+| Requirement | doer | observer |
 | --- | --- | --- |
 | `evals/cases/` | ≥ 1, seeded by the generator | ≥ 1, structural: two-part output, schema reference |
 | accuracy / edge / performance | required for the artifact and every module in `scripts/` | — |
 | `references/schema.md` | required, must define `deviations` | consumed, referenced from SKILL.md |
 | `references/variations/` | optional — add when real variations exist | optional — add when real variations exist |
 
-The pair itself is checked by `npm run health`: a doer without its interpreter (or the reverse) is
+The pair itself is checked by `npm run health`: a doer without its observer (or the reverse) is
 a **warning, never a blocker** — half a pair may land on a branch, but the report keeps naming it
 until the other half exists (`npm run skill:new -- --only <role>` scaffolds it).
 
 ## Naming
 
-`skills/<use-case>-doer/` and `skills/<use-case>-interpreter/`. The suffix is how the
+`skills/<use-case>-doer/` and `skills/<use-case>-observer/`. The suffix is how the
 tooling detects roles — there is no manifest. A product skill with neither suffix fails the format
 check.

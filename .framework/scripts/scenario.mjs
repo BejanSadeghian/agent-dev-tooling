@@ -6,7 +6,7 @@
 //   fixtures/         the starting workspace, copied into a fresh sandbox per trial
 //
 // Each trial stages the fixtures into a fresh sandbox, walks the steps in order
-// (doer, then interpreter — later steps see what earlier steps actually produced),
+// (doer, then observer — later steps see what earlier steps actually produced),
 // and evaluates checkpoints over the artifacts AND the transcript. Trials repeat
 // (default 3) because a stochastic system proves nothing in one run; the machine
 // verdict is strict (every checkpoint, every trial) and a HUMAN can override it,
