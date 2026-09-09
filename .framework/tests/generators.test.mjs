@@ -8,6 +8,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { parseFieldLine } from '../scripts/new-skill.mjs';
 import { REPO_ROOT } from '../scripts/lib/skills.mjs';
+import { runTest } from '../scripts/lib/tests.mjs';
 
 const node = (args, env = {}) =>
   spawnSync('node', args, { cwd: REPO_ROOT, encoding: 'utf8', env: { ...process.env, NO_COLOR: '1', ...env } });
@@ -57,12 +58,20 @@ test('the generator writes a complete pair', (t) => {
     'SKILL.md',
     'references/schema.md',
     'references/variations/default.md',
-    'references/interview-notes.md',
+    'assets/source/interview.md',
+    'assets/source/interview-notes.md',
+    'scripts/check.py',
+    'scripts/run.py',
+    'scripts/report.py',
     'scripts/unit_economics.py',
     'scripts/tests/test_accuracy_unit_economics.py',
     'scripts/tests/test_edge_unit_economics.py',
     'scripts/tests/test_performance_unit_economics.py',
+    'scripts/tests/test_accuracy_check.py',
+    'scripts/tests/test_edge_run.py',
+    'scripts/tests/test_performance_report.py',
     'evals/tests/schema-reports-deviations.json',
+    'evals/tests/artifact-matches-seed-input.json',
   ]) {
     assert.ok(fs.existsSync(path.join(doerDir, file)), `doer missing ${file}`);
   }
@@ -82,6 +91,42 @@ test('the generator writes a complete pair', (t) => {
   assert.match(observer, /## Facts/);
   assert.match(observer, /## Interpretations/);
   assert.match(observer, /schema\.md/);
+});
+
+test('multiple steps generate one module per step plus an orchestrator', (t) => {
+  const { doerDir, result } = generate(t, ANSWERS);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+
+  const orchestrator = fs.readFileSync(path.join(doerDir, 'scripts/unit_economics.py'), 'utf8');
+  assert.match(orchestrator, /from check import run as check/);
+  assert.match(orchestrator, /from run import run as run/);
+  assert.match(orchestrator, /from report import run as report/);
+  assert.match(orchestrator, /data = check\(data\)/);
+
+  const step = fs.readFileSync(path.join(doerDir, 'scripts/check.py'), 'utf8');
+  assert.match(step, /def run\(data/);
+
+  const script = fs.readFileSync(path.join(doerDir, 'assets/source/interview.md'), 'utf8');
+  assert.match(script, /In one sentence, what does the DOER do/);
+  const notes = fs.readFileSync(path.join(doerDir, 'assets/source/interview-notes.md'), 'utf8');
+  assert.match(notes, /order-level margin/);
+});
+
+test('the seed artifact test carries a real input and a computed expectation', (t) => {
+  const { doerDir, result } = generate(t, ANSWERS);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+
+  const seed = JSON.parse(fs.readFileSync(path.join(doerDir, 'evals/tests/artifact-matches-seed-input.json'), 'utf8'));
+  assert.equal(seed.type, 'artifact');
+  assert.equal(seed.kind, 'accuracy');
+  assert.equal(seed.entry, 'scripts/unit_economics.py:build_unit_economics');
+  assert.equal(seed.input.length, 2);
+  assert.deepEqual(Object.keys(seed.expected).sort(), ['deviations', 'records']);
+  assert.equal(seed.expected.records.length, 2);
+
+  // And the expectation is genuinely what the entry produces: the test passes.
+  const outcome = runTest(seed, doerDir);
+  assert.equal(outcome.passed, true, outcome.message);
 });
 
 test('generated Python tests declare their kind and what they cover', (t) => {

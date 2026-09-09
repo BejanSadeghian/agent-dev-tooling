@@ -30,15 +30,20 @@ function loadTargets(config) {
 // Development-only provenance: it belongs in the workshop, never in the shipped
 // skill. The consuming repo gets only what an agent needs to USE the skill.
 // Transient run debris (caches, outputs) never ships either.
-const DEV_ONLY = new Set(['runs', 'source-material', 'interview-notes.md', 'scenarios']);
-
-export function copySkill(srcDir, destDir) {
+// Lists come from framework.json `ship.devOnlyNames` / `ship.devOnlyPaths`
+// (names match any path segment; paths match from the skill root).
+export function copySkill(srcDir, destDir, config = loadConfig()) {
+  const devOnlyNames = new Set(config.ship?.devOnlyNames ?? []);
+  const devOnlyPaths = config.ship?.devOnlyPaths ?? [];
   fs.rmSync(destDir, { recursive: true, force: true });
   fs.cpSync(srcDir, destDir, {
     recursive: true,
     filter: (src) => {
       const parts = path.relative(srcDir, src).split(path.sep).filter(Boolean);
-      return !parts.some((part) => DEV_ONLY.has(part) || TRANSIENT_DIRS.has(part) || part.startsWith('.'));
+      if (parts.length === 0) return true;
+      const rel = parts.join('/');
+      if (devOnlyPaths.some((p) => rel === p || rel.startsWith(`${p}/`))) return false;
+      return !parts.some((part) => devOnlyNames.has(part) || TRANSIENT_DIRS.has(part) || part.startsWith('.'));
     },
   });
 }

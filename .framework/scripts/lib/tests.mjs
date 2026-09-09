@@ -112,6 +112,7 @@ export const TEST_TYPES = {
       if (!fs.existsSync(abs)) return { passed: false, message: `no such entry module: ${rel}` };
       const driver = [
         'import json, sys, importlib.util',
+        `sys.path.insert(0, ${JSON.stringify(path.dirname(abs))})`,
         `spec = importlib.util.spec_from_file_location("skill_entry", ${JSON.stringify(abs)})`,
         'mod = importlib.util.module_from_spec(spec)',
         'spec.loader.exec_module(mod)',

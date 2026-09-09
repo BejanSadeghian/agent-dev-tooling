@@ -22,7 +22,7 @@ commands — never hand-roll their jobs:
 | Build a new skill / use case | `skill-builder` | interview first, then `npm run skill:new -- --answers <file> --yes` — write the answers file OUTSIDE the repo or under gitignored `tmp/` (publish commits the whole tree); it writes the pair into `skills/` |
 | Test a skill being built | `skill-builder` | `npm run subagent -- <use-case> "<real task>"` (`--role observer`, `--discovery`) — NEVER run the skill yourself |
 | Run a repeatable acceptance eval | `skill-builder` | `npm run scenario -- <use-case> [name]` — 3 fresh-sandbox trials, one report. To CREATE one: author `evals/scenarios/<name>/scenario.json` + `fixtures/` per `.framework/framework-testing.md` (Layer 3) — fixtures are always synthetic, never the human's real file. Human decisions: `--waive <id> "reason"` (one failing check), `--accept`/`--reject "reason"` (whole verdict) — record any of them only at the human's explicit direction |
-| Fix a skill after feedback | `skill-builder` | edit + a regression case for each item, then `npm run regression -- <skill>` |
+| Fix a skill after feedback | `skill-builder` | edit + a regression test for each item, then `npm run regression -- <skill>` |
 | Add or fill tests, make fixtures | `test-generator` | `npm run test:new -- <skill>`; fixtures via its seeded `scripts/datagen.mjs` |
 | Check everything | — | `npm run check` |
 | Publish (confirm checks + save + deliver the pair) | `dev-helper` | `npm run publish -- <use-case>`. First time it exits asking for `.framework/targets.json` (gitignored) — ask the human for the team repo address and write the file (publish prints the exact shape), then re-run. If checks fail, the HUMAN may direct `--override "their reason"` — never override on your own |

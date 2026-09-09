@@ -33,7 +33,7 @@ kinds, all three required for a doer's artifact and every module in its `scripts
 Each file declares `KIND = "..."` and `COVERS = [...]` so coverage is provable. Tests are not
 JSON: JSON is only layer 2's format.
 
-## Layer 2 — document regression cases (`evals/cases/*.json`)
+## Layer 2 — document regression tests (`evals/tests/*.json`)
 
 Declarative assertions that pin the skill's written rules — every hard rule, every piece of
 author feedback, the trigger boundary. One JSON object per file; types: `files_exist`,

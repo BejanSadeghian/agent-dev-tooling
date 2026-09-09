@@ -80,6 +80,28 @@ async function collect(prompter, args) {
     hint: 'One per line, imperative: "Check the input columns". Blank line to finish. Leave empty for a sensible default.',
   });
 
+  // One deterministic module per step when the author named more than one.
+  let modules = [];
+  if (steps.length > 1) {
+    const slug = (text, i) => {
+      const word = (text.split(/\s+/)[0] || `step${i + 1}`).toLowerCase().replace(/[^a-z0-9_]/g, '');
+      return /^[a-z_]/.test(word) ? word : `step_${word}`;
+    };
+    const raw = await prompter.ask('moduleNames', 'Short code name for each step, in the same order (comma-separated)?', {
+      hint: 'One word each, e.g. "parse, reconcile, rank". Each becomes scripts/<name>.py with a single run() function.',
+      default: steps.map(slug).join(', '),
+    });
+    const seen = new Set();
+    modules = steps.map((step, i) => {
+      let name = String(raw).split(',')[i]?.trim().toLowerCase().replace(/[^a-z0-9_]/g, '') || slug(step, i);
+      if (!/^[a-z_]/.test(name)) name = `step_${name}`;
+      let unique = name, n = 2;
+      while (seen.has(unique)) unique = `${name}_${n++}`;
+      seen.add(unique);
+      return { name: unique, step };
+    });
+  }
+
   const interprets = await prompter.ask('interprets', 'In one sentence, what does the INTERPRETER read out of the artifact?', {
     hint: 'Third person: "Reads the sales summary and assesses category health and momentum."',
     default: `Reads the ${useCase} artifact, states the facts it shows, and interprets them.`,
@@ -100,13 +122,40 @@ async function collect(prompter, args) {
     default: 'Apply the judgment rules this skill documents: what counts as notable, concerning, or actionable in these facts.',
   });
 
-  return { useCase, what, trigger, nonTrigger, fields, steps, interprets, observerTrigger, observerNonTrigger, lens };
+  return { useCase, what, trigger, nonTrigger, fields, steps, modules, interprets, observerTrigger, observerNonTrigger, lens };
 }
 
 function write(file, contents) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, contents);
   return file;
+}
+
+/** Two sample rows built from the interview fields, for the artifact seed test. */
+function sampleValue(type, i) {
+  const t = (type || 'string').toLowerCase();
+  if (/(^|_)int/.test(t) || t === 'integer') return i + 1;
+  if (/float|number|decimal|double/.test(t)) return (i + 1) * 1.5;
+  if (/bool/.test(t)) return i % 2 === 0;
+  return `sample-${i + 1}`;
+}
+
+function seedInputFor(fields) {
+  return [0, 1].map((i) => Object.fromEntries((fields || []).map((f) => [f.name, sampleValue(f.type, i)])));
+}
+
+/** Run the doer entry on the seed input and return the produced artifact. */
+function runEntry(scriptsDir, module, fnName, input) {
+  const code = [
+    'import json, sys',
+    `sys.path.insert(0, ${JSON.stringify(scriptsDir)})`,
+    `from ${module} import ${fnName}`,
+    'payload = json.load(sys.stdin)',
+    `result = ${fnName}(payload)`,
+    'print(json.dumps(result, sort_keys=True, default=str))',
+  ].join('\n');
+  const out = execFileSync('python3', ['-c', code], { input: JSON.stringify(input), encoding: 'utf8' });
+  return JSON.parse(out);
 }
 
 async function main(argv) {
@@ -126,7 +175,7 @@ async function main(argv) {
     console.error('  npm run skill:new -- <use-case-name>                       # name only, defaults for the rest');
     console.error('  npm run skill:new -- --answers answers.json --yes          # full control');
     console.error(dim('  answers.json keys: useCase, what, trigger, nonTrigger, fields[], steps[],'));
-    console.error(dim('                     interprets, observerTrigger, observerNonTrigger, lens'));
+    console.error(dim('                     interprets, observerTrigger, observerNonTrigger, lens, moduleNames'));
     return 1;
   }
 
@@ -152,13 +201,41 @@ async function main(argv) {
     written.push(write(path.join(doerDir, 'SKILL.md'), T.doerSkillMd({ ...spec, steps })));
     written.push(write(path.join(doerDir, config.roles.doer.schemaFile), T.schemaMd(spec)));
     written.push(write(path.join(doerDir, 'references/variations/default.md'), T.variationMd({ name: `${spec.useCase}-doer`, useCase: spec.useCase })));
-    written.push(write(path.join(doerDir, 'references/interview-notes.md'), T.interviewNotes({ name: spec.useCase, answers: prompter.transcript })));
-    written.push(write(path.join(doerDir, config.python.dir, `${T.moduleNameFor(spec.useCase)}.py`), T.pythonModule(spec)));
-    for (const kind of config.coverage.kinds) {
-      written.push(write(path.join(doerDir, config.python.testsDir, `test_${kind}_${T.moduleNameFor(spec.useCase)}.py`), T.pythonTest({ kind, useCase: spec.useCase })));
+    written.push(write(path.join(doerDir, 'assets/source/interview.md'), T.interviewScript({ name: spec.useCase, questions: prompter.transcript.map((t) => t.question) })));
+    written.push(write(path.join(doerDir, 'assets/source/interview-notes.md'), T.interviewNotes({ name: spec.useCase, answers: prompter.transcript })));
+    const entryModule = T.moduleNameFor(spec.useCase);
+    const entryFn = T.functionNameFor(spec.useCase);
+    const testTargets = [{ module: entryModule, fn: entryFn, isEntry: true }];
+    if (spec.modules.length) {
+      for (const m of spec.modules) {
+        written.push(write(path.join(doerDir, config.python.dir, `${m.name}.py`), T.stepModule({ useCase: spec.useCase, name: m.name, step: m.step })));
+        testTargets.push({ module: m.name, fn: 'run', isEntry: false });
+      }
+      written.push(write(path.join(doerDir, config.python.dir, `${entryModule}.py`), T.orchestratorModule({ useCase: spec.useCase, modules: spec.modules })));
+    } else {
+      written.push(write(path.join(doerDir, config.python.dir, `${entryModule}.py`), T.pythonModule(spec)));
     }
-    for (const seed of T.doerSeedCases(spec)) {
+    for (const target of testTargets) {
+      for (const kind of config.coverage.kinds) {
+        written.push(write(path.join(doerDir, config.python.testsDir, `test_${kind}_${target.module}.py`), T.pythonTest({ kind, useCase: spec.useCase, module: target.module, fn: target.fn, isEntry: target.isEntry })));
+      }
+    }
+    for (const seed of T.doerSeedTests(spec)) {
       written.push(write(path.join(doerDir, config.evals.dir, seed.file), seed.text));
+    }
+    // Seed artifact test with a real expected value, computed by running the entry.
+    try {
+      const seedInput = seedInputFor(spec.fields);
+      const expected = runEntry(path.join(doerDir, config.python.dir), entryModule, entryFn, seedInput);
+      const seed = T.artifactSeedTest({
+        useCase: spec.useCase,
+        entry: `${config.python.dir}/${entryModule}.py:${entryFn}`,
+        input: seedInput,
+        expected,
+      });
+      written.push(write(path.join(doerDir, config.evals.dir, seed.file), seed.text));
+    } catch (err) {
+      console.log(dim(`  (skipped the artifact seed test: ${err.message})`));
     }
   }
 
@@ -166,7 +243,7 @@ async function main(argv) {
     generated.push(`${spec.useCase}${config.roles.suffixes.observer}`);
     written.push(write(path.join(observerDir, 'SKILL.md'), T.observerSkillMd({ ...spec, whatItInterprets: spec.interprets, trigger: spec.observerTrigger, nonTrigger: spec.observerNonTrigger })));
     written.push(write(path.join(observerDir, 'references/variations/default.md'), T.variationMd({ name: `${spec.useCase}-observer`, useCase: spec.useCase })));
-    for (const seed of T.observerSeedCases(spec)) {
+    for (const seed of T.observerSeedTests(spec)) {
       written.push(write(path.join(observerDir, config.evals.dir, seed.file), seed.text));
     }
   }
@@ -191,7 +268,7 @@ async function main(argv) {
 
   console.log(bold('\nNext'));
   console.log('  1. Replace the scaffolded parts: the real schema fields, the real deterministic logic, the real lens.');
-  console.log('  2. Make the three doer test files assert the real behaviour, not the scaffold\'s.');
+  console.log('  2. Make the generated test files assert the real behaviour, not the scaffold\'s.');
   console.log(`  3. Test it with a clean sub-agent: npm run subagent -- ${spec.useCase} "a realistic task"`);
   console.log(`  4. npm run check    ${dim('(then: npm run publish -- <use-case>)')}`);
   return 0;

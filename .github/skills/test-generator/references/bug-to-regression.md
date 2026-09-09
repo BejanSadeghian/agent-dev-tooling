@@ -22,7 +22,7 @@ A bug fixed without a test is a bug scheduled for re-release.
 
 ## For agent skills
 
-The same loop, expressed as a case in `evals/cases/*.json`: the feedback is the bug, the case is the
+The same loop, expressed as a test in `evals/tests/*.json`: the feedback is the bug, the test is the
 guard, `provenance` records who reported it and when. See `skill-builder`'s
 `references/regression-tests.md`.
 

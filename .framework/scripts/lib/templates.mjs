@@ -289,10 +289,94 @@ def write_artifact(rows: Iterable[Mapping[str, Any]], out_dir: str | Path) -> Pa
 `;
 }
 
-export function pythonTest({ kind, useCase }) {
-  const module = moduleNameFor(useCase);
+
+export function stepModule({ useCase, name, step }) {
+  return `"""${step} — one deterministic step of the ${useCase}-doer skill.
+
+Contract: same input, same output. Raises ValueError for a bad value and
+TypeError for a wrong type, naming the row. Chained by ${moduleNameFor(useCase)}.py,
+which owns the single artifact write.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Iterable, Mapping
+
+__all__ = ["run"]
+
+
+def run(data: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """${step}."""
+    # Scaffold: pass-through. Replace with the real logic (skill-builder step 5),
+    # keeping the contract above.
+    return [dict(row) for row in data]
+`;
+}
+
+export function orchestratorModule({ useCase, modules }) {
   const fn = functionNameFor(useCase);
+  const imports = modules.map((m) => `from ${m.name} import run as ${m.name}`).join("\n");
+  const chain = modules.map((m, i) => `    data = ${m.name}(data)  # ${i + 1}. ${m.step}`).join("\n");
+  return `"""Deterministic code for the ${useCase}-doer skill.
+
+Everything that must be reproducible lives here rather than in the prompt: the
+same input produces byte-identical output on every run, which is what makes it
+testable for accuracy, edge cases, and performance. The output ALWAYS matches
+references/schema.md — deviations are reported, never structural.
+
+The work is split into one module per step; this module only chains them and
+owns the single artifact write.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Iterable, Mapping
+
+${imports}
+
+__all__ = ["${fn}", "write_artifact"]
+
+
+def ${fn}(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    """Build the ${useCase} artifact — deterministic: same input, same output.
+
+    Args:
+        rows: input records. Each must carry the columns SKILL.md documents.
+
+    Returns:
+        {"records": [...], "deviations": [...]} conforming to references/schema.md.
+        Records are in a total order (never dict or input order); deviations is
+        always present, possibly empty.
+
+    Raises:
+        ValueError: a value is missing or unparseable — the message names the row.
+        TypeError: a value of the wrong type for its column.
+    """
+    data: Iterable[Mapping[str, Any]] = rows
+${chain}
+    records = [dict(row) for row in data]
+    records.sort(key=lambda r: tuple(sorted(map(str, r.items()))))
+    return {"records": records, "deviations": []}
+
+
+def write_artifact(rows: Iterable[Mapping[str, Any]], out_dir: str | Path) -> Path:
+    """Write outputs/${useCase}.json exactly as the schema declares it."""
+    directory = Path(out_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    target = directory / "${useCase}.json"
+    target.write_text(
+        json.dumps(${fn}(rows), indent=2, sort_keys=True, default=str) + "\\n",
+        encoding="utf-8",
+    )
+    return target
+`;
+}
+
+export function pythonTest({ kind, useCase, module = moduleNameFor(useCase), fn = functionNameFor(useCase), isEntry = true }) {
   const skillName = `${useCase}-doer`;
+  const stepImport = `from ${module} import ${fn}` + (isEntry ? ', write_artifact' : '');
   const header = `"""${kind[0].toUpperCase()}${kind.slice(1)} tests for ${skillName}."""
 
 KIND = "${kind}"
@@ -307,7 +391,7 @@ from pathlib import Path
 
 from skillharness import SkillTestCase
 
-from ${module} import ${fn}, write_artifact
+${stepImport}
 
 ROWS = [
     {"id": 1, "value": 10.0},
@@ -318,7 +402,7 @@ ROWS = [
 class TestAccuracy(SkillTestCase):
     skill = "${skillName}"
 
-    def test_known_input_produces_the_expected_output(self):
+${isEntry ? `    def test_known_input_produces_the_expected_output(self):
         # Replace with the real expectation: the smallest input whose correct
         # answer you can state without running the code.
         result = ${fn}(ROWS)
@@ -330,9 +414,23 @@ class TestAccuracy(SkillTestCase):
         self.assertIsInstance(result["deviations"], list)
 
     def test_result_order_is_stable(self):
-        self.assert_rows_equal(${fn}(ROWS)["records"], ${fn}(list(reversed(ROWS)))["records"])
+        self.assert_rows_equal(${fn}(ROWS)["records"], ${fn}(list(reversed(ROWS)))["records"])` : `    def test_known_input_produces_the_expected_output(self):
+        # Replace with the real expectation: the smallest input whose correct
+        # answer you can state without running the code.
+        result = ${fn}(ROWS)
+        self.assertEqual(len(result), len(ROWS))
 
-    def test_artifact_is_identical_across_runs(self):
+    def test_step_returns_a_list_of_rows(self):
+        result = ${fn}(ROWS)
+        self.assertIsInstance(result, list)
+        self.assertTrue(all(isinstance(r, dict) for r in result))
+
+    def test_same_input_gives_same_output(self):
+        # Steps own no ordering contract — that belongs to the entry. What a
+        # step must guarantee is purity: the same input, the same output.
+        self.assert_rows_equal(${fn}(list(ROWS)), ${fn}(list(ROWS)))`}
+
+${isEntry ? `    def test_artifact_is_identical_across_runs(self):
         with tempfile.TemporaryDirectory() as tmp:
             def produce():
                 target = write_artifact(ROWS, Path(tmp) / "run")
@@ -340,7 +438,9 @@ class TestAccuracy(SkillTestCase):
 
             first = self.assert_deterministic(produce, label="${useCase} artifact")
             parsed = json.loads(first["artifact"])
-            self.assertEqual(set(parsed), {"records", "deviations"})
+            self.assertEqual(set(parsed), {"records", "deviations"})` : `    def test_step_is_identical_across_runs(self):
+        first = self.assert_deterministic(lambda: {"rows": ${fn}(ROWS)}, label="${module} step")
+        self.assert_rows_equal(first["rows"], ${fn}(ROWS))`}
 `;
   }
 
@@ -358,13 +458,17 @@ ROWS = [
 class TestEdgeCases(SkillTestCase):
     skill = "${skillName}"
 
-    def test_empty_input_still_conforms(self):
+${isEntry ? `    def test_empty_input_still_conforms(self):
         result = ${fn}([])
         self.assertEqual(result["records"], [])
         self.assertEqual(result["deviations"], [])
 
     def test_single_row_is_handled(self):
-        self.assertEqual(len(${fn}(ROWS[:1])["records"]), 1)
+        self.assertEqual(len(${fn}(ROWS[:1])["records"]), 1)` : `    def test_empty_input_passes_through(self):
+        self.assertEqual(${fn}([]), [])
+
+    def test_single_row_is_handled(self):
+        self.assertEqual(len(${fn}(ROWS[:1])), 1)`}
 
     def test_bad_rows_raise_a_declared_error(self):
         with self.assertRaises((TypeError, ValueError)):
@@ -403,7 +507,7 @@ class TestPerformance(SkillTestCase):
 `;
 }
 
-export function doerSeedCases({ useCase, nonTrigger }) {
+export function doerSeedTests({ useCase, nonTrigger }) {
   return [
     {
       file: 'trigger-boundary-stated.json',
@@ -434,7 +538,7 @@ export function doerSeedCases({ useCase, nonTrigger }) {
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));
 }
 
-export function observerSeedCases({ useCase }) {
+export function observerSeedTests({ useCase }) {
   return [
     {
       file: 'output-separates-facts-from-interpretation.json',
@@ -461,6 +565,30 @@ export function observerSeedCases({ useCase }) {
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));
 }
 
+
+export function artifactSeedTest({ useCase, entry, input, expected }) {
+  const id = 'artifact-matches-seed-input';
+  return {
+    file: `${id}.json`,
+    text:
+      JSON.stringify(
+        {
+          id,
+          description: 'The doer entry turns the seed input into the expected artifact.',
+          type: 'artifact',
+          kind: 'accuracy',
+          covers: [useCase],
+          entry,
+          input,
+          expected,
+          provenance: 'seeded by the generator from the interview fields — extend with real datasets',
+        },
+        null,
+        2,
+      ) + '\n',
+  };
+}
+
 export function interviewNotes({ name, answers }) {
   const rows = answers.map((a) => `### ${a.question}\n\n${a.answer || '_(not answered)_'}\n`).join('\n');
   return `# Interview notes — ${name}
@@ -469,5 +597,16 @@ Captured by \`npm run skill:new\`. These answers are the provenance for the rule
 and for the regression cases. When a rule changes, update the answer that justified it.
 
 ${rows}
+`;
+}
+
+export function interviewScript({ name, questions }) {
+  const items = questions.map((q, i) => `${i + 1}. ${q}`).join('\n');
+  return `# Interview script — ${name}
+
+The questions \`npm run skill:new\` asked to generate this skill, frozen at
+generation time. The filled-in answers live in \`interview-notes.md\` beside this file.
+
+${items}
 `;
 }

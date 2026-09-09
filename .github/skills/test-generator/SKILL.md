@@ -33,7 +33,7 @@ Every artifact and every Python entrypoint gets **all three kinds**:
 Use when:
 
 - a skill's artifacts or Python entrypoints are missing any of the three kinds of test;
-- new or changed code needs tests (unit, API, E2E, or a skill regression case);
+- new or changed code needs tests (unit, API, E2E, or a skill regression test);
 - a fixture, seed dataset, or edge-case corpus is needed — any size, any format;
 - a bug was reported and must be locked down as a permanent regression test;
 - an existing suite is flaky, and the fix is deterministic data.
@@ -67,7 +67,7 @@ assertions — you replace the placeholder expectations, which is the part only 
 
 Choose the cheapest layer that can catch the failure (`references/test-strategies.md`): pure logic
 to unit tests, contract and status codes to API tests, a user-visible flow to E2E, a rule inside a
-skill document to a JSON regression case.
+skill document to a JSON regression test.
 
 ### 3. Write the accuracy tests
 

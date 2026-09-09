@@ -10,7 +10,7 @@ Choose the cheapest layer that can actually catch the failure.
 | Serialization, status codes, validation, auth | API/integration | Unit tests mock away the exact layer that breaks. |
 | A flow a user performs across screens | E2E | Nothing below the browser proves the flow. |
 | A schema/config/contract shape | schema test | Cheap, and it fails on the file that changed. |
-| An agent skill's rules | skill regression case | See `skill-builder` and `.framework/FRAMEWORK.md`. |
+| An agent skill's rules | skill regression test | See `skill-builder` and `.framework/FRAMEWORK.md`. |
 
 One E2E test for the happy path plus unit tests for the branches beats five E2E tests. E2E is where
 determinism goes to die: keep it thin.

@@ -14,6 +14,10 @@ outputs/
 # Captured sub-agent runs: transient evidence, judged then discarded.
 evals/runs/
 
+# Per-test trial evidence: the results.json summary is committed, but the bulky
+# produced value on failure is not.
+evals/tests/*/results/actual.json
+
 # Reviewer list and ship targets are per-clone, not shared.
 .framework/setup/reviewers.json
 .framework/targets.json

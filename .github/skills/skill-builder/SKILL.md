@@ -102,16 +102,17 @@ npm run skill:new -- --answers /tmp/answers.json --yes
 ```
 
 The answers file carries what the interview produced — keys: `useCase`, `what`, `trigger`,
-`nonTrigger`, `fields[]` (each `"name: type — meaning"`), `steps[]`, `interprets`,
+`nonTrigger`, `fields[]` (each `"name: type — meaning"`), `steps[]`, `moduleNames` (comma-separated,
+when `steps[]` has more than one), `interprets`,
 `observerTrigger`, `observerNonTrigger`, `lens`. (Run without flags only in a real
 terminal; a non-interactive bare run refuses rather than generating an unnamed skill.)
 
 It writes both skills into `skills/` (creating the folder if
 this is the first pair): the doer (`SKILL.md`,
 `references/schema.md`, `references/variations/`, `scripts/<module>.py`, an accuracy test, an
-edge-case test, a performance test, seed regression cases, the interview record) and the
+edge-case test, a performance test, seed regression tests, the interview record) and the
 observer (`SKILL.md` with the Facts/Interpretations contract, `references/variations/`,
-structural regression cases). It then validates and runs what it generated.
+structural regression tests). It then validates and runs what it generated.
 
 Generate both halves by default. `--only doer` / `--only observer` exists for completing a pair
 the health report flagged — never as an opening question.
@@ -124,7 +125,9 @@ The generator writes the structure and working scaffolds. You write the substanc
   `references/` linked from the step that needs it. Imperative second person, defaults not options.
 - doer `references/schema.md` — the real record fields. The doer ALWAYS conforms to this shape and
   reports anything the input forced into the `deviations` field. It never invents a new shape.
-- doer `scripts/<module>.py` — implement the exact parts. Total ordering on every output, an error
+- doer `scripts/<module>.py` — implement the exact parts. One module per deterministic step
+  (`scripts/<step>.py`, each exposing one `run()`), chained by the thin `scripts/<use-case>.py`
+  orchestrator that alone writes the final artifact. Total ordering on every output, an error
   contract in the docstring (`ValueError` for bad values, `TypeError` for wrong types), and a
   streaming pass where the input could be large.
 - doer `scripts/tests/` — replace placeholder expectations: accuracy from the smallest inputs whose
@@ -162,7 +165,7 @@ turn each answer into exactly one of:
 
 | Feedback | Lands as |
 |---|---|
-| "It should have done X" | a step in `SKILL.md` **and** a regression case asserting X |
+| "It should have done X" | a step in `SKILL.md` **and** a regression test asserting X |
 | "It fired when it shouldn't" | tightened `description` **and** a re-run with `--discovery` |
 | "That number is wrong" | a fix in `scripts/` **and** an accuracy test with the correct value |
 | "It broke on this file" | an edge case in `scripts/tests/test_edge_*.py`, then the fix |
@@ -188,11 +191,11 @@ npm run test:new -- <skill-name>
 Reports and fills the gaps: the doer's artifact and every deterministic module need an accuracy, an
 edge-case, and a performance test. The bar for the suite:
 
-1. One case per **hard rule** in `SKILL.md`.
-2. One case per **piece of author feedback** — the ratchet: a mistake made once cannot come back.
-3. One trigger case pinning the description's boundary.
+1. One test per **hard rule** in `SKILL.md`.
+2. One test per **piece of author feedback** — the ratchet: a mistake made once cannot come back.
+3. One trigger test pinning the description's boundary.
 4. Accuracy, edge, and performance coverage for the artifact and every module in the doer's `scripts/`.
-5. Structural cases pinning the observer's two-part output and its schema reference.
+5. Structural tests pinning the observer's two-part output and its schema reference.
 
 Write them with the author watching. "What would prove this is still working six months from now?"
 
@@ -215,7 +218,7 @@ will use it. If the checks do not confirm, publishing stops — the author may d
   committed schema, variations, Python, tests, cases.
 - A green suite covering every hard rule, the artifact, and every module.
 - Clean sub-agent transcripts under `evals/runs/` showing runs that needed no improvisation.
-- `references/interview-notes.md` — the provenance for every rule.
+- `assets/source/interview.md` + `interview-notes.md` — the provenance for every rule.
 
 ## Rubric
 

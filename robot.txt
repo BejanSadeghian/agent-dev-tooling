@@ -72,7 +72,7 @@ doctor reports the safety hooks were off, run `npm run setup`.
   fails anyway because the content fingerprint will not match.
 - Never weaken or skip the gate to get a commit through (SKIP_SKILL_GATE is for the human's
   explicit emergency use; CI does not skip).
-- Author feedback lands twice: as a skill edit AND as a regression case, so the mistake cannot
+- Author feedback lands twice: as a skill edit AND as a regression test, so the mistake cannot
   return.
 - Ship only green pairs: `npm run publish -- <use-case>` (targets in .framework/targets.json).
 - The gate in full: `npm run check` = lint -> format+roles -> tests -> rubric -> health.

@@ -44,32 +44,35 @@ Skills live one directory deep under a configured root (`skillsDirs`: `skills/` 
 <skills-root>/<skill-name>/
   SKILL.md            # required — the only file the agent always reads
   assets/             # static fixtures, sample data, images, file templates
+    source/           # development-only — the interview script and notes frozen at init
   references/         # deep-dive docs loaded on demand
     variations/       # optional — domain / use-case / regional adaptations, one file each
     schema.md         # any required input/output schemas; a doer MUST commit its
                       #   artifact schema here, and it must define "deviations"
     source-material/  # provenance — what the author gave to build this use case
-    interview-notes.md# provenance — the interview answers behind every rule
   scripts/            # executable code the skill runs; deterministic Python and its tests
     <module>.py
     tests/test_{accuracy,edge,performance}_<module>.py
   evals/
-    cases/*.json      # required (>= 1) — the JSON regression suite for this skill
+    tests/*.json      # required (>= 1) — the JSON regression suite for this skill
+    tests/<id>/results/  # trial evidence written by the regression runner
     scenarios/        # optional — agent-level scenario evals: <name>/scenario.json + fixtures/
     runs/             # captured sub-agent transcripts (gitignored)
 ```
 
 No other top-level directories are allowed inside a skill (`allowUnknownDirs: false`). Transient
-dirs (`outputs/`, `__pycache__/`, `.pytest_cache/`, `evals/runs/`) are invisible to both the
-layout check and the freshness hash.
+dirs (`outputs/`, `__pycache__/`, `.pytest_cache/`, `evals/runs/`, `evals/tests/*/results/`) are
+invisible to both the layout check and the freshness hash.
 
 **Provenance is pair-level and lives in the doer** — `references/source-material/` and
-`references/interview-notes.md` belong to the use case, and the doer is their one canonical home
-(never duplicated into the observer). Provenance and scenario evals are development-only:
-`npm run publish` strips `references/source-material/`, `references/interview-notes.md`,
-`evals/scenarios/`, and `evals/runs/` from the shipped copy — the consuming repo receives only
-what an agent needs to use the skill. Real or personal data never enters the repo at all
-(`framework-data.md`); the interview notes record where it lives instead.
+`assets/source/` belong to the use case, and the doer is their one canonical home
+(never duplicated into the observer). `assets/source/` holds the interview provenance frozen at
+init time: `interview.md` (the exact questions the generator asked) and `interview-notes.md`
+(the answers given). Provenance and scenario evals are development-only: `npm run publish`
+strips `assets/source/`, `references/source-material/`, `evals/scenarios/`, and `evals/runs/`
+from the shipped copy — the consuming repo receives only what an agent needs to use the skill.
+Real or personal data never enters the repo at all (`framework-data.md`); the interview notes
+record where it lives instead.
 
 ## 3. `SKILL.md`
 
@@ -115,6 +118,16 @@ Tests live in `scripts/tests/`, one file per kind, as `unittest.TestCase` subcla
 `skillharness` (`.framework/harness/`, stdlib-only) — they run under plain `python3 -m unittest`
 and under pytest when available.
 
+One skill, many deterministic steps: each step gets its own module, named for its
+responsibility (`scripts/parse.py`, `scripts/reconcile.py`, …), each exposing one public entry
+function `run(data) -> list[dict]` with the same deterministic contract. A thin orchestrator,
+`scripts/<use-case>.py`, chains the steps in order and is the **only** module that writes the
+final schema-conforming artifact (`build_<use-case>` / `write_artifact`). Shared private helpers
+live in `scripts/_common.py`. Coverage follows the split: every step module gets accuracy, edge,
+and performance tests against its `run()`; the orchestrator gets integration accuracy tests
+(known inputs → expected artifacts) without re-testing the internals. The generator scaffolds
+this layout when the interview names more than one step.
+
 ## 6. Test kinds and coverage
 
 | Kind | Question it answers |
@@ -135,10 +148,10 @@ Coverage owed, by role:
 
 `npm run test:new -- <skill>` reports every missing combination and writes the file that closes it.
 
-## 7. Regression suite (`evals/cases/*.json`)
+## 7. Regression suite (`evals/tests/*.json`)
 
 One JSON object per file: `id`, `description`, `type` required. Types — see
-`scripts/lib/cases.mjs`:
+`scripts/lib/tests.mjs`:
 
 | type | passes when |
 | --- | --- |
@@ -146,9 +159,20 @@ One JSON object per file: `id`, `description`, `type` required. Types — see
 | `contains` / `not_contains` | every / no `patterns[]` regex matches `file` |
 | `json_shape` | `file` parses as JSON and has `requiredKeys[]` (dot paths) |
 | `command` | `cmd` exits `expectExitCode` (default 0) and matches `expectStdout[]` |
+| `artifact` | `entry` (`scripts/<module>.py:<function>`) run on `input` deep-equals `expected` |
 
 `command` cases run from the skill directory and must be deterministic and offline. A case that
 can flake is not a regression test.
+
+Every test carries an explicit input and an expected output wherever one can be stated: `artifact`
+tests declare them as data (`input` / `expected`), `contains` tests as patterns, `json_shape`
+tests as required keys. A test that cannot say what passing looks like is a placeholder, not a test.
+
+The regression runner records trial evidence beside each test:
+`evals/tests/<test-id>/results/results.json` (pass/fail plus the run timestamp) is committed;
+`evals/tests/<test-id>/results/actual.json` (the produced value on failure) is gitignored.
+Both are excluded from the freshness hash — they are evidence of the last run, not part of the
+skill's definition.
 
 ## 8. The clean sub-agent rule
 

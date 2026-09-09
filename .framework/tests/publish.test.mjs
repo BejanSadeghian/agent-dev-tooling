@@ -19,6 +19,8 @@ test('publish ships the skill without its development-only provenance', (t) => {
     'references/variations/default.md': '# variation',
     'references/source-material/authors-runbook.md': 'raw notes',
     'references/interview-notes.md': 'answers',
+    'assets/source/interview.md': 'the questions asked at init',
+    'assets/source/interview-notes.md': 'the answers given at init',
     'scripts/margin.py': 'x = 1',
     'scripts/tests/test_accuracy_margin.py': 'KIND = "accuracy"',
     'evals/tests/rule.json': '{}',
@@ -41,7 +43,7 @@ test('publish ships the skill without its development-only provenance', (t) => {
     assert.ok(fs.existsSync(path.join(dest, rel)), `should ship: ${rel}`);
   }
   // ...the workshop's provenance and eval machinery does not.
-  for (const rel of ['references/source-material', 'references/interview-notes.md', 'evals/scenarios', 'evals/runs', '.pytest_cache', 'scripts/__pycache__', 'outputs']) {
+  for (const rel of ['references/source-material', 'references/interview-notes.md', 'assets/source', 'evals/scenarios', 'evals/runs', '.pytest_cache', 'scripts/__pycache__', 'outputs']) {
     assert.ok(!fs.existsSync(path.join(dest, rel)), `must NOT ship: ${rel}`);
   }
 });

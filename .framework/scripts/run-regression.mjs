@@ -5,12 +5,34 @@
 // report in .framework/state/perf/<skill>.json.
 //
 // Usage: node scripts/run-regression.mjs [skill-name ...] [--no-record] [--json] [--skip-python]
+import fs from 'node:fs';
+import path from 'node:path';
 import { runTest } from './lib/tests.mjs';
 import { comparePerf, hasPythonCode, perfTable, readPerf, runPythonTests, writePerf } from './lib/python.mjs';
 import { REPO_ROOT, discoverSkills, hashSkill, loadTests, loadConfig, writeState } from './lib/skills.mjs';
 import { bold, dim, green, red, yellow } from './lib/report.mjs';
 
-export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = false } = {}) {
+/** Trial evidence, stored beside the test: evals/tests/<id>/results/.
+ *  results.json is committed; actual.json (failures only) is gitignored.
+ *  Both are excluded from the freshness hash — they are evidence, not definition. */
+export function writeTestResults(config, skill, results, ranAt) {
+  const testsRoot = path.join(skill.dir, config.evals.dir);
+  const resultsName = config.evals.resultsDirName ?? 'results';
+  for (const r of results) {
+    const safeId = String(r.id).replace(/[^a-zA-Z0-9-_]+/g, '-').slice(0, 80) || 'test';
+    const dir = path.join(testsRoot, safeId, resultsName);
+    fs.mkdirSync(dir, { recursive: true });
+    const summary = { id: r.id, passed: r.passed, ranAt };
+    if (r.message) summary.message = r.message;
+    fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(summary, null, 2) + '\n');
+    if (!r.passed && r.actual !== undefined) {
+      fs.writeFileSync(path.join(dir, 'actual.json'), JSON.stringify(r.actual, null, 2) + '\n');
+    }
+  }
+}
+
+export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = false, record = true } = {}) {
+  const ranAt = new Date().toISOString();
   const { cases, problems } = loadTests(config, skill.dir);
   const results = problems.map((p) => ({
     id: p.file,
@@ -28,6 +50,7 @@ export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = fa
       kind: c[config.coverage.caseKindField],
       passed: outcome.passed,
       message: outcome.message,
+      actual: outcome.actual,
     });
   }
 
@@ -71,6 +94,7 @@ export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = fa
 
   return {
     skill: skill.name,
+    skillDir: skill.dir,
     contentHash: hashSkill(skill.dir),
     passed: results.every((r) => r.passed),
     total: results.length,
@@ -79,6 +103,7 @@ export function runSkillSuite(config, skill, { root = REPO_ROOT, skipPython = fa
     measurements,
     perfFindings,
     runner,
+    ranAt,
   };
 }
 
@@ -95,22 +120,22 @@ function main(argv) {
     return 1;
   }
 
-  const ranAt = new Date().toISOString();
-  const runs = skills.map((s) => runSkillSuite(config, s, { skipPython }));
+  const runs = skills.map((s) => runSkillSuite(config, s, { skipPython, record }));
 
   if (record) {
     for (const run of runs) {
+      writeTestResults(config, { dir: run.skillDir, name: run.skill }, run.results, run.ranAt);
       writeState(config, run.skill, {
         skill: run.skill,
         contentHash: run.contentHash,
         passed: run.passed,
         total: run.total,
         failed: run.failed,
-        ranAt,
+        ranAt: run.ranAt,
         cases: run.results.map(({ id, passed, kind }) => ({ id, passed, ...(kind ? { kind } : {}) })),
       });
       if (run.measurements.length) {
-        writePerf(config, run.skill, { runner: run.runner, measurements: run.measurements, ranAt });
+        writePerf(config, run.skill, { runner: run.runner, measurements: run.measurements, ranAt: run.ranAt });
       }
     }
   }

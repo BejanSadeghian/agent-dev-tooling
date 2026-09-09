@@ -86,4 +86,4 @@ accident.
 - **Record the seed in the test file**, next to the fixture path. A fixture nobody can regenerate is
   a liability.
 - **Extending the generator?** Add the type to `GENERATORS`, its boundary values to `EDGE_VALUES`,
-  and a case to this skill's `evals/cases/` in the same change.
+  and a test to this skill's `evals/tests/` in the same change.

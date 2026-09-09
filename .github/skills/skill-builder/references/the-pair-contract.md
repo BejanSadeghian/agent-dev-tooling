@@ -49,7 +49,7 @@ The observer's input contract IS the doer's `references/schema.md`:
 
 | Requirement | doer | observer |
 | --- | --- | --- |
-| `evals/cases/` | ≥ 1, seeded by the generator | ≥ 1, structural: two-part output, schema reference |
+| `evals/tests/` | ≥ 1, seeded by the generator — including an `artifact` test with a real input and a computed expected output | ≥ 1, structural: two-part output, schema reference |
 | accuracy / edge / performance | required for the artifact and every module in `scripts/` | — |
 | `references/schema.md` | required, must define `deviations` | consumed, referenced from SKILL.md |
 | `references/variations/` | optional — add when real variations exist | optional — add when real variations exist |
