@@ -19,7 +19,9 @@ The testing sections below are the short version; those pages win on detail.
   artifact), then applies **Interpretations** (its own lens) — always in that order, always
   separated. The single init interview captures that lens as three concrete judgments — what
   is notable, what is concerning, what is actionable — and the generator seeds each as a
-  structural test.
+  structural test. The observer ships its own `references/schema.md` (the reading's shape),
+  `references/voice.md`, `references/example-observations.md`, and `scripts/thresholds.py`
+  (default materiality, author-overridable) — and never refers to the doer's schema file.
 - `<use-case>-investigator` — optional, not part of the pair contract. When the source material
   holds cross-analysis content (comparing across artifacts or runs), init stubs this third skill:
   a folder with a `SKILL.md` marked to be developed further.

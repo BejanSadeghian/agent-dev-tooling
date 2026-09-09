@@ -81,6 +81,9 @@
         "## Facts",
         "## Interpretations",
         "schema\\.md"
+      ],
+      "forbiddenBodyPatterns": [
+        "-doer/references/schema"
       ]
     }
   },
@@ -140,6 +143,7 @@
     "requireArtifactCoverage": true,
     "requirePythonCoverage": true,
     "requirePerfMeasurements": true,
+    "perfMeasurementRoles": ["doer"],
     "stateDir": ".framework/state"
   },
   "health": {

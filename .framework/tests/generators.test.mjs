@@ -79,14 +79,22 @@ test('the generator writes a complete pair', (t) => {
   }
   for (const file of [
     'SKILL.md',
-    'references/variations/default.md',
+    'references/schema.md',
+    'references/voice.md',
+    'references/example-observations.md',
+    'references/thresholds.md',
+    'references/variations/.gitkeep',
+    'scripts/thresholds.py',
     'evals/tests/output-separates-facts-from-interpretation.json',
-    'evals/tests/reads-the-doers-schema.json',
+    'evals/tests/declares-its-own-schema.json',
+    'evals/tests/never-references-the-doers-schema.json',
     'evals/tests/lens-states-notable-concerning-actionable.json',
     'evals/tests/observer-never-recomputes.json',
+    'evals/tests/ships-its-reference-files.json',
   ]) {
     assert.ok(fs.existsSync(path.join(observerDir, file)), `observer missing ${file}`);
   }
+  assert.ok(!fs.existsSync(path.join(observerDir, 'references/variations/default.md')), 'observer variations should default to empty');
 
   const schema = fs.readFileSync(path.join(doerDir, 'references/schema.md'), 'utf8');
   assert.match(schema, /deviations/);
@@ -94,10 +102,14 @@ test('the generator writes a complete pair', (t) => {
   const observer = fs.readFileSync(path.join(observerDir, 'SKILL.md'), 'utf8');
   assert.match(observer, /## Facts/);
   assert.match(observer, /## Interpretations/);
-  assert.match(observer, /schema\.md/);
+  assert.match(observer, /references\/schema\.md/);
+  assert.doesNotMatch(observer, /-doer\/references\/schema/);
   assert.match(observer, /#### Notable/);
   assert.match(observer, /#### Concerning/);
   assert.match(observer, /#### Actionable/);
+  assert.match(observer, /scripts\/thresholds\.py/);
+  const thresholds = fs.readFileSync(path.join(observerDir, 'scripts/thresholds.py'), 'utf8');
+  assert.match(thresholds, /MATERIALITY_PCT/);
   assert.match(observer, /never recompute/);
   assert.match(observer, /below the floor/);
 });

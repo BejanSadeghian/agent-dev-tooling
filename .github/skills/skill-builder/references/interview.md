@@ -48,6 +48,9 @@ Compare the source file against what the finished set needs to know:
 | Reading | which artifact fields the observer leans on; how deviations change the reading |
 | Facts contract | what a fact cites; what must never appear in Facts |
 | Lens | notable / concerning / actionable, each with a concrete example |
+| Voice | how the reading sounds — a past write-up they were happy with |
+| Examples | an accepted and a rejected past observation, and why each |
+| Thresholds | what counts as material — a number or percentage, with the default |
 | Investigator | cross-analysis content, if any — what gets compared across artifacts or runs |
 | Scope | what it deliberately does not cover; what it needs available; input size on a bad day |
 

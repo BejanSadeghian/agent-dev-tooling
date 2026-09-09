@@ -274,7 +274,14 @@ async function main(argv) {
   if (wantObserver) {
     generated.push(`${spec.useCase}${config.roles.suffixes.observer}`);
     written.push(write(path.join(observerDir, 'SKILL.md'), T.observerSkillMd({ ...spec, whatItInterprets: spec.interprets, trigger: spec.observerTrigger, nonTrigger: spec.observerNonTrigger })));
-    written.push(write(path.join(observerDir, 'references/variations/default.md'), T.variationMd({ name: `${spec.useCase}-observer`, useCase: spec.useCase })));
+    written.push(write(path.join(observerDir, 'references/schema.md'), T.observerSchemaMd(spec)));
+    written.push(write(path.join(observerDir, 'references/voice.md'), T.observerVoiceMd(spec)));
+    written.push(write(path.join(observerDir, 'references/example-observations.md'), T.observerExampleObservationsMd(spec)));
+    written.push(write(path.join(observerDir, 'references/thresholds.md'), T.observerThresholdsRefMd(spec)));
+    // variations/ defaults to empty — the author adds regional, edge-case, or
+    // sector variations during refinement. The .gitkeep keeps the folder tracked.
+    written.push(write(path.join(observerDir, 'references/variations/.gitkeep'), ''));
+    written.push(write(path.join(observerDir, 'scripts/thresholds.py'), T.observerThresholdsPy(spec)));
     for (const seed of T.observerSeedTests(spec)) {
       written.push(write(path.join(observerDir, config.evals.dir, seed.file), seed.text));
     }

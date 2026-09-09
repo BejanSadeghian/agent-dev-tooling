@@ -59,6 +59,19 @@ test('a product skill without a role suffix fails the format check', (t) => {
   assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /must carry a role suffix/);
 });
 
+test('an observer that references the doer schema file fails the format check', (t) => {
+  const repo = makeRepo({
+    name: 'sales-summary-observer',
+    skillsRoot: 'skills',
+    skillMd: observerSkillMd('sales-summary-observer').replace(
+      'per its references/schema.md',
+      'per ../sales-summary-doer/references/schema.md',
+    ),
+  });
+  t.after(repo.cleanup);
+  assert.match(messages(validateSkill(loadConfig(repo.root), repo.skill)), /must not match.*-doer\/references\/schema/);
+});
+
 test('a doer without references/schema.md fails the format check', (t) => {
   const repo = makeDoerRepo({ schemaMd: null });
   t.after(repo.cleanup);

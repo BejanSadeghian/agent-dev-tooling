@@ -36,23 +36,31 @@ observer's Facts rules in the same edit.
 
 ## The handoff
 
-The observer's input contract IS the doer's `references/schema.md`:
+The observer reads the doer's artifact — including its `deviations` field, which it carries
+into Facts first, so the reader knows what the data could not say. It never recomputes the
+doer's values. A number the observer produced is a number nobody can reproduce.
 
-- Its `SKILL.md` names the doer, the schema file, and the `deviations` field (the format validator
-  checks this).
-- Step one of its workflow is reading `deviations` and carrying every entry into the Facts section
-  — the reader must know what the data could not say.
-- It never recomputes the doer's values. A number the observer produced is a number nobody can
-  reproduce.
+The observer's own output shape is committed in its `references/schema.md`: the reading is a
+Markdown document with exactly two sections, in this order — `## Facts` (each fact citing the
+artifact field or record it came from), then `## Interpretations` (judgment applying the lens).
+Its `SKILL.md` never refers to the doer's schema file; the format validator refuses an observer
+that does.
+
+The observer's judgment is initialized, not invented: `references/voice.md` holds how the
+reading sounds, `references/example-observations.md` holds accepted past readings, and
+`scripts/thresholds.py` holds what counts as material (default materiality, author-overridable),
+explained in `references/thresholds.md`. When a judgment turns on a number, the cutoff comes
+from that script — never from prose.
 
 ## Coverage each half owes
 
 | Requirement | doer | observer |
 | --- | --- | --- |
-| `evals/tests/` | ≥ 1, seeded by the generator — including an `artifact` test with a real input and a computed expected output | ≥ 1, structural: two-part output, schema reference |
-| accuracy / edge / performance | required for the artifact and every module in `scripts/` | — |
-| `references/schema.md` | required, must define `deviations` | consumed, referenced from SKILL.md |
-| `references/variations/` | optional — add when real variations exist | optional — add when real variations exist |
+| `evals/tests/` | ≥ 1, seeded by the generator — including an `artifact` test with a real input and a computed expected output | ≥ 1, structural: two-part output, own schema, lens, never-recompute |
+| accuracy / edge / performance | required for the artifact and every module in `scripts/` | — (observer `scripts/` holds configuration, not computation) |
+| `references/schema.md` | required, must define `deviations` | required — defines the reading's shape (Facts, then Interpretations) |
+| `references/variations/` | optional — add when real variations exist | defaults to empty — add regional, edge-case, or sector variations as discovered |
+| voice, examples, thresholds | — | `references/voice.md`, `references/example-observations.md`, `scripts/thresholds.py` (+ `references/thresholds.md`) — initialized at init, made real during refinement |
 
 The pair itself is checked by `npm run health`: a doer without its observer (or the reverse) is
 a **warning, never a blocker** — half a pair may land on a branch, but the report keeps naming it

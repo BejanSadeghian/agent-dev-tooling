@@ -115,9 +115,10 @@ allowed-tools:
 ${whatItInterprets}
 
 This is the **observer** half of the \`${useCase}\` pair. It reads the artifact
-\`${useCase}-doer\` produced (shape: the doer's \`references/schema.md\`), identifies
-facts from it, and applies interpretations of those facts using this skill's own
-lens. It never recomputes the doer's numbers and never mixes opinion into facts.
+\`${useCase}-doer\` produced, identifies facts from it, and applies interpretations
+of those facts using this skill's own lens. It never recomputes the doer's numbers
+and never mixes opinion into facts. Its own output shape is fixed in
+\`references/schema.md\` — the doer's schema file is never referenced here.
 
 ## When to use
 
@@ -132,7 +133,7 @@ Do **not** use for: ${nonTrigger}. Producing or transforming the data itself is
 
 | Input | Required | Notes |
 |---|---|---|
-| \`outputs/${useCase}.json\` | yes | The doer's artifact, conforming to its \`references/schema.md\`. Read its \`deviations\` field first. |
+| \`outputs/${useCase}.json\` | yes | The doer's artifact. Read its \`deviations\` field first. |
 
 ## Workflow
 
@@ -172,6 +173,11 @@ ${actionable}
 Check \`references/variations/\` for the domain, use-case, or regional variation
 that matches this request and apply its adjustments.
 
+When a judgment turns on a number, the cutoff comes from \`scripts/thresholds.py\` —
+never invent one. Write the reading in the voice described in \`references/voice.md\`;
+compare against \`references/example-observations.md\` for what an accepted reading
+looks like.
+
 ### 4. Produce the two-part output
 
 The output document has exactly two sections, in this order:
@@ -196,8 +202,113 @@ A reader must always be able to tell what is data and what is opinion.
 
 ## References
 
-- \`../${useCase}-doer/references/schema.md\` — the shape of the artifact this skill consumes.
+- \`references/schema.md\` — the shape of the reading this skill produces.
+- \`references/voice.md\` — how the reading sounds.
+- \`references/example-observations.md\` — what an accepted reading looks like.
+- \`references/thresholds.md\` — what counts as material; the values live in \`scripts/thresholds.py\`.
 - \`references/variations/\` — domain, use-case, and regional adaptations of the lens.
+`;
+}
+
+export function observerSchemaMd({ useCase }) {
+  return `# ${title(`${useCase}-observer`)} — output schema
+
+The shape of the reading this skill produces. The reading is a Markdown document
+with exactly two sections, in this order.
+
+## Facts
+
+- \`facts\`: one bullet per fact, each in the form
+  \`- <statement> (from: <field or record>)\`
+- The statement says only what the artifact shows — no judgment words.
+- \`from\` cites the artifact field or record the statement came from.
+- Every entry in the artifact's \`deviations\` field appears here first.
+
+## Interpretations
+
+- \`interpretations\`: one bullet per judgment, each applying the lens
+  (Notable / Concerning / Actionable) to the facts above.
+- Each interpretation names the facts it builds on.
+- A judgment that turns on a number cites the threshold from
+  \`scripts/thresholds.py\` that it crossed.
+
+Changing this shape is an interface change: update the schema, the workflow in
+SKILL.md, and the tests in the same edit.
+`;
+}
+
+export function observerVoiceMd({ useCase }) {
+  return `# Voice — ${title(`${useCase}-observer`)}
+
+How the reading sounds. This is a scaffold: replace it with the author's real
+voice during refinement, drawn from write-ups they were happy with.
+
+- Sentence length and directness: short, plain sentences. One fact per bullet.
+- Numbers are stated with their unit and their source, e.g. "margin fell 3.2pts
+  (from: records[4].margin)".
+- Facts never carry judgment words — no "good", "bad", "worrying", "healthy",
+  "urgent". Those belong under Interpretations.
+- Interpretations name the so-what in the first clause, then the evidence.
+- Nothing decorative: no throat-clearing, no hedging stacks, no exclamation marks.
+`;
+}
+
+export function observerExampleObservationsMd({ useCase }) {
+  return `# Example observations — ${title(`${useCase}-observer`)}
+
+What an accepted reading looked like. This is a scaffold: add real ones during
+refinement — each with the artifact excerpt it was based on and why it was
+accepted. Rejected readings go here too, with why they were rejected; a rejected
+reading is worth a regression test.
+
+## Example 1
+
+- **Artifact showed:** (paste the excerpt — fields and values)
+- **Reading said:** (paste the Facts and Interpretations as written)
+- **Why it was accepted:** (what made this one right)
+`;
+}
+
+export function observerThresholdsRefMd({ useCase }) {
+  return `# Thresholds — ${title(`${useCase}-observer`)}
+
+What counts as material: the numbers behind "concerning". The values live in
+\`../scripts/thresholds.py\` — change them there, never in prose. This file
+explains what each threshold means and when the author overrides the default.
+
+| Threshold | Default | Meaning |
+|---|---|---|
+| \`MATERIALITY_PCT\` | 5% | A move smaller than this is noise, not a finding. |
+| \`MATERIALITY_ABS\` | 0.0 | Absolute floor: below this, a change is never concerning whatever the percentage. Set the unit during refinement. |
+
+Rule: the observer reads these cutoffs, it never invents its own. If the author
+gives a different number for a run, that number goes into the script — not into
+the reading.
+`;
+}
+
+export function observerThresholdsPy({ useCase }) {
+  return `"""Thresholds for the ${useCase}-observer: what counts as material.
+
+These are the defaults captured at init. The author overrides them by editing
+the values below — the observer reads this file, it never invents its own
+cutoffs. See ../references/thresholds.md for what each one means.
+"""
+
+# A move smaller than this is noise, not a finding. Fraction, e.g. 0.05 = 5%.
+MATERIALITY_PCT = 0.05
+
+# Absolute floor: below this, a change is never concerning whatever the
+# percentage. Set the unit and the floor during refinement.
+MATERIALITY_ABS = 0.0
+
+
+def is_material(old, new):
+    """True when the move from old to new is big enough to matter."""
+    if old == 0:
+        return new != 0 and abs(new) >= MATERIALITY_ABS
+    pct = abs(new - old) / abs(old)
+    return pct >= MATERIALITY_PCT and abs(new - old) >= MATERIALITY_ABS
 `;
 }
 
@@ -573,14 +684,25 @@ export function observerSeedTests({ useCase }) {
       },
     },
     {
-      file: 'reads-the-doers-schema.json',
+      file: 'declares-its-own-schema.json',
       body: {
-        id: 'reads-the-doers-schema',
-        description: "The skill still names the doer's schema as its input contract.",
+        id: 'declares-its-own-schema',
+        description: 'The skill names its own schema as the shape of the reading it produces.',
         type: 'contains',
         file: 'SKILL.md',
-        patterns: [`${useCase}-doer`, 'schema\\.md', 'deviations'],
-        provenance: 'the pair contract: the observer consumes exactly what the schema declares',
+        patterns: ['references/schema\\.md'],
+        provenance: "the observer's output shape is committed, not invented at run time",
+      },
+    },
+    {
+      file: 'never-references-the-doers-schema.json',
+      body: {
+        id: 'never-references-the-doers-schema',
+        description: "The skill never refers to the doer's schema file.",
+        type: 'not_contains',
+        file: 'SKILL.md',
+        patterns: ['-doer/references/schema'],
+        provenance: 'the observer reads the doer\'s artifact, not its schema file; its own schema defines its output',
       },
     },
     {
@@ -603,6 +725,22 @@ export function observerSeedTests({ useCase }) {
         file: 'SKILL.md',
         patterns: ['never recompute'],
         provenance: 'the pair contract: exactness lives in the doer, judgment lives here',
+      },
+    },
+    {
+      file: 'ships-its-reference-files.json',
+      body: {
+        id: 'ships-its-reference-files',
+        description: 'The observer ships its schema, voice, example observations, thresholds ref, and thresholds script.',
+        type: 'files_exist',
+        paths: [
+          'references/schema.md',
+          'references/voice.md',
+          'references/example-observations.md',
+          'references/thresholds.md',
+          'scripts/thresholds.py',
+        ],
+        provenance: 'the observer framework: schema, voice, examples, and thresholds are initialized, not invented later',
       },
     },
   ].map((c) => ({ file: c.file, text: JSON.stringify(c.body, null, 2) + '\n' }));

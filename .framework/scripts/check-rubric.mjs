@@ -3,7 +3,7 @@
 // exists, was run, was green, and was run AFTER the latest edit to the skill.
 // Usage: node scripts/check-rubric.mjs [skill-name ...] [--json]
 import { validateSkill } from './validate-skill.mjs';
-import { coverageGaps } from './lib/roles.mjs';
+import { coverageGaps, roleOf } from './lib/roles.mjs';
 import { hasPythonCode, pythonModules, readPerf } from './lib/python.mjs';
 import { REPO_ROOT, discoverSkills, hashSkill, loadTests, loadConfig, readState } from './lib/skills.mjs';
 import { bold, dim, printFindings } from './lib/report.mjs';
@@ -57,8 +57,11 @@ export function checkRubric(config, skill, root = REPO_ROOT) {
     }
   }
   // --- performance measurements recorded (R10) -------------------------------
+  // Only the roles listed in rubric.perfMeasurementRoles owe this: the
+  // observer's scripts/ holds configuration (thresholds), not computation.
   const modules = pythonModules(config, skill.dir);
-  if (rubric.requirePerfMeasurements && modules.length && hasPythonCode(config, skill.dir)) {
+  const owesPerf = (rubric.perfMeasurementRoles ?? ['doer']).includes(roleOf(config, skill));
+  if (rubric.requirePerfMeasurements && owesPerf && modules.length && hasPythonCode(config, skill.dir)) {
     const perf = readPerf(config, skill.name, root);
     const perfRel = `${config.perf.stateDir}/${skill.name}.json`;
     if (!perf || perf.corrupt) {

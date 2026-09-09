@@ -151,7 +151,13 @@ The generator writes the structure and working scaffolds. You write the substanc
   happen" edge cases; performance sizes and budgets from how big the real data gets.
 - observer `SKILL.md` — the real lens: what counts as notable, concerning, actionable. Keep the
   two-part output contract exactly: `## Facts` (each fact citing the artifact field or record it
-  came from, deviations carried in), then `## Interpretations`.
+  came from, deviations carried in), then `## Interpretations`. Never refer to the doer's
+  schema file — the observer reads the doer's artifact, and its own output shape is its own
+  `references/schema.md`.
+- observer `references/voice.md`, `references/example-observations.md`, `scripts/thresholds.py`
+  (+ `references/thresholds.md`) — replace the scaffold with the author's real voice, real
+  accepted readings, and real materiality numbers. Numeric cutoffs live in the script, never in
+  prose.
 - investigator `SKILL.md` — only when the source file or interview offered cross-analysis
   content: keep the generated stub as-is (marked to be developed further). Do not invent a
   contract for it.

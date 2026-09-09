@@ -135,7 +135,15 @@ export function validateSkill(config, skill) {
     for (const pattern of config.roles.observer.requiredBodyPatterns) {
       if (!new RegExp(pattern).test(body)) {
         err(
-          `observer SKILL.md must match /${pattern}/ — its output separates facts from interpretation and names the doer's schema`,
+          `observer SKILL.md must match /${pattern}/ — its output separates facts from interpretation and names its own schema`,
+          'SKILL.md',
+        );
+      }
+    }
+    for (const pattern of config.roles.observer.forbiddenBodyPatterns ?? []) {
+      if (new RegExp(pattern).test(body)) {
+        err(
+          `observer SKILL.md must not match /${pattern}/ — it reads the doer's artifact, never the doer's schema file`,
           'SKILL.md',
         );
       }
