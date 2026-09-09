@@ -136,7 +136,9 @@ The generator writes the structure and working scaffolds. You write the substanc
 - both `references/variations/` — one file per domain/use-case/regional variation from the
   interview, each stating when it applies and what changes.
 
-Run `npm run check` before showing the draft to anyone.
+Run `npm run check` before showing the draft to anyone. Then run ONE clean subagent smoke test
+(step 6, one doer run on a real task) and present the draft together with that run's result —
+the author's first review is of a tested draft, never bare files. Do not wait to be asked.
 
 ### 6. Test with a clean sub-agent — never in your own context
 

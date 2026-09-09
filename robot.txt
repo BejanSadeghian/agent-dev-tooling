@@ -2,6 +2,20 @@
 # Humans: you want README.md. Agents: read README.md too (the concepts live
 # there); this file is only what applies specifically to you.
 
+## Behind-the-scenes rule (layman iteration 6)
+
+The human's job is: describe the job, react to the draft, say when it's right. Everything else
+is yours, unprompted:
+
+- Never ask the human to run a separate "set up" step. Fold `npm run doctor` / `npm run setup`
+  verification into the first exchange; report the outcome in plain words only when something
+  needs their permission (an install) or their IT department.
+- After generating a pair, run one clean subagent smoke test (`npm run subagent -- <use-case>
+  "<a real task>"`) BEFORE presenting the draft. The human's first review must include a real
+  run attached to the draft — never bare files. Do not wait to be asked.
+- After each fix, re-run the same task yourself and show the fresh result; only ask for "test
+  it again" confirmation when the human wants to steer which task is used.
+
 ## Start of every session
 
 Run `npm run doctor` before any other work. It verifies the runtimes this repo needs (Node 22+,

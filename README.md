@@ -19,190 +19,144 @@ does the technical parts for you.
 > concepts live here — but the rules that apply specifically to you live there.
 > *(If you are a person: you can ignore that file — this page is yours.)*
 
-## Getting started: your first skill, step by step
+## The short version
 
-### Step 0 — one-time setup (the only step you do by hand)
+You describe the job in plain words. You answer a few questions. You get a working first draft of a skill — tested, not just written. Everything technical in between happens on its own; you never touch a terminal, a setting, or a checklist.
 
-**Have these two things first** (five minutes with whoever asked you to do this, if you don't):
+## Get here (once)
 
-- A **GitHub account**. Any GitHub account includes the free version of **Copilot** — the AI
-  assistant this guide is built around (think ChatGPT, but living inside your editor where it
-  can actually do the work). That free version is enough for this guide — so if nobody answers tonight, a free account from
-  [github.com/signup](https://github.com/signup) still gets you through Steps 0–5. For the
-  final delivery step you'll want company access; send whoever set you this task this exact
-  sentence: *"I need a GitHub account in our organization with a Copilot seat, plus access to
-  the skills repo and our team's delivery repo."*
-- The **web address of your team's repo** — where finished skills get delivered. It looks
-  like `github.com/yourcompany/team-skills`. Last step only; everything before it works
-  without it.
+Three things — five minutes with whoever asked you to do this, if you don't have them:
 
-**Then set up (once):**
+1. A **GitHub account**. Any GitHub account includes the free version of **Copilot** — the AI
+   assistant this guide is built around (think ChatGPT, but living inside your editor where it
+   can actually do the work). That free version is enough for this guide — so if nobody answers tonight, a free account from
+   [github.com/signup](https://github.com/signup) still gets you through every step below. For the
+   final delivery step you'll want company access; send whoever set you this task this exact
+   sentence: *"I need a GitHub account in our organization with a Copilot seat, plus access to
+   the skills repo and our team's delivery repo."*
+2. **VS Code** (free) from [code.visualstudio.com](https://code.visualstudio.com) — open it,
+   click the little person icon in the bottom-left corner, and sign in with your GitHub account so
+   **Copilot** works. (A browser window will open asking you to authorize — approve it. Bouncing
+   once or twice between VS Code and the browser is normal.)
+3. This project open in VS Code: **File → Open Folder**, pick the folder named
+   **agent-dev-tooling**. (Emailed as a .zip? Double-click the zip in Downloads first — that
+   unpacks the real folder — then Open Folder on that. "Open Folder" just means "work in this
+   folder" — you can't break anything.)
 
-1. Install [VS Code](https://code.visualstudio.com) — a free program where the AI assistant
-   lives. Open it, click the little person icon in the bottom-left corner, and sign in with
-   your GitHub account so **Copilot** works. (A browser window will open asking you to
-   authorize — approve it. Bouncing once or twice between VS Code and the browser is normal.)
-2. Get this project into VS Code:
-   - **If the project folder is already on your computer** (someone sent or set it up):
-     **File → Open Folder**, pick it, done. (Emailed as a .zip? Double-click the zip in
-     Downloads first — that unpacks the real folder — then Open Folder on that.)
-   - **If not:** the project lives at a web address — it's in your browser's address bar when
-     reading this on GitHub; otherwise ask the person who sent you here. In VS Code the
-     **Clone Git Repository** button is on the Welcome screen; if you don't see it, press
-     **Command+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows), type `clone`, press Enter.
-     Paste the address, pick where to keep it. Once — after that, just **File → Open Recent**.
-     ("Clone" just means "get my own copy" — you can't break anything.)
-3. Open the **Copilot Chat panel**: the speech-bubble icon in the left icon column, or press
-   **Control+Command+I** on a Mac (**Ctrl+Alt+I** on Windows).
-4. At the bottom of the chat panel is a small dropdown that says **Ask**, **Edit**, or
-   **Agent** — set it to **Agent**. The other two only *talk about* work; Agent mode *does*
-   the work.
-5. **Prove it works** before anything else — type: **"What folder are you working in?"**
-   The right answer ends in **agent-dev-tooling** (this project's name — a tacked-on ending
-   like `-main` is fine too). Anything else:
-   - It named a different folder (like "Downloads")? **File → Open Folder**, pick the folder
-     actually named agent-dev-tooling, ask again.
-   - It gave you instructions instead of an answer? The mode dropdown isn't on **Agent** —
-     set it and ask again.
-   - No speech-bubble icon at all? Your Copilot sign-in didn't finish — click the person icon
-     (bottom-left) and sign in again.
+Then open the **Copilot Chat panel** — the speech-bubble icon in the left column, or press
+**Control+Command+I** on a Mac (**Ctrl+Alt+I** on Windows) — and check the little dropdown at
+the bottom says **Agent**. (The other two, Ask and Edit, only *talk about* work; Agent *does*
+the work.)
 
-   Don't start Step 1 until this answers correctly — otherwise every step after will only
-   *pretend* to happen. And if the wrong-mode chat handed you instructions or commands:
-   ignore them completely — once you're in Agent mode, just ask again and it does the work.
+Say hello: **"Hi — is everything set up?"** The assistant checks the folder, the chat mode, and
+your computer itself, then reports back in plain words — and fixes or explains anything that's
+off. If it names a different folder (like "Downloads"), you opened the wrong one: **File →
+Open Folder**, pick agent-dev-tooling, and say hello again. From here on, the assistant does
+everything.
 
 > **Every "Prompt" in this guide gets typed into that Copilot Chat panel — never into ChatGPT
 > or a browser.** A chat outside this folder cannot see your computer and will happily
-> pretend things worked when nothing happened. (That includes setup trouble: if something in
-> this step goes wrong, ask the person who sent you here — not a chatbot in a browser.)
+> pretend things worked when nothing happened. (That includes setup trouble: if something goes
+> wrong, ask the person who sent you here — not a chatbot in a browser.)
 
 Closing your laptop is fine, and so is starting a brand-new chat later — everything lives in
 the folder, not the conversation, so the assistant picks up where things stand.
 
-From here on, the assistant does everything — work through the steps in order. (Prefer a
-terminal? The same walkthrough with the actual commands is in
+(Prefer a terminal? The same walkthrough with the actual commands is in
 [docs/advanced.md](docs/advanced.md).)
 
-### Step 1 — get set up
-
-> Prompt: "Set this repo up on my computer."
-
-**What happens:**
-
-- Checks your computer has three standard free tools this project needs (called Node,
-  Python, and git — you never use them directly).
-- Anything missing: it asks your permission, then installs. Saying yes to what the assistant
-  proposes is safe (your Mac may also ask for your password — normal). Unsure what any
-  button or popup is? Ask the assistant "what am I approving?" before clicking. On a locked
-  company machine, forward what it names to IT — these tools also have per-user installs that
-  need no admin rights, and what the assistant shows you names them.
-- Switches on the safety checks and runs everything once.
-- Safe to repeat — an already-set-up computer just gets confirmed.
-
-**Done when:** the chat shows the checks finishing with the words **"All checks passed."** Items marked "optional" can wait — the assistant offers them when first needed.
-
-### Step 2 — build a skill
+## Step 1 — describe the job, get a first draft
 
 > Prompt: "I want to build a skill for ___" — describe the job in your own words. Have notes
 > or example files? Drag them from Finder straight into the chat box (yes, that works), or
 > just say where they are ("there's an example in my Downloads called timesheet-march.xlsx").
-> Everyday examples are fine here; keep genuinely sensitive files for Step 3, which explains
-> how they're kept private.
+> Everyday examples are fine here — and hold anything genuinely sensitive for a moment; the
+> next section explains how your files stay private.
 
-**What happens:**
+**What happens — all of it on its own:**
 
+- First, quietly: it verifies your computer has the few free tools this project needs, and
+  switches on the safety checks. Anything missing, it asks your permission and installs it —
+  your Mac may ask for your password, which is normal. On a locked company machine, forward
+  whatever it names to IT. You never ask for this step; it just happens.
 - It reads everything you gave it first, and plays back what it learned.
 - Then an interview about the gaps only, one question at a time — and you steer it ("let's
-  talk about when this should be used", "skip that part").
-- Answer from real examples; say "I don't know" rather than guessing.
-- Generates two skill folders into `skills/`, tests included: the **doer** (does the
-  mechanical work exactly) and the **interpreter** (says what the result means — facts first,
-  then opinion).
-- Comes back with follow-ups while it turns placeholders into your real rules.
+  talk about when this should be used", "skip that part"). Answer from real examples; say
+  "I don't know" rather than guessing.
+- It builds the skill — two matching halves: the **doer** (does the mechanical work exactly)
+  and the **interpreter** (says what the result means — facts first, then opinion) — with its
+  tests included.
+- Then, still on its own, it runs the skill once against a real task using a **fresh,
+  separate agent** — one that never saw your conversation, so it can't paper over gaps — and
+  brings you the draft **together with** what that first run produced.
 
-**Done when:** the pair exists in `skills/` and its checks pass.
+**Done when:** you're reading a first draft with a real test result attached — not a blank
+page, not a promise.
 
-### Step 3 — test it
+## Step 2 — make it right
 
-> Prompt: "Test it on a real task: ___" — a genuine task from your queue, not an invented
-> one.
-
-A word on your data: the assistant keeps your real files in a spot that is never uploaded —
-what eventually gets published is the **skill** (instructions and tests), never your data.
-The AI does read what you show it, though, so for genuinely sensitive material follow your
-company's AI policy.
-
-**What happens:**
-
-- A **fresh, separate agent** (which never saw your chat) runs the skill — automatic, you never open it yourself.
-- You get its transcript and the result it produced.
-- An automatic verdict: right shape? Facts separated from Interpretations?
-- Say **"make this a repeatable test"** to save the task as a scenario: it re-runs three times
-  from scratch, and you get one report card showing what held up and what wavered — a verdict
-  you can overrule, with your reason kept on record.
-
-**Done when:** you have read the result. Messy first runs are normal.
-
-### Step 4 — edit with feedback
+Read the draft and the test result, then react the way you'd react to a colleague's first
+attempt:
 
 > Prompt: "It should have done X instead" — one piece of feedback at a time, about the output.
 
 **What happens:**
 
 - One item at a time — a list of five gets five shallow fixes; one at a time gets five real ones.
-- Each item becomes a fix AND a test that would have caught it.
-- The assistant will tell you when a red "failed" is deliberate (a new test shown failing
-  once to prove it can catch the mistake). A red nobody explained is real — ask about it.
-- The skill's tests re-run and the fresh result is recorded.
+- Each item becomes a fix AND a test that would have caught it, so the mistake can never return.
+- The assistant re-runs the skill and shows you the fresh result. It will tell you when a red
+  "failed" is deliberate (a new test shown failing once to prove it can catch the mistake). A red
+  nobody explained is real — ask about it.
 
-**Done when:** you prompt **"Test it again"** (same task) and two runs in a row come back clean — the automatic verdict passes and you have nothing left to correct.
+**Done when:** you say **"Test it again"** (same task) and two runs in a row come back clean —
+the automatic verdict passes and you have nothing left to correct.
 
-### Step 5 — validate
+A word on your data: the assistant keeps your real files in a spot that is never uploaded —
+what eventually gets delivered is the **skill** (instructions and tests), never your data.
+The AI does read what you show it, though, so for genuinely sensitive material follow your
+company's AI policy. Say **"make this a repeatable test"** any time to save a task as a
+scenario: it re-runs three times from scratch, and you get one report card showing what held up
+and what wavered — a verdict you can overrule, with your reason kept on record.
 
-> Prompt: "Check my work."
+## Step 3 — ship it
+
+> Prompt: "Check my work, then publish ___ to our team's repo" — the blank is the skill's name
+> from Step 1, but "publish my skill" works too. You'll need the web address of your team's repo
+> — where finished skills get delivered; it looks like `github.com/yourcompany/team-skills`.
+> Asked once, then remembered.
 
 **What happens:**
 
-- Every check runs: format, pair rules, all tests, nothing-edited-without-retesting.
-- Anything wrong is explained in plain words, with the fix.
-
-**Done when:** the chat shows **"All checks passed."**
-
-### Step 6 — publish
-
-> Prompt: "Publish ___ to our team's repo" — the blank is the skill's name from Step 2, but
-> "publish my skill" works too; the assistant knows which one you built.
-
-**What happens:**
-
-- The checks run one more time; nothing goes out unless they confirm.
-- If they don't confirm, it's still your call: say "publish anyway — because ___" and your
-  reason goes on the record.
-- Your work is quietly saved and uploaded first, so nothing is ever lost.
-- The pair is copied to the receiving repo (it asks for the address once, then remembers), and a
-  review request opens there.
+- Every check runs: format, pair rules, all tests, nothing-edited-without-retesting. Anything
+  wrong is explained in plain words, with the fix.
+- Nothing goes out unless the checks confirm — or unless you say "publish anyway — because
+  ___", in which case your reason goes on the record with your name attached.
+- Your work is quietly saved and uploaded first, so nothing is ever lost. The pair is copied to
+  the team repo, and a review request opens there.
 
 **Done when:** the assistant puts a web link in the chat — that page is where your team
 reviews and approves the delivery. Send the link to your team lead. Your part is finished.
 
-(If publishing stops with a permissions message instead of a link: your account can't write to
-the team repo yet. Nothing is lost — your work is saved. Send the Step 0 access sentence to
-your lead, then say "publish" again once access is granted.)
+(If it stops with a permissions message instead of a link: your account can't write to the team
+repo yet. Nothing is lost — your work is saved. Send the Get-here access sentence to your lead,
+then say "publish" again once access is granted.)
+
+**Stuck or confused at any point?** Say "Where am I — what should I do next?" in THIS chat.
+A browser chatbot can only pretend to know — it cannot see your computer.
 
 ## Quick reference — things you can say
 
 | Say something like | What the assistant does |
 | --- | --- |
-| "Set this repo up on my computer" | Checks your computer has what it needs, offers to install anything missing, and switches on the safety checks |
-| "I want to build a skill for ___" | Interviews you about it (one question at a time), then generates the whole pair with its tests |
-| "Test it on a real task: ___" | Runs the skill with a **fresh, separate agent** and shows you what it produced |
+| "Hi — is everything set up?" | Verifies the folder, the chat mode, and your computer — then fixes or explains anything that's off. You only ever say this if something feels wrong; setup otherwise happens on its own |
+| "I want to build a skill for ___" | Interviews you about it (one question at a time), generates the whole pair with its tests, and runs it once itself — you get the draft with a real test result attached |
+| "Test it on a real task: ___" | Runs the skill with a **fresh, separate agent** and shows you what it produced (the first run happens automatically — say this for later ones) |
 | "Make this a repeatable test" | Saves the task as a scenario: three fresh runs, one report card with a pass grid, a verdict you can overrule |
 | "Accept that test result anyway — because ___" | Rare. Records your override on the report card, reason and name attached; the machine's verdict stays visible underneath |
 | "Waive C3 on that report — because ___" | Accepts just that one failing check (each row on the report card has a short ID); everything else still counts |
 | "It should have done X instead" | Fixes the skill AND adds a test so that mistake can never come back |
 | "Test it again" | Re-runs the same task with a fresh agent — how you confirm a fix landed |
-| "Check my work" | Runs every check and explains anything that fails, in plain words |
-| "Publish ___ to our team's repo" | Confirms the checks, saves your work, delivers the pair with a review request — one ask |
+| "Check my work, then publish ___ to our team's repo" | Runs every check (explaining anything that fails in plain words), saves your work, and delivers the pair with a review request — one ask |
 | "Publish anyway — because ___" | Last resort. This ships work the checks call broken, with your name and reason attached to the delivery for everyone to see. Hear the explanation first |
 | "How is the library doing?" | Shows the health report: anything untested, stale, or half a pair |
 
